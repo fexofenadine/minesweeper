@@ -11,8 +11,52 @@
   src: url(data:font/woff2;base64,d09GMk9UVE8AAA6sAAkAAAAAn4QAAA5kAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAADYKiXgZgAIxsATYCJAOGKAQGBYYPByAb4J41Y9xtGDYOYOZ774jkejMj+//PSDqGaII+CGjVbjvJHSOcIouEQVNIYS5OTC6kPYRn24tDOIhbMbGMmE6Ft3hwuJMjhDVEQds6yGZPKpHLlEzJlKL4jU/0+pbXPJR/bh9ZrxuXtLcp9fLma798zukS/R8M4znrInHxs9N0mZ/R73ZIqPGo+fvDf9sISTp56Buj/ZndPTFr16ydoxKJECohLdUkE4M1HpUSfABPBZXJ6UTi4oWewbL3fhojsIAjIAB4/t/bfRMeVAYJFhDMZElg0c7pNwUlIECI2D1f8DvMzgKD5wsIO7NtEZC7e7fNjG1uKUlZrVoSqiBk3dA1CZ5gADKDiV7UV7SuKCgHtk3Pd6xDRVq0nevGBim2mztwrpB2c9219KUqGRPqTNahANzYVYZAUlDm8zz+jd+ye/AC4ktaWdQCDDBssUX2Bf37vcuUOvOidWmABkGXjlIYU4pQGgq7IJrz7Nec116lrc9plVUWRAIg0IxrQRinXV3Ke59SBdqKL6Uj1aWUbpK+l8wmfbyJBDRg8W4a8whAonDJXLmg/gx+rbkxepaBFCA5Up9Qmnr3UENELPdh+1Jtu1zu7HY7dr3DRm+rgfn93f+SHz3/r5f/G/XFulvvA9o6qIErk+SgBn9MBzmod9fYGDE4dTz9eLwmk4///r/GBn3LhTG7JFhJd8KsHhbbExFMYEl0jlBmpjbYOXv4YlQWX6LUmR3eWC5YWTUQIkOFHgsQD0FipClQpUWfCUt2nHnwFSRcjERpshUoVaVei059hk2gFCZPrNCa7B4//BXtW11+BEgB6DDjwE2AKCkClcWXKHVm1g6uXv4EKosvUVrqbBzdvBEygyuSa4w2N9O9ls6+8COJMtqYYo8r/kSSjE/JzCuuqG3aqn2Xnv3iUzLziita1Lbu0LVX/0R6TmFZdUNrVxqYBWgg4CDDgIsIORqMfukJ/lAaFmAFNhuwmRcMGG9eYcb68gFBgq8QYUIZF1JpY11eGSDChDIupNLGurwKQIQJZVxIpY11eVWACBPKuJBKG+vyagARJpRxIZU21uXVASJMKONCKm1srqWMC6m0sS6vDRBhQhkXUmljXV4HIMKEMi6k0sa6vC5AhAllXEiljXV5PYAIE8q4kEob6/L6ACJMKONCKm2sy2sBRHgXH/dpIkKabIliB/fV/Gf4IUSf5pAVVdMN07Id1/ODMIqTNMuLcjqbL5ZV3bRdP6zWm+1ufziezpfr7f54vt4AIkwo40JWVE03TMt2XM8PwihO0iwvyqpu2q4fxmle1m0/TkBiUfPI6tkTlUEms8VqszucLrfH6xNESVZUTTdMy3Zczw/CKE7SLC/Kqm7arh/GaV7WbT/O637e70ei0BgsDk8gksgUKo3OYLLYgzwJ1aD33PdnPfdKIA5q4U9siGfpk1xSRMqewSyc95dvES/P62/zrlgNrX3t36X7aL/aTbCRcC5cOzwrfEoCVoJ5QmsiDWJXEhSSl3SSzJQ8iaKfcgbIoGqjHqbxp8Wjg9CTMZgw6jPRMI0yB7MQseyykrOCrLqsZ2xD7NIcAEcDKAPBgvwhXy4crlfuRJ5sXhXebz7Bn8z/NUMFkQUfISWhr/9SkQCRS9EKMVVxdPFTgkJiieqXXKIPGSnpIulxZptNk6mSOeAkZQtlP3gCuQ+hVL5Tfk/kUMhXeJeW5X7laBVxVTE1UXVWDRZNJi1GbXjt363UtdAD9E6DJAMBg7so26jCBNtUwszDvMMS2uqwqrfusfna89hbO1Q5ZjqpOhu5ILjcrsZuiG63u6sHmcfc1tOL3Gt+7+n95xDni+Ob7Kfvz+X/77JwzQ4yC2YKNgu+f0w9S8MCwrUi1CNFogSihKPmaM8Yipg55oh5ZXFj+WNNYiNj+2OXuLi495+wxcVU/UeaOWaUeR7I+B5ZZsNBXRL8GT3lcvl8iuQzrgPrPlpi/HL60wv5cDFc5VZh0Z2z+uZvoVO5BYS/4IQn1Z7RL9+/z9p4+iZY8SKOQ5PkLs8jUS/nqH5YWpryu2U9KVzwMTbSyAt3SG96QRt4HcIUJAP6kInwCs+CjE7cQ8LLfAlqoJbpVIUEXcZpk3zP7Q70R3haGdp/gGLmVtYHQ2VtKwJeGVfWGvZjnRVjY4qKqo58GeECJouEC+5kyWwz1YBeEyz/kpa7HusV14dydr/Jg1MYSay6o2JRkscQAlKiRWewZaBJlZuk24nS9PSzvfbSuMGlYJyeZe4RE9etTqJCtZxlIyKhElWjzUL0wBFk1HRkmMlWmHDRiNzgcH//DeXaRNlYABO+KrGvtM/qgxX+Dc9esE4AyPvs8wswFidiZe9/sWFdvkKhmrGEcDmbPGSPZkGsZ6tIEpcsIhrpTs+zHblS5V8HbwSx6NQwReT8JZ4x/Vi8iqQiwOmPMy10PuNPKieLC29mL/1htwuQIKyy6BftM6JUN6CNRTHiG9wyJ0u+u6ToCrSStK7DSVoGEhDPhL+evB3xWs8WeSps7TkyBjhOrDvcVWAbVwSP4h4t7x9mpDUZTvFYdxbgNocpLCHA7alO0GdvTalZKHWUdGLlXxJsofqcmZT+YpY2arLVf01qaAnvIiYy7DLhX67Uek24Ne67NXq2IxKJUJGCgLroABLfHLoom9UVqqQxB6FAIv9vAOFn1xKsrHF/UbCE1MhJAgOBcAUp2hiqn255VcjTQSXYOSXfcbtcNSWsFuzrR0KN3Rkx3ukOcrnqP1gEC7afsWC3oQL8JW6FtI31mrt+XZIN0oPiu3wza0eWD4ycNRrc1Uwclnd9ow8ZSGrEF7122DlWztm6soNqs7UMchxSOqiE53F+ymIYBfWCXrp/98Qtj6hOFfTaJEs/z44F+ZYEuEe/+gaHSlvstDTZ6z869NYyUJkYagMqyF3j/LtuXHbXLC8q2sihE09fZY7rU6weiw2OTLvLmtDnv02GaJd+Poi3Ut45yTlUmoLxkjAMiQqRVVJe9olwDwy+58PsSC+TGrH4hCdeuAJdgHqUn9zxgSUaa8TVB39+XjpJv7uKRyGfKfPjSaaFx7emJtXzgwm36Rst40zeY1yVCN5ubrwjg43bfw0H3I52+wqF3YtCQ08zIvb4DV6WoU5DR3IOxkwx2eu3zowWr8VdTQbiCjJ3BQDANDqMbHJK1xeGqb3/kMgIjw75L4FNW52bnXa2eNvRvludZsfgQ1g9ZDbpPxT9EnMfyBru1bCVGxPdNgQR7kSa0D3nDPM5gRlcYAvBK0iSRwrgeG554Cdwhg+AJAElLNWVGxSqKEs4UOLqEle5jF5kcyWrYfO3iAqMvEFOJaZJNbIVsAzEHFqDR0wZOo40J81VQZkw9iybMoPN1I5qWQ4+b6SHcH5me47a3rpkSms1tO+fekUgv2zvj9Eg57zfgDRM2087KZ2pnt6bS+TFfN8h9oGFgS+YNGPOcoTUD+VbdcEe7tZPzscsfjzzTG3GxPEamlcrs473Q7UIcIVP157ktRmOqf62FV9fZ4TcLEJhW6geghBoJQsHrTOu8MFd9eA54V8Sgh1y/prr41HlXXKugv7xyZqXeoF9k32jvCIR+8ms+/JOXheuS/MSEr19XqvQKahlMi4/J4aAKcSNqSNk0OP7DDg2ofZ54DJKumyz14ZVb2Pt99n8LKchb16MzRn9vMODf0OX+XMtwMMtc5vVFrkcTjYRnLDHY6PGuscphVuDYHXoXd8cAfidFUzIJgG600wBx950V+it46h1J6XHcuxhCK7vQA2T7mqUomIHSrf270PTL2N4CmdCnV0j4l0WMD1LVM9iwYNR2cRBP1ACJ1CrTlqIteL2yAbLotWXDXx4vwpwesl/QZDEdXtD3p205D5KDeUu730t8KDCzshj9dshedBvp2ypNlrp0GySdctWDaeBBQAXJsGHKZDlEFxHdk0Ki1o7+wWvwOynC7+LubmAawVqa/LZhkEFw5fWzumx+rKYj/HLToXZe9EGs/VGId94YAZSd99U/vajVHezVYZ3113rYxx7CneUU3XbXvxyTCUk2tXQzUCX1sh3fNo0/igC0Ehj/IiGZSa2ThFmgZkwgSUXoSp6WOBB6YBYa8+x8b+RBUKa+iAgJL9QPqU8yWGNfN4GXv74cfy0n/TxQqcYHnHu0W9IJ4SAfaf10nogoKjdFgAUQhEYUwceQ+JjGPTRFirUaNCiQ48BIybMWLBiw44DCIITF248ePHhJ0CQEGEiRIkRJymaYTleECVZUTXdMC3bcT0/CKM4SbO8KKu6abt+GKez+WK5Wm+2u/3heDqjBEAIRtBcoTQ1M7ewVKk1Wp3eYGVtY2tn7+Do5Ozi6ubu4enlDYAQjKAYTpApVBqdwWSxOVweXyAUiSVSmVyhVKk1Wp3eYDSZLVab3eEEJBY1j6yePZAAPIAIIAbIAHKAGqAHmqmo/xclcmbXsxuRztwbq/6y99BA9cdpNos5KZbG0V2RcW503pjCX4ad34j3ryR+3FTIQBZpHUWCwHqpgWtMxn0+50lfoECNlE6FAhFOpacpKVTMDIEk7IOBhQq6k1AAgbS9Zv/S+sdDuG7hGpMkCOSI+yB0/DF18otwXc5DJapmfo6zB+Eu0Jbk9TgdOe+lp+7k/Cj/u4Yv67T9yxJyrH2tAlxeltE6LYLQCQkvFcAsWBxyp5jOT23gIfIZO/kkAKEKEJZACZCqmygoNjMHGlTrtFHQjPoFDFjSJMDg9fTQHzpMR+goHaPjdEJPkWimr+KiDiNtAYY9RJiG3MXiLIdYHfHAZsE/HLBnSg/GegjoMB2ho3SMjtMJPRWbaavXxPZpxB+XLVCxgVa53AGtdjt2QH08t49dd3lqNW8ewm2uF+3BVnq1dxNXy295y9uxbXk7/rhwLbrHfMduXC0BiB1kOyL+TECQgcNxHwEA) format('woff2');
 }
 
+/*theme fonts, all under the sil open font license, see src/fonts*/
+@font-face {
+  font-family: 'Monoton';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./monoton.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Audiowide';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./audiowide.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Share Tech Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./share-tech-mono.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./jetbrains-mono.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 700;
+  font-display: swap;
+  src: url(./jetbrains-mono-bold.woff2) format('woff2');
+}
+
 :root {
   --pixel-font: 'Wine MS Sans Serif Pixel', Tahoma, Geneva, sans-serif;
+  --ui-font: var(--pixel-font);
+  --title-font: var(--pixel-font);
+  --title-weight: bold;
+  --text-font: Tahoma, Geneva, sans-serif;
+  --font-size: 11px;
+  --font-smoothing: none;
+  --text-glow: none;
+  --title-glow: none;
   --desktop: #cbcbcb;
   --text: #000;
   --face: #d4d0c8;
@@ -59,7 +103,14 @@
 }
 
 :root[data-theme='synthwave'] {
-  /*synthwave '84 palette*/
+  /*synthwave '84 palette with neon fonts*/
+  --ui-font: 'Audiowide', var(--pixel-font);
+  --title-font: 'Monoton', var(--pixel-font);
+  --title-weight: normal;
+  --text-font: 'Audiowide', Tahoma, sans-serif;
+  --font-smoothing: auto;
+  --text-glow: 0 0 3px #ff7edb, 0 0 8px rgba(54, 249, 246, 0.7);
+  --title-glow: 0 0 4px #ff7edb, 0 0 10px #f92aad;
   color-scheme: dark;
   --desktop: #171520;
   --text: #ffffffee;
@@ -109,6 +160,10 @@
 
 :root[data-theme='solarized'] {
   color-scheme: dark;
+  --ui-font: 'JetBrains Mono', monospace;
+  --title-font: 'JetBrains Mono', monospace;
+  --text-font: 'JetBrains Mono', monospace;
+  --font-smoothing: auto;
   --desktop: #002b36;
   --text: #93a1a1;
   --face: #073642;
@@ -151,7 +206,15 @@
 }
 
 :root[data-theme='matrix'] {
-  /*monochrome phosphor green on black*/
+  /*monochrome phosphor green on black with a terminal font*/
+  --ui-font: 'Share Tech Mono', monospace;
+  --title-font: 'Share Tech Mono', monospace;
+  --title-weight: normal;
+  --text-font: 'Share Tech Mono', monospace;
+  --font-size: 12px;
+  --font-smoothing: auto;
+  --text-glow: 0 0 4px #00ff41, 0 0 9px rgba(0, 255, 65, 0.6);
+  --title-glow: 0 0 4px #00ff41;
   color-scheme: dark;
   --desktop: #000;
   --text: #00ff41;
@@ -207,10 +270,7 @@ body,
 }
 
 html {
-  font:
-    normal 11px/16px Tahoma,
-    Geneva,
-    sans-serif;
+  font: normal var(--font-size) / 16px var(--text-font);
 }
 
 body {
@@ -566,9 +626,10 @@ main::before {
   padding: 3px 2px 4px 2px;
   overflow: hidden;
   color: var(--title-text);
-  font-weight: bold;
-  font-family: var(--pixel-font);
-  -webkit-font-smoothing: none;
+  font-weight: var(--title-weight);
+  font-family: var(--title-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-shadow: var(--title-glow);
   font-size: inherit;
   line-height: 1;
   white-space: nowrap;
@@ -645,8 +706,9 @@ main::before {
 }
 .Menu_root {
   display: inline-block;
-  font-family: var(--pixel-font);
-  -webkit-font-smoothing: none;
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-shadow: var(--text-glow);
   margin: 0;
   padding: 1px 0;
   color: var(--text);
@@ -736,6 +798,7 @@ main::before {
 .Menu_option:hover {
   color: var(--highlight-text);
   background: var(--highlight);
+  text-shadow: none;
 }
 
 .Menu_hotKey {
