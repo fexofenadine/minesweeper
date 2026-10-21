@@ -29,6 +29,7 @@
 .pressed {
   composes: root;
   padding: 1px 0 0 1px;
+  background: var(--cell-open);
 }
 
 .pressed::before {

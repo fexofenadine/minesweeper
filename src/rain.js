@@ -9,7 +9,8 @@
  * implied warranty.
  */
 
-//canvas port of the strip, wave, fog and camera logic from xscreensaver's glmatrix.c
+//canvas port of the strip, wave and fog logic from xscreensaver's glmatrix.c
+//the camera stays level so the rain always falls straight down
 
 const GRID_SIZE = 70
 const GRID_DEPTH = 35
@@ -19,25 +20,6 @@ const STRIPS = 44
 const TICK = 30
 
 const glyphs = [...'ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789']
-const views = [
-  [0, 0],
-  [0, -20],
-  [0, 20],
-  [25, 0],
-  [-25, 0],
-  [25, 20],
-  [-25, 20],
-  [25, -20],
-  [-25, -20],
-  [10, 0],
-  [-10, 0],
-  [0, 0],
-  [0, 0],
-  [0, 0],
-  [0, 0],
-  [0, 0],
-]
-
 const frand = (n) => Math.random() * n
 const bellrand = (n) => (frand(n) + frand(n) + frand(n)) / 3
 const randomGlyph = () => Math.floor(Math.random() * glyphs.length) + 1
@@ -95,16 +77,18 @@ const tickStrip = (s) => {
   }
 }
 
+//each sprite is padded to hold a glyph plus the glow around it
+const PAD = 1.6
+
 //mirrored glyphs pre-drawn with a glow, one row plain and one row bright for changing glyphs
 const buildAtlas = (cell) => {
   const atlas = document.createElement('canvas')
   atlas.width = cell * glyphs.length
   atlas.height = cell * 2
   const context = atlas.getContext('2d')
-  context.font = `${Math.round(cell * 0.8)}px monospace`
+  context.font = `${Math.round((cell / PAD) * 0.8)}px monospace`
   context.textAlign = 'center'
   context.textBaseline = 'middle'
-  context.shadowBlur = cell * 0.15
   ;['#2cff6e', '#d4ffe0'].forEach((colour, row) => {
     context.fillStyle = colour
     context.shadowColor = colour
@@ -112,6 +96,11 @@ const buildAtlas = (cell) => {
       context.save()
       context.translate((i + 0.5) * cell, (row + 0.5) * cell)
       context.scale(-1, 1)
+      //a wide soft halo then a tighter one for a phosphor glow
+      context.shadowBlur = cell * 0.3
+      context.fillText(glyph, 0, 0)
+      context.fillText(glyph, 0, 0)
+      context.shadowBlur = cell * 0.07
       context.fillText(glyph, 0, 0)
       context.restore()
     })
@@ -124,10 +113,10 @@ export const startRain = () => {
   const root = document.documentElement
   const canvas = document.createElement('canvas')
   canvas.style.cssText =
-    'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none'
+    'position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;filter:blur(0.6px)'
   document.body.prepend(canvas)
   const context = canvas.getContext('2d')
-  const cell = 64
+  const cell = 96
   const atlas = buildAtlas(cell)
 
   //start every strip part way through so the screen is already full of rain
@@ -138,29 +127,6 @@ export const startRain = () => {
     s.spinnerY = frand(GRID_SIZE)
     return s
   })
-
-  const camera = { last: 0, target: 0, x: 0, y: 0, steps: 100, tick: 0, moving: false, wait: 0 }
-  const trackCamera = () => {
-    if (!camera.moving) {
-      if (++camera.wait < 20) return
-      camera.wait = 0
-      if (Math.floor(Math.random() * 20)) return
-      camera.moving = true
-    }
-    const [ox, oy] = views[camera.last]
-    const [tx, ty] = views[camera.target]
-    //ease between views so the camera never jerks to a stop
-    const t = Math.sin(((Math.PI / 2) * camera.tick) / camera.steps)
-    camera.x = ox + (tx - ox) * t
-    camera.y = oy + (ty - oy) * t
-    if (++camera.tick >= camera.steps) {
-      camera.tick = 0
-      camera.steps = 350
-      camera.last = camera.target
-      camera.target = Math.floor(Math.random() * (views.length - 1)) + 1
-      camera.moving = false
-    }
-  }
 
   let width = 0
   let height = 0
@@ -180,12 +146,6 @@ export const startRain = () => {
 
     //same view as an 80 degree perspective with the eye at z 25
     const focal = height / 2 / Math.tan((40 * Math.PI) / 180)
-    const ax = (camera.x * Math.PI) / 180
-    const ay = (camera.y * Math.PI) / 180
-    const sinX = Math.sin(ax)
-    const cosX = Math.cos(ax)
-    const sinY = Math.sin(ay)
-    const cosY = Math.cos(ay)
 
     const glyph = (g, x, y, z, brightness) => {
       const changing = g < 0
@@ -198,18 +158,27 @@ export const startRain = () => {
         brightness *= ramp[Math.min(WAVE_SIZE - 1, Math.max(0, Math.floor(ratio * WAVE_SIZE)))]
       }
       const top = y + 1
-      const rx = x * cosY + z * sinY
-      const rz = -x * sinY + z * cosY
-      const ry = top * cosX - rz * sinX
-      const depth = 25 - (top * sinX + rz * cosX)
+      const depth = 25 - z
       if (depth < 1) return
       const scale = focal / depth
-      const sx = width / 2 + rx * scale
-      const sy = height / 2 - ry * scale
+      const sx = width / 2 + x * scale
+      const sy = height / 2 - top * scale
       if (scale < 2 || sx > width || sy > height || sx + scale < 0 || sy + scale < 0) return
       context.globalAlpha = Math.min(1, brightness)
       const index = Math.abs(g) - 1
-      context.drawImage(atlas, index * cell, changing ? cell : 0, cell, cell, sx, sy, scale, scale)
+      const size = scale * PAD
+      const offset = (size - scale) / 2
+      context.drawImage(
+        atlas,
+        index * cell,
+        changing ? cell : 0,
+        cell,
+        cell,
+        sx - offset,
+        sy - offset,
+        size,
+        size,
+      )
     }
 
     for (const s of strips) {
@@ -234,7 +203,6 @@ export const startRain = () => {
     last = now
     for (let n = 0; n < ticks; n++) {
       strips.forEach(tickStrip)
-      trackCamera()
     }
     draw()
   }

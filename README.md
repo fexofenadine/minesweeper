@@ -1,10 +1,48 @@
 # Minesweeper
 
-A Windows style minesweeper with classic, synthwave and solarized dark themes.
+A Windows style minesweeper with classic, synthwave, solarized dark and matrix themes.
 
 [Play Minesweeper](https://fexofenadine.github.io/minesweeper/)
 
 [![Play Minesweeper](public/minesweeper.jpg)](https://fexofenadine.github.io/minesweeper/)
+
+## Themes
+
+Pick a theme from the **Theme** menu. Your choice is remembered.
+
+| Synthwave (expert, game over)                | Solarized Dark                                    | Matrix                                 |
+| -------------------------------------------- | ------------------------------------------------- | -------------------------------------- |
+| ![Synthwave](docs/screenshots/synthwave.jpg) | ![Solarized Dark](docs/screenshots/solarized.jpg) | ![Matrix](docs/screenshots/matrix.jpg) |
+
+## What this fork adds
+
+On top of the [original game](https://github.com/frenzzy/minesweeper), which has the classic look, the four difficulty levels, marks, best times and touch support, this fork adds:
+
+### Four themes
+
+- **Classic** keeps the Windows look, with a freely licensed background colour matched to the Windows XP wallpaper and a Windows 95 pixel font for the menus and title bar.
+- **Synthwave** uses the SynthWave '84 palette over a neon wireframe landscape, with VHS scanlines, film grain, a rolling tracking band and tape wobble, glitching counters, a pulsing neon window glow and Monoton and Audiowide fonts.
+- **Solarized Dark** uses the Solarized palette over a blurred code photo, with JetBrains Mono.
+- **Matrix** is monochrome green on black over falling code rain ported from xscreensaver's GLMatrix, with glowing glyphs, CRT scanlines, glitching counters, a pulsing green haze around the window and Share Tech Mono.
+- In Synthwave and Matrix, hitting a mine makes the minefield glitch out until the next game.
+
+### Gameplay
+
+- **Double-click chording**: double-click (or tap) a revealed number whose mines are all flagged to open every unflagged neighbour.
+- **Safe First Click** (on by default): mines are only placed after the first click, never under it.
+- **No Guessing**: the first click opens an empty area and every board can be solved with logic alone. A solver checks each board and redeals until it finds one, usually in a few milliseconds even on Expert.
+
+### Window and display
+
+- **Resizable window**: drag the grip in the bottom right corner to scale the whole window up or down, keeping its aspect ratio so the cells stay square. Double-click the grip to reset. The size is remembered.
+- **Full-screen backgrounds**: wallpapers always cover the browser window, whatever its size, zoom or orientation.
+
+### Under the hood
+
+- Rebuilt on [Vite](https://vite.dev) with Vitest, ESLint and Prettier, replacing the abandoned hyperapp-tools webpack 4 setup.
+- A plain static build with readable asset names, versioned links so browsers never mix old and new files, and a simple offline-capable service worker.
+- Google Analytics removed.
+- Tests for chording, mine placement and the no-guessing solver.
 
 ## Development
 

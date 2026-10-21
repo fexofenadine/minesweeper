@@ -77,6 +77,7 @@
   --cell: #bdbdbd;
   --cell-light: #fff;
   --cell-shadow: #7b7b7b;
+  --cell-open: var(--cell);
   --lcd: #000;
   --lcd-on: #f00;
   --lcd-off: rgba(255, 0, 0, 0.5);
@@ -233,26 +234,28 @@
   --input: #000;
   --input-frame: #003b00;
   --panel: #010a03;
-  --cell: #04210c;
-  --cell-light: #12702d;
+  /*raised tiles stand out from dug out ones, and each clue has its own hue*/
+  --cell: #0b3d19;
+  --cell-light: #34b85a;
   --cell-shadow: #000;
+  --cell-open: #010803;
   --lcd: #000;
   --lcd-on: #00ff41;
   --lcd-off: rgba(0, 255, 65, 0.12);
-  --num-1: #00ff41;
-  --num-2: #8affa8;
-  --num-3: #00c234;
-  --num-4: #c4ffd2;
-  --num-5: #009e2a;
-  --num-6: #52ff7d;
-  --num-7: #e6ffec;
-  --num-8: #007a20;
+  --num-1: #3dff6e;
+  --num-2: #4ff0ff;
+  --num-3: #f2ff4d;
+  --num-4: #ffffff;
+  --num-5: #ffa53d;
+  --num-6: #6dffcf;
+  --num-7: #c8c8c8;
+  --num-8: #7fa37f;
   --glyph: #00ff41;
-  --flag: #00ff41;
-  --mine: #00ff41;
+  --flag: #f0fff2;
+  --mine: #9dffb0;
   --mine-shine: #000;
-  --hurt: #006b1c;
-  --wrong: #c4ffd2;
+  --hurt: #b31212;
+  --wrong: #ff5c5c;
   --smiley: #00ff41;
   --smiley-line: #000;
   --glow-dim:
@@ -413,6 +416,22 @@ main::before {
 /*the code rain canvas shows through*/
 :root[data-theme='matrix'] main::before {
   background: none;
+}
+
+/*crt scanlines and vignette over the code rain*/
+:root[data-theme='matrix'] main::after {
+  background:
+    repeating-linear-gradient(rgba(0, 0, 0, 0.55) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.55));
+  animation: matrix-roll 10s linear infinite;
+}
+
+@keyframes matrix-roll {
+  to {
+    background-position:
+      0 300px,
+      0 0;
+  }
 }
 
 /*code photo by chris ried on unsplash, muted under the solarized base*/
