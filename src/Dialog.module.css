@@ -11,26 +11,36 @@
 
 .dialog {
   position: relative;
+  zoom: var(--scale, 1);
   display: inline-block;
-  color: #000;
+  color: var(--text);
   text-align: left;
   vertical-align: top;
-  background: #d4d0c8;
+  background: var(--face);
   border: 1px solid;
-  border-color: #d4d0c8 #222 #222 #d4d0c8;
+  border-color: var(--face) var(--window-frame) var(--window-frame) var(--face);
+  box-shadow: var(--glow-dim);
+  animation: glow 4s ease-in-out infinite;
+}
+
+/*pulse between the theme glows*/
+@keyframes glow {
+  50% {
+    box-shadow: var(--glow-bright);
+  }
 }
 
 .container {
   padding: 1px;
   border: 1px solid;
-  border-color: #fff #808080 #808080 #fff;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
 }
 
 .header {
   display: flex;
   align-items: center;
-  background: linear-gradient(to right, #0a246a, #a6caf0) 100% 0 no-repeat;
-  background-color: #0a246a;
+  background: linear-gradient(to right, var(--title-start), var(--title-end)) 100% 0 no-repeat;
+  background-color: var(--title-start);
 }
 
 .title {
@@ -38,8 +48,10 @@
   margin: 0;
   padding: 3px 2px 4px 2px;
   overflow: hidden;
-  color: #fff;
+  color: var(--title-text);
   font-weight: bold;
+  font-family: var(--pixel-font);
+  -webkit-font-smoothing: none;
   font-size: inherit;
   line-height: 1;
   white-space: nowrap;
@@ -53,4 +65,5 @@
 
 .close {
   display: block;
+  fill: currentColor;
 }

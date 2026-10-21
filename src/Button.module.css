@@ -3,12 +3,12 @@
   display: inline-block;
   margin: 0;
   padding: 0 1px 1px 0;
-  color: #000;
+  color: var(--text);
   font: inherit;
   vertical-align: top;
-  background: #d4d0c8;
+  background: var(--face);
   border: 1px solid;
-  border-color: #fff #404040 #404040 #fff;
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
   outline: 0;
   cursor: pointer;
 }
@@ -21,7 +21,7 @@
   bottom: 0;
   left: 0;
   border: 1px solid;
-  border-color: #d4d0c8 #808080 #808080 #d4d0c8;
+  border-color: var(--face) var(--shadow) var(--shadow) var(--face);
   content: '';
 }
 
@@ -31,29 +31,29 @@
 
 .root:active {
   padding: 1px 0 0 1px;
-  border-color: #404040 #fff #fff #404040;
+  border-color: var(--dark-shadow) var(--light) var(--light) var(--dark-shadow);
 }
 
 .root:active::after {
-  border-color: #808080 #d4d0c8 #d4d0c8 #808080;
+  border-color: var(--shadow) var(--face) var(--face) var(--shadow);
 }
 
 .root:focus {
-  border-color: #000;
+  border-color: var(--frame);
 }
 
 .root:focus::before {
-  border-color: transparent #808080 #808080 transparent;
+  border-color: transparent var(--shadow) var(--shadow) transparent;
 }
 
 .root:focus::after {
-  border-color: #fff #404040 #404040 #fff;
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
 }
 
 .root:focus:active::before {
-  border-color: #808080 transparent transparent #808080;
+  border-color: var(--shadow) transparent transparent var(--shadow);
 }
 
 .root:focus:active::after {
-  border-color: #000 #fff #fff #000;
+  border-color: var(--frame) var(--light) var(--light) var(--frame);
 }

@@ -69,8 +69,36 @@ const Menu = ({ state, actions }) => (
       />
       <Separator />
       <SubMenuItem name="Marks (?)" checked={state.marks} onClick={actions.toggleMarks} />
+      <SubMenuItem
+        name="Safe First Click"
+        checked={state.safeStart || state.noGuess}
+        onClick={actions.toggleSafeStart}
+      />
+      <SubMenuItem name="No Guessing" checked={state.noGuess} onClick={actions.toggleNoGuess} />
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
+    </MenuItem>
+    <MenuItem name="Theme" type="theme" active={state.menu} onChange={actions.toggleMenu}>
+      <SubMenuItem
+        name="Classic"
+        checked={state.theme === 'classic'}
+        onClick={() => actions.setTheme('classic')}
+      />
+      <SubMenuItem
+        name="Synthwave"
+        checked={state.theme === 'synthwave'}
+        onClick={() => actions.setTheme('synthwave')}
+      />
+      <SubMenuItem
+        name="Solarized Dark"
+        checked={state.theme === 'solarized'}
+        onClick={() => actions.setTheme('solarized')}
+      />
+      <SubMenuItem
+        name="Matrix"
+        checked={state.theme === 'matrix'}
+        onClick={() => actions.setTheme('matrix')}
+      />
     </MenuItem>
   </ul>
 )

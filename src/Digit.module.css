@@ -1,13 +1,14 @@
 .root {
-  background: #000;
+  position: relative;
+  background: var(--lcd);
   border: 1px solid;
-  border-color: #808080 #fff #fff #808080;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
 }
 
 .digit {
   display: inline-block;
   vertical-align: top;
-  fill: red;
+  fill: var(--lcd-on);
 }
 
 .digit[data-n='-'] .t,
@@ -37,5 +38,79 @@
 .digit[data-n='7'] .lt,
 .digit[data-n='7'] .m,
 .digit[data-n='9'] .lb {
-  fill: rgba(255, 0, 0, 0.5);
+  fill: var(--lcd-off);
+}
+
+/*neon theme counter glitch and scanlines*/
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .root {
+  animation: lcdGlitch 5.3s steps(1, end) infinite;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .root::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(
+        transparent,
+        color-mix(in srgb, var(--fringe-b) 35%, transparent) 50%,
+        transparent
+      )
+      0 -40% / 100% 35% no-repeat,
+    repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, 0.45) 1px 2px);
+  pointer-events: none;
+  content: '';
+  animation:
+    lcdBand 2.2s linear infinite,
+    lcdFlicker 0.12s steps(2) infinite;
+}
+
+@keyframes lcdGlitch {
+  0% {
+    transform: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  18% {
+    transform: translateX(-2px);
+    filter: drop-shadow(3px 0 var(--fringe-a)) drop-shadow(-3px 0 var(--fringe-b));
+  }
+  20% {
+    transform: translate(2px, 1px) skewX(-6deg);
+    clip-path: inset(0 0 55% 0);
+  }
+  22% {
+    transform: none;
+    clip-path: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  57% {
+    transform: translateY(-1px);
+    clip-path: inset(40% 0 20% 0);
+    filter: drop-shadow(-3px 0 var(--fringe-a)) drop-shadow(3px 0 var(--fringe-b)) hue-rotate(60deg);
+  }
+  59% {
+    transform: none;
+    clip-path: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  84% {
+    transform: translateX(3px) scaleX(1.04);
+  }
+  86% {
+    transform: none;
+  }
+}
+
+@keyframes lcdBand {
+  to {
+    background-position: 0 140%;
+  }
+}
+
+@keyframes lcdFlicker {
+  50% {
+    opacity: 0.6;
+  }
 }

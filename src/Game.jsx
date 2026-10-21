@@ -5,6 +5,7 @@ import Menu from './Menu'
 import Digit from './Digit'
 import Play from './Play'
 import Cell from './Cell'
+import Grip from './Grip'
 
 const Game = ({ key, state, actions }) => (
   <Dialog key={key} title="Minesweeper">
@@ -20,7 +21,7 @@ const Game = ({ key, state, actions }) => (
         />
         <Digit value={state.game.time} />
       </div>
-      <div class={s.field}>
+      <div class={state.game.lose ? s.fieldLost : s.field}>
         {state.game.field.map((row, y) => (
           <div class={state.game.win || state.game.lose ? s.inactive : s.active}>
             {row.map((cell, x) => (
@@ -40,12 +41,14 @@ const Game = ({ key, state, actions }) => (
                 onDown={actions.down}
                 onMove={actions.move}
                 onTouch={actions.touch}
+                onChord={actions.chord}
               />
             ))}
           </div>
         ))}
       </div>
     </div>
+    <Grip />
   </Dialog>
 )
 

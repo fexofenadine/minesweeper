@@ -1,25 +1,40 @@
 {
-  "name": "web",
+  "name": "minesweeper",
   "version": "0.1.0",
   "private": true,
-  "homepage": "",
+  "description": "Windows style minesweeper with classic, synthwave and solarized dark themes",
+  "homepage": "https://fexofenadine.github.io/minesweeper/",
+  "repository": "github:fexofenadine/minesweeper",
+  "license": "MIT",
+  "contributors": [
+    "Vladimir Kutepov (https://github.com/frenzzy)",
+    "fexofenadine (https://github.com/fexofenadine)"
+  ],
+  "type": "module",
   "engines": {
-    "node": ">=8.9.0"
+    "node": "^20.19.0 || >=22.12.0"
   },
   "dependencies": {
-    "hyperapp": "^1.2.9",
-    "hyperapp-render": "^3.0.0"
+    "hyperapp": "^1.2.9"
   },
   "devDependencies": {
-    "gh-pages": "^2.0.1",
-    "hyperapp-tools": "^2.1.0"
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.13.0",
+    "gh-pages": "^6.3.0",
+    "globals": "^17.13.0",
+    "jsdom": "^30.1.3",
+    "prettier": "^3.9.10",
+    "vite": "^8.3.4",
+    "vitest": "^5.0.5"
   },
   "scripts": {
-    "start": "hyperapp-tools start",
-    "build": "hyperapp-tools build",
-    "test": "hyperapp-tools test",
-    "lint": "hyperapp-tools lint",
-    "predeploy": "hyperapp-tools build --render",
-    "deploy": "gh-pages --dist build/public"
+    "start": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "predeploy": "vite build",
+    "deploy": "gh-pages --dist build"
   }
 }

@@ -7,7 +7,7 @@
   font-weight: bold;
   text-align: center;
   vertical-align: top;
-  background: #bdbdbd;
+  background: var(--cell);
   border: 0;
   outline: 0;
   cursor: inherit;
@@ -22,7 +22,7 @@
   bottom: 0;
   left: 0;
   border: 2px solid;
-  border-color: #fff #7b7b7b #7b7b7b #fff;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
   content: '';
 }
 
@@ -32,15 +32,64 @@
 }
 
 .pressed::before {
-  border: 1px solid #7b7b7b;
+  border: 1px solid var(--cell-shadow);
   border-width: 1px 0 0 1px;
 }
 
 .image {
   display: block;
+  fill: var(--glyph);
 }
 
 .hurt {
   composes: image;
-  background: #f00;
+  background: var(--hurt);
+}
+
+.n1 {
+  fill: var(--num-1);
+}
+
+.n2 {
+  fill: var(--num-2);
+}
+
+.n3 {
+  fill: var(--num-3);
+}
+
+.n4 {
+  fill: var(--num-4);
+}
+
+.n5 {
+  fill: var(--num-5);
+}
+
+.n6 {
+  fill: var(--num-6);
+}
+
+.n7 {
+  fill: var(--num-7);
+}
+
+.n8 {
+  fill: var(--num-8);
+}
+
+.flagCloth {
+  fill: var(--flag);
+}
+
+.wrong {
+  fill: var(--wrong);
+}
+
+.mine {
+  fill: var(--mine);
+}
+
+.shine {
+  fill: var(--mine-shine);
 }

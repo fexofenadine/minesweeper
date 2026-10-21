@@ -3,8 +3,8 @@
   display: block;
   margin: 0;
   padding: 3px 3px 2px 2px;
-  background: #bdbdbd;
-  border: 1px solid #7b7b7b;
+  background: var(--cell);
+  border: 1px solid var(--cell-shadow);
   outline: 0;
   cursor: pointer;
 }
@@ -16,7 +16,7 @@
   bottom: 0;
   left: 0;
   border: 2px solid;
-  border-color: #fff #7b7b7b #7b7b7b #fff;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
   content: '';
 }
 
@@ -26,7 +26,7 @@
 
 .root:active::before {
   border-width: 1px 0 0 1px;
-  border-color: #7b7b7b;
+  border-color: var(--cell-shadow);
 }
 
 .down,
@@ -37,4 +37,12 @@
 .face,
 .root:active .down {
   display: block;
+}
+
+.face {
+  fill: var(--smiley-line);
+}
+
+.skin {
+  fill: var(--smiley);
 }

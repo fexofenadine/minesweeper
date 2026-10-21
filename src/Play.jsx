@@ -41,7 +41,7 @@ const Play = ({ pressed, lose, win, onReset }) => (
     oncreate={(el) => el.focus()}
   >
     <svg class={s.face} width="19" height="19">
-      <circle cx="9.5" cy="9.5" r="8.5" fill="#ff0" />
+      <circle class={s.skin} cx="9.5" cy="9.5" r="8.5" />
       <path d="M9.5 2A7.5 7.5 0 1 1 2 9.5 7.508 7.508 0 0 1 9.5 2m0-1A8.5 8.5 0 1 0 18 9.5 8.5 8.5 0 0 0 9.5 1z" />
       <g class={s.up}>
         <Face pressed={pressed} lose={lose} win={win} />

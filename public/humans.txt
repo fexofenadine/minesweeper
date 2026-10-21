@@ -1,10 +1,10 @@
-# humanstxt.org/
-# The humans responsible & technology colophon
+#humanstxt.org
 
-# TEAM
+#team
 
     Vladimir Kutepov
+    fexofenadine
 
-# TECHNOLOGY COLOPHON
+#technology colophon
 
     Hyperapp Starter -- https://github.com/kriasoft/hyperapp-starter

@@ -1,7 +1,7 @@
 .root {
   display: block;
   border: 1px solid;
-  border-color: #808080 #fff #fff #808080;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
 }
 
 .input {
@@ -11,9 +11,9 @@
   padding: 0 2px;
   color: inherit;
   font: inherit;
-  background: #fff;
+  background: var(--input);
   border: 1px solid;
-  border-color: #000 #d4d0c8 #d4d0c8 #000;
+  border-color: var(--input-frame) var(--face) var(--face) var(--input-frame);
   border-radius: 0;
   outline: 0;
   appearance: none;

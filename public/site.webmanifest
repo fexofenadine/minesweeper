@@ -13,7 +13,7 @@
       "type": "image/png"
     }
   ],
-  "start_url": "/minesweeper/?utm_source=homescreen",
+  "start_url": "./",
   "display": "standalone",
   "theme_color": "#cbcbcb",
   "background_color": "#cbcbcb"

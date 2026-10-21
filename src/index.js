@@ -1,26 +1,10 @@
 import { app } from 'hyperapp'
 import { state, actions, view } from './app'
+import { startRain } from './rain'
 
-window.app = app(state, actions, view, document.getElementById('app'))
+app(state, actions, view, document.getElementById('app'))
+startRain()
 
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js');
-}
-
-// Enable hot module replacement
-// https://webpack.js.org/concepts/hot-module-replacement/
-if (module.hot) {
-  let prevState = state
-  module.hot.accept('./app', () => {
-    const prevApp = window.app
-    const currState = prevApp.getState()
-    prevApp.destroy()
-    const prevContainer = document.getElementById('app')
-    const nextContainer = prevContainer.cloneNode(false)
-    prevContainer.parentNode.appendChild(nextContainer)
-    prevContainer.parentNode.removeChild(prevContainer)
-    const nextState = JSON.stringify(prevState) === JSON.stringify(state) ? currState : state
-    window.app = app(nextState, actions, view, nextContainer)
-    prevState = state
-  })
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  navigator.serviceWorker.register('service-worker.js')
 }

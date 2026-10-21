@@ -1,3 +1,205 @@
+/*windows 95 ui font from 98.css*/
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-weight: 400;
+  src: url(./fonts/ms_sans_serif.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-weight: 700;
+  src: url(./fonts/ms_sans_serif_bold.woff2) format('woff2');
+}
+
+:root {
+  --pixel-font: 'Pixelated MS Sans Serif', Tahoma, Geneva, sans-serif;
+  --desktop: #cbcbcb;
+  --text: #000;
+  --face: #d4d0c8;
+  --light: #fff;
+  --shadow: #808080;
+  --dark-shadow: #404040;
+  --frame: #000;
+  --window-frame: #222;
+  --title-start: #0a246a;
+  --title-end: #a6caf0;
+  --title-text: #fff;
+  --highlight: #0a246a;
+  --highlight-text: #fff;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #fff;
+  --input-frame: #000;
+  --panel: #c0c0c0;
+  --cell: #bdbdbd;
+  --cell-light: #fff;
+  --cell-shadow: #7b7b7b;
+  --lcd: #000;
+  --lcd-on: #f00;
+  --lcd-off: rgba(255, 0, 0, 0.5);
+  --num-1: #00f;
+  --num-2: #007b00;
+  --num-3: #f00;
+  --num-4: #00007b;
+  --num-5: #7b0000;
+  --num-6: #007b7b;
+  --num-7: #000;
+  --num-8: #7b7b7b;
+  --glyph: #000;
+  --flag: #f00;
+  --mine: #000;
+  --mine-shine: #fff;
+  --hurt: #f00;
+  --wrong: #f00;
+  --smiley: #ff0;
+  --smiley-line: #000;
+  --glow-dim: none;
+  --glow-bright: none;
+  --fringe-a: rgba(255, 0, 90, 0.8);
+  --fringe-b: rgba(0, 255, 255, 0.8);
+}
+
+:root[data-theme='synthwave'] {
+  /*synthwave '84 palette*/
+  color-scheme: dark;
+  --desktop: #171520;
+  --text: #ffffffee;
+  --face: #241b2f;
+  --light: #614d85;
+  --shadow: #171520;
+  --dark-shadow: #0d0b12;
+  --frame: #ff7edb;
+  --window-frame: #0d0b12;
+  --title-start: #880088;
+  --title-end: #ff7edb;
+  --title-text: #fff;
+  --highlight: #ff7edb;
+  --highlight-text: #241b2f;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #2a2139;
+  --input-frame: #0d0b12;
+  --panel: #262335;
+  --cell: #34294f;
+  --cell-light: #614d85;
+  --cell-shadow: #171520;
+  --lcd: #171520;
+  --lcd-on: #fe4450;
+  --lcd-off: rgba(254, 68, 80, 0.15);
+  --num-1: #36f9f6;
+  --num-2: #72f1b8;
+  --num-3: #fe4450;
+  --num-4: #ff7edb;
+  --num-5: #f97e72;
+  --num-6: #fede5d;
+  --num-7: #848bbd;
+  --num-8: #b6b1b1;
+  --glyph: #ffffffee;
+  --flag: #fe4450;
+  --mine: #ffffffee;
+  --mine-shine: #241b2f;
+  --hurt: #fe4450;
+  --wrong: #fe4450;
+  --smiley: #fede5d;
+  --smiley-line: #241b2f;
+  --glow-dim:
+    0 0 0 1px #ff7edb, 0 0 12px 3px rgba(255, 126, 219, 0.85),
+    0 0 36px 10px rgba(255, 126, 219, 0.45);
+  --glow-bright:
+    0 0 0 1px #36f9f6, 0 0 16px 5px rgba(54, 249, 246, 0.9), 0 0 48px 16px rgba(54, 249, 246, 0.5);
+}
+
+:root[data-theme='solarized'] {
+  color-scheme: dark;
+  --desktop: #002b36;
+  --text: #93a1a1;
+  --face: #073642;
+  --light: #2f5964;
+  --shadow: #00212a;
+  --dark-shadow: #00161c;
+  --frame: #268bd2;
+  --window-frame: #00161c;
+  --title-start: #268bd2;
+  --title-end: #2aa198;
+  --title-text: #fdf6e3;
+  --highlight: #268bd2;
+  --highlight-text: #fdf6e3;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #002b36;
+  --input-frame: #00161c;
+  --panel: #073642;
+  --cell: #0b4250;
+  --cell-light: #3d6874;
+  --cell-shadow: #001f27;
+  --lcd: #001f27;
+  --lcd-on: #cb4b16;
+  --lcd-off: rgba(203, 75, 22, 0.2);
+  --num-1: #268bd2;
+  --num-2: #859900;
+  --num-3: #dc322f;
+  --num-4: #6c71c4;
+  --num-5: #cb4b16;
+  --num-6: #2aa198;
+  --num-7: #d33682;
+  --num-8: #93a1a1;
+  --glyph: #93a1a1;
+  --flag: #dc322f;
+  --mine: #eee8d5;
+  --mine-shine: #073642;
+  --hurt: #dc322f;
+  --wrong: #dc322f;
+  --smiley: #b58900;
+  --smiley-line: #002b36;
+}
+
+:root[data-theme='matrix'] {
+  /*monochrome phosphor green on black*/
+  color-scheme: dark;
+  --desktop: #000;
+  --text: #00ff41;
+  --face: #020d05;
+  --light: #0f5c25;
+  --shadow: #000;
+  --dark-shadow: #000;
+  --frame: #00ff41;
+  --window-frame: #000;
+  --title-start: #003b00;
+  --title-end: #008f11;
+  --title-text: #d7ffdf;
+  --highlight: #00ff41;
+  --highlight-text: #000;
+  --menu-shadow: rgba(0, 255, 65, 0.25);
+  --input: #000;
+  --input-frame: #003b00;
+  --panel: #010a03;
+  --cell: #04210c;
+  --cell-light: #12702d;
+  --cell-shadow: #000;
+  --lcd: #000;
+  --lcd-on: #00ff41;
+  --lcd-off: rgba(0, 255, 65, 0.12);
+  --num-1: #00ff41;
+  --num-2: #8affa8;
+  --num-3: #00c234;
+  --num-4: #c4ffd2;
+  --num-5: #009e2a;
+  --num-6: #52ff7d;
+  --num-7: #e6ffec;
+  --num-8: #007a20;
+  --glyph: #00ff41;
+  --flag: #00ff41;
+  --mine: #00ff41;
+  --mine-shine: #000;
+  --hurt: #006b1c;
+  --wrong: #c4ffd2;
+  --smiley: #00ff41;
+  --smiley-line: #000;
+  --glow-dim:
+    0 0 0 1px #00ff41, 0 0 18px 4px rgba(0, 255, 65, 0.6), 0 0 48px 16px rgba(0, 255, 65, 0.25);
+  --glow-bright:
+    0 0 0 1px #8affa8, 0 0 24px 8px rgba(0, 255, 65, 0.85), 0 0 72px 26px rgba(0, 255, 65, 0.4);
+  --fringe-a: rgba(0, 255, 65, 0.8);
+  --fringe-b: rgba(196, 255, 210, 0.6);
+}
+
 html,
 body,
 #app {
@@ -5,12 +207,15 @@ body,
 }
 
 html {
-  font: normal 11px/16px Tahoma, Geneva, sans-serif;
+  font:
+    normal 11px/16px Tahoma,
+    Geneva,
+    sans-serif;
 }
 
 body {
   margin: 0;
-  background: #cbcbcb;
+  background: var(--desktop);
 }
 
 main {
@@ -25,4 +230,132 @@ main {
   background: url(./background.jpg) 50% 50%;
   background-size: cover;
   user-select: none;
+}
+
+/*keeps the vhs layers between the background and the window*/
+:root[data-theme='synthwave'] main {
+  overflow: hidden;
+  background: var(--desktop);
+  isolation: isolate;
+}
+
+:root[data-theme='synthwave'] main::before,
+:root[data-theme='synthwave'] main::after {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+}
+
+/*background by neeqolah creative works on unsplash, with film grain and tape wobble*/
+:root[data-theme='synthwave'] main::before {
+  top: -12px;
+  right: -12px;
+  bottom: -12px;
+  left: -12px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"),
+    url(./synthwave.jpg) 50% 60% / cover;
+  filter: blur(0.4px) saturate(1.15);
+  animation:
+    vhs-grain 0.5s steps(1, end) infinite,
+    vhs-wobble 7s steps(1, end) infinite;
+}
+
+/*tracking band, scanlines and vignette*/
+:root[data-theme='synthwave'] main::after {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.06) 30%,
+        rgba(148, 218, 234, 0.22) 48%,
+        rgba(240, 80, 138, 0.18) 52%,
+        rgba(255, 255, 255, 0.06) 70%,
+        transparent
+      )
+      0 -30% / 100% 10% no-repeat,
+    repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5));
+  animation:
+    vhs-roll 6s linear infinite,
+    vhs-flicker 0.12s steps(2) infinite;
+}
+
+@keyframes vhs-grain {
+  0% {
+    background-position:
+      0 0,
+      50% 50%;
+  }
+  25% {
+    background-position:
+      -60px 40px,
+      50% 50%;
+  }
+  50% {
+    background-position:
+      90px -70px,
+      50% 50%;
+  }
+  75% {
+    background-position:
+      -30px -110px,
+      50% 50%;
+  }
+}
+
+@keyframes vhs-wobble {
+  0% {
+    transform: none;
+  }
+  41% {
+    transform: translateX(-4px) skewX(1.5deg);
+    filter: blur(0.6px) saturate(1.4) hue-rotate(-12deg);
+  }
+  42% {
+    transform: translateX(3px);
+  }
+  43% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+  82% {
+    transform: translateY(2px) translateX(2px);
+    filter: blur(0.8px) saturate(1.3) brightness(1.15);
+  }
+  83% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+}
+
+@keyframes vhs-roll {
+  to {
+    background-position:
+      0 130%,
+      0 240px,
+      0 0;
+  }
+}
+
+@keyframes vhs-flicker {
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/*the code rain canvas shows through*/
+:root[data-theme='matrix'] main {
+  background: none;
+}
+
+/*code photo by chris ried on unsplash, muted under the solarized base*/
+:root[data-theme='solarized'] main {
+  background:
+    linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
+    url(./solarized.jpg) 50% 50% / cover var(--desktop);
 }

@@ -1,0 +1,51 @@
+import { createHash } from 'node:crypto'
+import { basename } from 'node:path'
+import { defineConfig } from 'vite'
+
+//adds ?v=<content hash> to asset links so browsers never mix old and new files
+const versionAssets = () => ({
+  name: 'version-assets',
+  transformIndexHtml: {
+    order: 'post',
+    handler: (html, { bundle }) =>
+      html.replace(/\.\/(assets\/[^"?]+)"/g, (match, file) => {
+        const output = bundle?.[file]
+        if (!output) return match
+        const hash = createHash('sha256')
+          .update(output.code ?? output.source)
+          .digest('hex')
+          .slice(0, 8)
+        return `./${file}?v=${hash}"`
+      }),
+  },
+})
+
+export default defineConfig({
+  base: './',
+  oxc: {
+    jsx: { runtime: 'classic', pragma: 'h' },
+  },
+  css: {
+    modules: {
+      //readable class names like Cell_root
+      generateScopedName: (name, file) => `${basename(file).split('.')[0]}_${name}`,
+    },
+  },
+  build: {
+    outDir: 'build',
+    minify: false,
+    cssMinify: false,
+    modulePreload: { polyfill: false },
+    rolldownOptions: {
+      input: { app: 'index.html' },
+      output: {
+        entryFileNames: 'assets/[name].js',
+        assetFileNames: 'assets/[name][extname]',
+      },
+    },
+  },
+  plugins: [versionAssets()],
+  test: {
+    environment: 'jsdom',
+  },
+})

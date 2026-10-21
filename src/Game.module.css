@@ -1,7 +1,7 @@
 .root {
   padding: 6px 5px 5px 6px;
-  background: #c0c0c0;
-  border: solid #fff;
+  background: var(--panel);
+  border: solid var(--light);
   border-width: 3px 0 0 3px;
 }
 
@@ -13,14 +13,14 @@
   padding: 4px 7px 3px 5px;
   text-align: center;
   border: 2px solid;
-  border-color: #808080 #fff #fff #808080;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
 }
 
 .field {
   white-space: nowrap;
   border-width: 2px 3px 3px 2px;
   border-style: solid;
-  border-color: #808080 #fff #fff #808080;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
   border-radius: 0 2px;
   -webkit-tap-highlight-color: transparent;
 }
@@ -31,4 +31,125 @@
 
 .inactive {
   cursor: default;
+}
+
+/*neon theme meltdown after hitting a mine*/
+.fieldLost {
+  composes: field;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost {
+  position: relative;
+  animation:
+    jitter 2.4s steps(1, end) infinite,
+    chroma 3.1s steps(1, end) infinite;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::before,
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: '';
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::before {
+  background: linear-gradient(
+      transparent,
+      color-mix(in srgb, var(--fringe-b) 40%, transparent) 45%,
+      color-mix(in srgb, var(--fringe-a) 40%, transparent) 55%,
+      transparent
+    )
+    0 -20% / 100% 20% no-repeat;
+  mix-blend-mode: screen;
+  animation: band 1.7s linear infinite;
+}
+
+:global(:root:is([data-theme='synthwave'], [data-theme='matrix'])) .fieldLost::after {
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
+  animation: flicker 0.15s steps(2) infinite;
+}
+
+@keyframes jitter {
+  0% {
+    transform: none;
+    clip-path: none;
+  }
+  7% {
+    transform: translate(-3px, 1px) skewX(4deg);
+    clip-path: inset(10% 0 55% 0);
+  }
+  9% {
+    transform: translate(4px, -1px);
+    clip-path: inset(50% 0 20% 0);
+  }
+  11% {
+    transform: none;
+    clip-path: none;
+  }
+  38% {
+    transform: translateX(2px);
+    clip-path: inset(30% 0 40% 0);
+  }
+  40% {
+    transform: none;
+    clip-path: none;
+  }
+  68% {
+    transform: translate(-5px, 0) skewX(-7deg);
+    clip-path: inset(70% 0 5% 0);
+  }
+  70% {
+    transform: translate(3px, 2px);
+    clip-path: inset(0 0 75% 0);
+  }
+  72% {
+    transform: translateY(-2px) scaleY(1.03);
+    clip-path: none;
+  }
+  74% {
+    transform: none;
+  }
+}
+
+@keyframes chroma {
+  0% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+  30% {
+    filter: drop-shadow(-4px 0 var(--fringe-a)) drop-shadow(4px 0 var(--fringe-b)) hue-rotate(90deg)
+      saturate(2);
+  }
+  34% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+  61% {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  63% {
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b)) contrast(1.4);
+  }
+  90% {
+    filter: drop-shadow(3px 1px var(--fringe-a)) drop-shadow(-3px -1px var(--fringe-b))
+      hue-rotate(-60deg);
+  }
+  93% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+}
+
+@keyframes band {
+  to {
+    background-position: 0 120%;
+  }
+}
+
+@keyframes flicker {
+  50% {
+    opacity: 0.4;
+  }
 }

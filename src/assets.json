@@ -1,4 +1,0 @@
-{
-  "app.css": "[publicPath]assets/app.[hash].css",
-  "app.js": "[publicPath]assets/app.[hash].js"
-}
