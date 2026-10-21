@@ -606,12 +606,31 @@ var Grip_module_default = {
 	grip: "Grip_grip"
 };
 //#endregion
+//#region src/storage.js
+var load = (key) => {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+};
+var save = (key, value) => {
+	try {
+		localStorage.setItem(key, value);
+	} catch {}
+};
+var remove = (key) => {
+	try {
+		localStorage.removeItem(key);
+	} catch {}
+};
+//#endregion
 //#region src/Grip.jsx
 var root$5 = document.documentElement;
 var clampScale = (scale) => Math.round(Math.min(4, Math.max(.5, scale)) * 20) / 20;
 var setScale = (scale) => {
 	root$5.style.setProperty("--scale", scale);
-	localStorage.setItem("scale", scale);
+	save("scale", scale);
 };
 var resize = (event) => {
 	event.preventDefault();
@@ -1027,7 +1046,7 @@ var customLevel = (data, defaults) => {
 	};
 };
 var loadLevel = () => {
-	const level = localStorage.getItem("level");
+	const level = load("level");
 	if (typeof level !== "string") return levels.beginner;
 	if (levels[level]) return levels[level];
 	const data = level.split(",");
@@ -1038,7 +1057,7 @@ var loadLevel = () => {
 	}, levels.beginner);
 };
 var loadTheme = () => {
-	const theme = localStorage.getItem("theme");
+	const theme = load("theme");
 	return themes.includes(theme) ? theme : "classic";
 };
 var prevent = (event) => {
@@ -1048,9 +1067,9 @@ var prevent = (event) => {
 var state = {
 	menu: null,
 	game: createGame(loadLevel()),
-	marks: Boolean(localStorage.getItem("marks")),
-	safeStart: localStorage.getItem("safeStart") !== "off",
-	noGuess: Boolean(localStorage.getItem("noGuess")),
+	marks: Boolean(load("marks")),
+	safeStart: load("safeStart") !== "off",
+	noGuess: Boolean(load("noGuess")),
 	theme: loadTheme(),
 	winner: null,
 	bestTime: null,
@@ -1066,7 +1085,7 @@ var actions = {
 	reset: (payload) => ({ game }) => {
 		cancelAnimationFrame(game.raf);
 		const params = payload && levels[payload.level] || payload || game;
-		localStorage.setItem("level", params.level === "custom" ? [
+		save("level", params.level === "custom" ? [
 			params.width,
 			params.height,
 			params.mines
@@ -1261,7 +1280,7 @@ var actions = {
 	},
 	win: () => ({ game }) => {
 		if (game.level === "custom") return null;
-		const time = parseInt(localStorage.getItem(game.level), 10);
+		const time = parseInt(load(game.level), 10);
 		if (time && time <= game.time) return null;
 		return { winner: {
 			name: "Anonymous",
@@ -1275,8 +1294,8 @@ var actions = {
 	} }),
 	submitBestTime: (event) => ({ winner }, actions) => {
 		event.preventDefault();
-		localStorage.setItem(winner.level, winner.time);
-		localStorage.setItem(`${winner.level}Name`, winner.name.trim());
+		save(winner.level, winner.time);
+		save(`${winner.level}Name`, winner.name.trim());
 		actions.toggleBestTime();
 		return { winner: null };
 	},
@@ -1284,14 +1303,14 @@ var actions = {
 		menu: null,
 		bestTime: bestTime ? null : { levels: levelNames.map((level) => ({
 			level,
-			name: localStorage.getItem(`${level}Name`) || "Anonymous",
-			time: Math.min(999, parseInt(localStorage.getItem(level), 10) || 0) || 999
+			name: load(`${level}Name`) || "Anonymous",
+			time: Math.min(999, parseInt(load(level), 10) || 0) || 999
 		})) }
 	}),
 	resetBestTime: () => ({ bestTime: { levels: levelNames.map((level) => ({
 		level,
-		name: localStorage.removeItem(`${level}Name`) || "Anonymous",
-		time: localStorage.removeItem(level) || 999
+		name: remove(`${level}Name`) || "Anonymous",
+		time: remove(level) || 999
 	})) } }),
 	toggleCustomField: () => ({ game, customField }) => ({
 		menu: null,
@@ -1312,7 +1331,7 @@ var actions = {
 	},
 	toggleSafeStart: () => (state) => {
 		const safeStart = !state.safeStart;
-		localStorage.setItem("safeStart", safeStart ? "" : "off");
+		save("safeStart", safeStart ? "" : "off");
 		return {
 			menu: null,
 			safeStart
@@ -1320,7 +1339,7 @@ var actions = {
 	},
 	toggleNoGuess: () => (state) => {
 		const noGuess = !state.noGuess;
-		localStorage.setItem("noGuess", noGuess ? "yes" : "");
+		save("noGuess", noGuess ? "yes" : "");
 		return {
 			menu: null,
 			noGuess
@@ -1328,14 +1347,14 @@ var actions = {
 	},
 	toggleMarks: () => (state) => {
 		const marks = !state.marks;
-		localStorage.setItem("marks", marks ? "yes" : "");
+		save("marks", marks ? "yes" : "");
 		return {
 			menu: null,
 			marks
 		};
 	},
 	setTheme: (theme) => () => {
-		localStorage.setItem("theme", theme);
+		save("theme", theme);
 		document.documentElement.dataset.theme = theme;
 		return {
 			menu: null,
@@ -1380,24 +1399,6 @@ var SPLASH_RATIO = .7;
 var STRIPS = 44;
 var TICK = 30;
 var glyphs = [..."ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789"];
-var views = [
-	[0, 0],
-	[0, -20],
-	[0, 20],
-	[25, 0],
-	[-25, 0],
-	[25, 20],
-	[-25, 20],
-	[25, -20],
-	[-25, -20],
-	[10, 0],
-	[-10, 0],
-	[0, 0],
-	[0, 0],
-	[0, 0],
-	[0, 0],
-	[0, 0]
-];
 var frand = (n) => Math.random() * n;
 var bellrand = (n) => (frand(n) + frand(n) + frand(n)) / 3;
 var randomGlyph = () => Math.floor(Math.random() * glyphs.length) + 1;
@@ -1447,15 +1448,15 @@ var tickStrip = (s) => {
 		s.wavePosition = (s.wavePosition + 1) % WAVE_SIZE;
 	}
 };
+var PAD = 1.6;
 var buildAtlas = (cell) => {
 	const atlas = document.createElement("canvas");
 	atlas.width = cell * glyphs.length;
 	atlas.height = cell * 2;
 	const context = atlas.getContext("2d");
-	context.font = `${Math.round(cell * .8)}px monospace`;
+	context.font = `${Math.round(cell / PAD * .8)}px monospace`;
 	context.textAlign = "center";
 	context.textBaseline = "middle";
-	context.shadowBlur = cell * .15;
 	["#2cff6e", "#d4ffe0"].forEach((colour, row) => {
 		context.fillStyle = colour;
 		context.shadowColor = colour;
@@ -1463,6 +1464,10 @@ var buildAtlas = (cell) => {
 			context.save();
 			context.translate((i + .5) * cell, (row + .5) * cell);
 			context.scale(-1, 1);
+			context.shadowBlur = cell * .3;
+			context.fillText(glyph, 0, 0);
+			context.fillText(glyph, 0, 0);
+			context.shadowBlur = cell * .07;
 			context.fillText(glyph, 0, 0);
 			context.restore();
 		});
@@ -1472,10 +1477,10 @@ var buildAtlas = (cell) => {
 var startRain = () => {
 	const root = document.documentElement;
 	const canvas = document.createElement("canvas");
-	canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none";
+	canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;filter:blur(0.6px)";
 	document.body.prepend(canvas);
 	const context = canvas.getContext("2d");
-	const cell = 64;
+	const cell = 96;
 	const atlas = buildAtlas(cell);
 	const strips = Array.from({ length: STRIPS }, () => {
 		const s = {};
@@ -1484,36 +1489,6 @@ var startRain = () => {
 		s.spinnerY = frand(GRID_SIZE);
 		return s;
 	});
-	const camera = {
-		last: 0,
-		target: 0,
-		x: 0,
-		y: 0,
-		steps: 100,
-		tick: 0,
-		moving: false,
-		wait: 0
-	};
-	const trackCamera = () => {
-		if (!camera.moving) {
-			if (++camera.wait < 20) return;
-			camera.wait = 0;
-			if (Math.floor(Math.random() * 20)) return;
-			camera.moving = true;
-		}
-		const [ox, oy] = views[camera.last];
-		const [tx, ty] = views[camera.target];
-		const t = Math.sin(Math.PI / 2 * camera.tick / camera.steps);
-		camera.x = ox + (tx - ox) * t;
-		camera.y = oy + (ty - oy) * t;
-		if (++camera.tick >= camera.steps) {
-			camera.tick = 0;
-			camera.steps = 350;
-			camera.last = camera.target;
-			camera.target = Math.floor(Math.random() * (views.length - 1)) + 1;
-			camera.moving = false;
-		}
-	};
 	let width = 0;
 	let height = 0;
 	const resize = () => {
@@ -1528,12 +1503,6 @@ var startRain = () => {
 		context.fillRect(0, 0, width, height);
 		context.globalCompositeOperation = "lighter";
 		const focal = height / 2 / Math.tan(40 * Math.PI / 180);
-		const ax = camera.x * Math.PI / 180;
-		const ay = camera.y * Math.PI / 180;
-		const sinX = Math.sin(ax);
-		const cosX = Math.cos(ax);
-		const sinY = Math.sin(ay);
-		const cosY = Math.cos(ay);
 		const glyph = (g, x, y, z, brightness) => {
 			const changing = g < 0;
 			if (changing) brightness *= 1.5;
@@ -1543,18 +1512,17 @@ var startRain = () => {
 				brightness *= ramp[Math.min(21, Math.max(0, Math.floor(ratio * WAVE_SIZE)))];
 			}
 			const top = y + 1;
-			const rx = x * cosY + z * sinY;
-			const rz = -x * sinY + z * cosY;
-			const ry = top * cosX - rz * sinX;
-			const depth = 25 - (top * sinX + rz * cosX);
+			const depth = 25 - z;
 			if (depth < 1) return;
 			const scale = focal / depth;
-			const sx = width / 2 + rx * scale;
-			const sy = height / 2 - ry * scale;
+			const sx = width / 2 + x * scale;
+			const sy = height / 2 - top * scale;
 			if (scale < 2 || sx > width || sy > height || sx + scale < 0 || sy + scale < 0) return;
 			context.globalAlpha = Math.min(1, brightness);
 			const index = Math.abs(g) - 1;
-			context.drawImage(atlas, index * cell, changing ? cell : 0, cell, cell, sx, sy, scale, scale);
+			const size = scale * PAD;
+			const offset = (size - scale) / 2;
+			context.drawImage(atlas, index * cell, changing ? cell : 0, cell, cell, sx - offset, sy - offset, size, size);
 		};
 		for (const s of strips) {
 			s.glyphs.forEach((g, i) => {
@@ -1573,10 +1541,7 @@ var startRain = () => {
 		if (now - last < TICK) return;
 		const ticks = Math.min(3, Math.floor((now - last) / TICK));
 		last = now;
-		for (let n = 0; n < ticks; n++) {
-			strips.forEach(tickStrip);
-			trackCamera();
-		}
+		for (let n = 0; n < ticks; n++) strips.forEach(tickStrip);
 		draw();
 	};
 	const update = () => {

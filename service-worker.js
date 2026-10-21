@@ -2,15 +2,17 @@ const CACHE = 'minesweeper'
 
 self.addEventListener('install', () => self.skipWaiting())
 
-//drop caches left by older versions of this worker
+//drop caches left by older workers, and reload open tabs they were serving stale files to
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) =>
-        Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))),
-      )
-      .then(() => self.clients.claim()),
+    caches.keys().then(async (keys) => {
+      const stale = keys.filter((key) => key !== CACHE)
+      await Promise.all(stale.map((key) => caches.delete(key)))
+      await self.clients.claim()
+      if (!stale.length) return
+      const tabs = await self.clients.matchAll({ type: 'window' })
+      tabs.forEach((tab) => tab.navigate(tab.url))
+    }),
   )
 })
 
