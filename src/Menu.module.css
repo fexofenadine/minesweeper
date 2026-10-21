@@ -1,7 +1,8 @@
 .root {
   display: inline-block;
-  font-family: var(--pixel-font);
-  -webkit-font-smoothing: none;
+  font-family: var(--ui-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-shadow: var(--text-glow);
   margin: 0;
   padding: 1px 0;
   color: var(--text);
@@ -92,6 +93,7 @@
 .option:hover {
   color: var(--highlight-text);
   background: var(--highlight);
+  text-shadow: none;
 }
 
 .hotKey {

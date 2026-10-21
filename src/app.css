@@ -11,8 +11,52 @@
   src: url(./fonts/ms_sans_serif_bold.woff2) format('woff2');
 }
 
+/*theme fonts, all under the sil open font license, see src/fonts*/
+@font-face {
+  font-family: 'Monoton';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/monoton.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Audiowide';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/audiowide.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Share Tech Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/share-tech-mono.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(./fonts/jetbrains-mono.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 700;
+  font-display: swap;
+  src: url(./fonts/jetbrains-mono-bold.woff2) format('woff2');
+}
+
 :root {
   --pixel-font: 'Wine MS Sans Serif Pixel', Tahoma, Geneva, sans-serif;
+  --ui-font: var(--pixel-font);
+  --title-font: var(--pixel-font);
+  --title-weight: bold;
+  --text-font: Tahoma, Geneva, sans-serif;
+  --font-size: 11px;
+  --font-smoothing: none;
+  --text-glow: none;
+  --title-glow: none;
   --desktop: #cbcbcb;
   --text: #000;
   --face: #d4d0c8;
@@ -59,7 +103,14 @@
 }
 
 :root[data-theme='synthwave'] {
-  /*synthwave '84 palette*/
+  /*synthwave '84 palette with neon fonts*/
+  --ui-font: 'Audiowide', var(--pixel-font);
+  --title-font: 'Monoton', var(--pixel-font);
+  --title-weight: normal;
+  --text-font: 'Audiowide', Tahoma, sans-serif;
+  --font-smoothing: auto;
+  --text-glow: 0 0 3px #ff7edb, 0 0 8px rgba(54, 249, 246, 0.7);
+  --title-glow: 0 0 4px #ff7edb, 0 0 10px #f92aad;
   color-scheme: dark;
   --desktop: #171520;
   --text: #ffffffee;
@@ -109,6 +160,10 @@
 
 :root[data-theme='solarized'] {
   color-scheme: dark;
+  --ui-font: 'JetBrains Mono', monospace;
+  --title-font: 'JetBrains Mono', monospace;
+  --text-font: 'JetBrains Mono', monospace;
+  --font-smoothing: auto;
   --desktop: #002b36;
   --text: #93a1a1;
   --face: #073642;
@@ -151,7 +206,15 @@
 }
 
 :root[data-theme='matrix'] {
-  /*monochrome phosphor green on black*/
+  /*monochrome phosphor green on black with a terminal font*/
+  --ui-font: 'Share Tech Mono', monospace;
+  --title-font: 'Share Tech Mono', monospace;
+  --title-weight: normal;
+  --text-font: 'Share Tech Mono', monospace;
+  --font-size: 12px;
+  --font-smoothing: auto;
+  --text-glow: 0 0 4px #00ff41, 0 0 9px rgba(0, 255, 65, 0.6);
+  --title-glow: 0 0 4px #00ff41;
   color-scheme: dark;
   --desktop: #000;
   --text: #00ff41;
@@ -207,10 +270,7 @@ body,
 }
 
 html {
-  font:
-    normal 11px/16px Tahoma,
-    Geneva,
-    sans-serif;
+  font: normal var(--font-size) / 16px var(--text-font);
 }
 
 body {

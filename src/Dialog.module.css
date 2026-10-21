@@ -49,9 +49,10 @@
   padding: 3px 2px 4px 2px;
   overflow: hidden;
   color: var(--title-text);
-  font-weight: bold;
-  font-family: var(--pixel-font);
-  -webkit-font-smoothing: none;
+  font-weight: var(--title-weight);
+  font-family: var(--title-font);
+  -webkit-font-smoothing: var(--font-smoothing);
+  text-shadow: var(--title-glow);
   font-size: inherit;
   line-height: 1;
   white-space: nowrap;
