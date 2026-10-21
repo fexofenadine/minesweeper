@@ -1,18 +1,18 @@
-/*windows 95 ui font from 98.css*/
+/*windows 95 ui font, pixel conversion of wine's lgpl ms sans serif, see src/fonts*/
 @font-face {
-  font-family: 'Pixelated MS Sans Serif';
+  font-family: 'Wine MS Sans Serif Pixel';
   font-weight: 400;
   src: url(./fonts/ms_sans_serif.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Pixelated MS Sans Serif';
+  font-family: 'Wine MS Sans Serif Pixel';
   font-weight: 700;
   src: url(./fonts/ms_sans_serif_bold.woff2) format('woff2');
 }
 
 :root {
-  --pixel-font: 'Pixelated MS Sans Serif', Tahoma, Geneva, sans-serif;
+  --pixel-font: 'Wine MS Sans Serif Pixel', Tahoma, Geneva, sans-serif;
   --desktop: #cbcbcb;
   --text: #000;
   --face: #d4d0c8;
@@ -227,24 +227,26 @@ main {
   min-width: 100%;
   min-height: 100%;
   vertical-align: top;
-  background: url(./background.jpg) 50% 50%;
-  background-size: cover;
+  isolation: isolate;
   user-select: none;
 }
 
-/*keeps the vhs layers between the background and the window*/
-:root[data-theme='synthwave'] main {
-  overflow: hidden;
-  background: var(--desktop);
-  isolation: isolate;
-}
-
-:root[data-theme='synthwave'] main::before,
-:root[data-theme='synthwave'] main::after {
-  position: absolute;
+/*wallpaper layers are fixed to the viewport so they fill it at any size, zoom or rotation*/
+main::before,
+main::after {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: -1;
   pointer-events: none;
   content: '';
+}
+
+/*hill photo by chris barbalis on unsplash, colour matched to the windows xp wallpaper*/
+main::before {
+  background: url(./background.jpg) 50% 50% / cover;
 }
 
 /*background by neeqolah creative works on unsplash, with film grain and tape wobble*/
@@ -349,12 +351,12 @@ main {
 }
 
 /*the code rain canvas shows through*/
-:root[data-theme='matrix'] main {
+:root[data-theme='matrix'] main::before {
   background: none;
 }
 
 /*code photo by chris ried on unsplash, muted under the solarized base*/
-:root[data-theme='solarized'] main {
+:root[data-theme='solarized'] main::before {
   background:
     linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
     url(./solarized.jpg) 50% 50% / cover var(--desktop);

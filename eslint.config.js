@@ -16,7 +16,7 @@ export default [
     },
   },
   {
-    files: ['vite.config.js', 'eslint.config.js', 'prettier.config.js'],
+    files: ['vite.config.js', 'eslint.config.js', 'prettier.config.js', 'src/fonts/convert.mjs'],
     languageOptions: { globals: { ...globals.node } },
   },
 ]
