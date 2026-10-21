@@ -1,0 +1,1173 @@
+/*windows 95 ui font from 98.css*/
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-weight: 400;
+  src: url(./ms_sans_serif.woff2) format('woff2');
+}
+
+@font-face {
+  font-family: 'Pixelated MS Sans Serif';
+  font-weight: 700;
+  src: url(./ms_sans_serif_bold.woff2) format('woff2');
+}
+
+:root {
+  --pixel-font: 'Pixelated MS Sans Serif', Tahoma, Geneva, sans-serif;
+  --desktop: #cbcbcb;
+  --text: #000;
+  --face: #d4d0c8;
+  --light: #fff;
+  --shadow: #808080;
+  --dark-shadow: #404040;
+  --frame: #000;
+  --window-frame: #222;
+  --title-start: #0a246a;
+  --title-end: #a6caf0;
+  --title-text: #fff;
+  --highlight: #0a246a;
+  --highlight-text: #fff;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #fff;
+  --input-frame: #000;
+  --panel: #c0c0c0;
+  --cell: #bdbdbd;
+  --cell-light: #fff;
+  --cell-shadow: #7b7b7b;
+  --lcd: #000;
+  --lcd-on: #f00;
+  --lcd-off: rgba(255, 0, 0, 0.5);
+  --num-1: #00f;
+  --num-2: #007b00;
+  --num-3: #f00;
+  --num-4: #00007b;
+  --num-5: #7b0000;
+  --num-6: #007b7b;
+  --num-7: #000;
+  --num-8: #7b7b7b;
+  --glyph: #000;
+  --flag: #f00;
+  --mine: #000;
+  --mine-shine: #fff;
+  --hurt: #f00;
+  --wrong: #f00;
+  --smiley: #ff0;
+  --smiley-line: #000;
+  --glow-dim: none;
+  --glow-bright: none;
+  --fringe-a: rgba(255, 0, 90, 0.8);
+  --fringe-b: rgba(0, 255, 255, 0.8);
+}
+
+:root[data-theme='synthwave'] {
+  /*synthwave '84 palette*/
+  color-scheme: dark;
+  --desktop: #171520;
+  --text: #ffffffee;
+  --face: #241b2f;
+  --light: #614d85;
+  --shadow: #171520;
+  --dark-shadow: #0d0b12;
+  --frame: #ff7edb;
+  --window-frame: #0d0b12;
+  --title-start: #880088;
+  --title-end: #ff7edb;
+  --title-text: #fff;
+  --highlight: #ff7edb;
+  --highlight-text: #241b2f;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #2a2139;
+  --input-frame: #0d0b12;
+  --panel: #262335;
+  --cell: #34294f;
+  --cell-light: #614d85;
+  --cell-shadow: #171520;
+  --lcd: #171520;
+  --lcd-on: #fe4450;
+  --lcd-off: rgba(254, 68, 80, 0.15);
+  --num-1: #36f9f6;
+  --num-2: #72f1b8;
+  --num-3: #fe4450;
+  --num-4: #ff7edb;
+  --num-5: #f97e72;
+  --num-6: #fede5d;
+  --num-7: #848bbd;
+  --num-8: #b6b1b1;
+  --glyph: #ffffffee;
+  --flag: #fe4450;
+  --mine: #ffffffee;
+  --mine-shine: #241b2f;
+  --hurt: #fe4450;
+  --wrong: #fe4450;
+  --smiley: #fede5d;
+  --smiley-line: #241b2f;
+  --glow-dim:
+    0 0 0 1px #ff7edb, 0 0 12px 3px rgba(255, 126, 219, 0.85),
+    0 0 36px 10px rgba(255, 126, 219, 0.45);
+  --glow-bright:
+    0 0 0 1px #36f9f6, 0 0 16px 5px rgba(54, 249, 246, 0.9), 0 0 48px 16px rgba(54, 249, 246, 0.5);
+}
+
+:root[data-theme='solarized'] {
+  color-scheme: dark;
+  --desktop: #002b36;
+  --text: #93a1a1;
+  --face: #073642;
+  --light: #2f5964;
+  --shadow: #00212a;
+  --dark-shadow: #00161c;
+  --frame: #268bd2;
+  --window-frame: #00161c;
+  --title-start: #268bd2;
+  --title-end: #2aa198;
+  --title-text: #fdf6e3;
+  --highlight: #268bd2;
+  --highlight-text: #fdf6e3;
+  --menu-shadow: rgba(0, 0, 0, 0.5);
+  --input: #002b36;
+  --input-frame: #00161c;
+  --panel: #073642;
+  --cell: #0b4250;
+  --cell-light: #3d6874;
+  --cell-shadow: #001f27;
+  --lcd: #001f27;
+  --lcd-on: #cb4b16;
+  --lcd-off: rgba(203, 75, 22, 0.2);
+  --num-1: #268bd2;
+  --num-2: #859900;
+  --num-3: #dc322f;
+  --num-4: #6c71c4;
+  --num-5: #cb4b16;
+  --num-6: #2aa198;
+  --num-7: #d33682;
+  --num-8: #93a1a1;
+  --glyph: #93a1a1;
+  --flag: #dc322f;
+  --mine: #eee8d5;
+  --mine-shine: #073642;
+  --hurt: #dc322f;
+  --wrong: #dc322f;
+  --smiley: #b58900;
+  --smiley-line: #002b36;
+}
+
+:root[data-theme='matrix'] {
+  /*monochrome phosphor green on black*/
+  color-scheme: dark;
+  --desktop: #000;
+  --text: #00ff41;
+  --face: #020d05;
+  --light: #0f5c25;
+  --shadow: #000;
+  --dark-shadow: #000;
+  --frame: #00ff41;
+  --window-frame: #000;
+  --title-start: #003b00;
+  --title-end: #008f11;
+  --title-text: #d7ffdf;
+  --highlight: #00ff41;
+  --highlight-text: #000;
+  --menu-shadow: rgba(0, 255, 65, 0.25);
+  --input: #000;
+  --input-frame: #003b00;
+  --panel: #010a03;
+  --cell: #04210c;
+  --cell-light: #12702d;
+  --cell-shadow: #000;
+  --lcd: #000;
+  --lcd-on: #00ff41;
+  --lcd-off: rgba(0, 255, 65, 0.12);
+  --num-1: #00ff41;
+  --num-2: #8affa8;
+  --num-3: #00c234;
+  --num-4: #c4ffd2;
+  --num-5: #009e2a;
+  --num-6: #52ff7d;
+  --num-7: #e6ffec;
+  --num-8: #007a20;
+  --glyph: #00ff41;
+  --flag: #00ff41;
+  --mine: #00ff41;
+  --mine-shine: #000;
+  --hurt: #006b1c;
+  --wrong: #c4ffd2;
+  --smiley: #00ff41;
+  --smiley-line: #000;
+  --glow-dim:
+    0 0 0 1px #00ff41, 0 0 18px 4px rgba(0, 255, 65, 0.6), 0 0 48px 16px rgba(0, 255, 65, 0.25);
+  --glow-bright:
+    0 0 0 1px #8affa8, 0 0 24px 8px rgba(0, 255, 65, 0.85), 0 0 72px 26px rgba(0, 255, 65, 0.4);
+  --fringe-a: rgba(0, 255, 65, 0.8);
+  --fringe-b: rgba(196, 255, 210, 0.6);
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+html {
+  font:
+    normal 11px/16px Tahoma,
+    Geneva,
+    sans-serif;
+}
+
+body {
+  margin: 0;
+  background: var(--desktop);
+}
+
+main {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-width: 100%;
+  min-height: 100%;
+  vertical-align: top;
+  background: url(./background.jpg) 50% 50%;
+  background-size: cover;
+  user-select: none;
+}
+
+/*keeps the vhs layers between the background and the window*/
+:root[data-theme='synthwave'] main {
+  overflow: hidden;
+  background: var(--desktop);
+  isolation: isolate;
+}
+
+:root[data-theme='synthwave'] main::before,
+:root[data-theme='synthwave'] main::after {
+  position: absolute;
+  z-index: -1;
+  pointer-events: none;
+  content: '';
+}
+
+/*background by neeqolah creative works on unsplash, with film grain and tape wobble*/
+:root[data-theme='synthwave'] main::before {
+  top: -12px;
+  right: -12px;
+  bottom: -12px;
+  left: -12px;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.16'/%3E%3C/svg%3E"),
+    url(./synthwave.jpg) 50% 60% / cover;
+  filter: blur(0.4px) saturate(1.15);
+  animation:
+    vhs-grain 0.5s steps(1, end) infinite,
+    vhs-wobble 7s steps(1, end) infinite;
+}
+
+/*tracking band, scanlines and vignette*/
+:root[data-theme='synthwave'] main::after {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(
+        transparent,
+        rgba(255, 255, 255, 0.06) 30%,
+        rgba(148, 218, 234, 0.22) 48%,
+        rgba(240, 80, 138, 0.18) 52%,
+        rgba(255, 255, 255, 0.06) 70%,
+        transparent
+      )
+      0 -30% / 100% 10% no-repeat,
+    repeating-linear-gradient(rgba(0, 0, 0, 0.25) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.5));
+  animation:
+    vhs-roll 6s linear infinite,
+    vhs-flicker 0.12s steps(2) infinite;
+}
+
+@keyframes vhs-grain {
+  0% {
+    background-position:
+      0 0,
+      50% 50%;
+  }
+  25% {
+    background-position:
+      -60px 40px,
+      50% 50%;
+  }
+  50% {
+    background-position:
+      90px -70px,
+      50% 50%;
+  }
+  75% {
+    background-position:
+      -30px -110px,
+      50% 50%;
+  }
+}
+
+@keyframes vhs-wobble {
+  0% {
+    transform: none;
+  }
+  41% {
+    transform: translateX(-4px) skewX(1.5deg);
+    filter: blur(0.6px) saturate(1.4) hue-rotate(-12deg);
+  }
+  42% {
+    transform: translateX(3px);
+  }
+  43% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+  82% {
+    transform: translateY(2px) translateX(2px);
+    filter: blur(0.8px) saturate(1.3) brightness(1.15);
+  }
+  83% {
+    transform: none;
+    filter: blur(0.4px) saturate(1.15);
+  }
+}
+
+@keyframes vhs-roll {
+  to {
+    background-position:
+      0 130%,
+      0 240px,
+      0 0;
+  }
+}
+
+@keyframes vhs-flicker {
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/*the code rain canvas shows through*/
+:root[data-theme='matrix'] main {
+  background: none;
+}
+
+/*code photo by chris ried on unsplash, muted under the solarized base*/
+:root[data-theme='solarized'] main {
+  background:
+    linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
+    url(./solarized.jpg) 50% 50% / cover var(--desktop);
+}
+.Game_root {
+  padding: 6px 5px 5px 6px;
+  background: var(--panel);
+  border: solid var(--light);
+  border-width: 3px 0 0 3px;
+}
+
+.Game_scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 0 0 6px;
+  padding: 4px 7px 3px 5px;
+  text-align: center;
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.Game_field {
+  white-space: nowrap;
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Game_active {
+  cursor: pointer;
+}
+
+.Game_inactive {
+  cursor: default;
+}
+
+/*neon theme meltdown after hitting a mine*/
+.Game_fieldLost {
+}
+
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost {
+  position: relative;
+  animation:
+    Game_jitter 2.4s steps(1, end) infinite,
+    Game_chroma 3.1s steps(1, end) infinite;
+}
+
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::before,
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: none;
+  content: '';
+}
+
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::before {
+  background: linear-gradient(
+      transparent,
+      color-mix(in srgb, var(--fringe-b) 40%, transparent) 45%,
+      color-mix(in srgb, var(--fringe-a) 40%, transparent) 55%,
+      transparent
+    )
+    0 -20% / 100% 20% no-repeat;
+  mix-blend-mode: screen;
+  animation: Game_band 1.7s linear infinite;
+}
+
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::after {
+  background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
+  animation: Game_flicker 0.15s steps(2) infinite;
+}
+
+@keyframes Game_jitter {
+  0% {
+    transform: none;
+    clip-path: none;
+  }
+  7% {
+    transform: translate(-3px, 1px) skewX(4deg);
+    clip-path: inset(10% 0 55% 0);
+  }
+  9% {
+    transform: translate(4px, -1px);
+    clip-path: inset(50% 0 20% 0);
+  }
+  11% {
+    transform: none;
+    clip-path: none;
+  }
+  38% {
+    transform: translateX(2px);
+    clip-path: inset(30% 0 40% 0);
+  }
+  40% {
+    transform: none;
+    clip-path: none;
+  }
+  68% {
+    transform: translate(-5px, 0) skewX(-7deg);
+    clip-path: inset(70% 0 5% 0);
+  }
+  70% {
+    transform: translate(3px, 2px);
+    clip-path: inset(0 0 75% 0);
+  }
+  72% {
+    transform: translateY(-2px) scaleY(1.03);
+    clip-path: none;
+  }
+  74% {
+    transform: none;
+  }
+}
+
+@keyframes Game_chroma {
+  0% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+  30% {
+    filter: drop-shadow(-4px 0 var(--fringe-a)) drop-shadow(4px 0 var(--fringe-b)) hue-rotate(90deg)
+      saturate(2);
+  }
+  34% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+  61% {
+    filter: invert(1) hue-rotate(180deg);
+  }
+  63% {
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b)) contrast(1.4);
+  }
+  90% {
+    filter: drop-shadow(3px 1px var(--fringe-a)) drop-shadow(-3px -1px var(--fringe-b))
+      hue-rotate(-60deg);
+  }
+  93% {
+    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
+  }
+}
+
+@keyframes Game_band {
+  to {
+    background-position: 0 120%;
+  }
+}
+
+@keyframes Game_flicker {
+  50% {
+    opacity: 0.4;
+  }
+}
+.Dialog_a {
+  margin: 50px;
+}
+
+.Dialog_b {
+  margin-top: env(safe-area-inset-top);
+  margin-right: env(safe-area-inset-right);
+  margin-bottom: env(safe-area-inset-bottom);
+  margin-left: env(safe-area-inset-left);
+}
+
+.Dialog_dialog {
+  position: relative;
+  zoom: var(--scale, 1);
+  display: inline-block;
+  color: var(--text);
+  text-align: left;
+  vertical-align: top;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--face) var(--window-frame) var(--window-frame) var(--face);
+  box-shadow: var(--glow-dim);
+  animation: Dialog_glow 4s ease-in-out infinite;
+}
+
+/*pulse between the theme glows*/
+@keyframes Dialog_glow {
+  50% {
+    box-shadow: var(--glow-bright);
+  }
+}
+
+.Dialog_container {
+  padding: 1px;
+  border: 1px solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+}
+
+.Dialog_header {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(to right, var(--title-start), var(--title-end)) 100% 0 no-repeat;
+  background-color: var(--title-start);
+}
+
+.Dialog_title {
+  flex-grow: 1;
+  margin: 0;
+  padding: 3px 2px 4px 2px;
+  overflow: hidden;
+  color: var(--title-text);
+  font-weight: bold;
+  font-family: var(--pixel-font);
+  -webkit-font-smoothing: none;
+  font-size: inherit;
+  line-height: 1;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.Dialog_button {
+  padding: 2px 2px 2px 0;
+  line-height: 9px;
+}
+
+.Dialog_close {
+  display: block;
+  fill: currentColor;
+}
+.Button_root {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0 1px 1px 0;
+  color: var(--text);
+  font: inherit;
+  vertical-align: top;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
+  outline: 0;
+  cursor: pointer;
+}
+
+.Button_root::before,
+.Button_root::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 1px solid;
+  border-color: var(--face) var(--shadow) var(--shadow) var(--face);
+  content: '';
+}
+
+.Button_root::before {
+  border: 2px solid transparent;
+}
+
+.Button_root:active {
+  padding: 1px 0 0 1px;
+  border-color: var(--dark-shadow) var(--light) var(--light) var(--dark-shadow);
+}
+
+.Button_root:active::after {
+  border-color: var(--shadow) var(--face) var(--face) var(--shadow);
+}
+
+.Button_root:focus {
+  border-color: var(--frame);
+}
+
+.Button_root:focus::before {
+  border-color: transparent var(--shadow) var(--shadow) transparent;
+}
+
+.Button_root:focus::after {
+  border-color: var(--light) var(--dark-shadow) var(--dark-shadow) var(--light);
+}
+
+.Button_root:focus:active::before {
+  border-color: var(--shadow) transparent transparent var(--shadow);
+}
+
+.Button_root:focus:active::after {
+  border-color: var(--frame) var(--light) var(--light) var(--frame);
+}
+.Menu_root {
+  display: inline-block;
+  font-family: var(--pixel-font);
+  -webkit-font-smoothing: none;
+  margin: 0;
+  padding: 1px 0;
+  color: var(--text);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: top;
+  list-style: none;
+  outline: 0;
+}
+
+.Menu_column {
+  position: relative;
+  display: inline-block;
+  vertical-align: top;
+}
+
+.Menu_columnActive {
+}
+
+.Menu_button {
+  display: block;
+  margin: 0;
+  padding: 2px 6px 3px 5px;
+  overflow: hidden;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-overflow: ellipsis;
+  background: none;
+  border: 1px solid transparent;
+  outline: 0;
+  cursor: pointer;
+}
+
+.Menu_button:hover {
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+}
+
+.Menu_columnActive .Menu_button {
+  padding: 3px 5px 2px 6px;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.Menu_menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1;
+  display: none;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--face) var(--window-frame) var(--window-frame) var(--face);
+  box-shadow: 2px 2px 2px var(--menu-shadow);
+}
+
+.Menu_columnActive > .Menu_menu {
+  display: block;
+}
+
+.Menu_item {
+  position: relative;
+}
+
+.Menu_list {
+  margin: 0;
+  padding: 1px;
+  list-style: none;
+  border: 1px solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+}
+
+.Menu_option {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 2px 42px 4px 17px;
+  color: inherit;
+  font: inherit;
+  font-weight: inherit;
+  text-align: inherit;
+  background: none;
+  border: 0;
+  outline: 0;
+  cursor: pointer;
+}
+
+.Menu_option:hover {
+  color: var(--highlight-text);
+  background: var(--highlight);
+}
+
+.Menu_hotKey {
+  position: absolute;
+  top: 2px;
+  right: 20px;
+}
+
+.Menu_check {
+  position: relative;
+  display: inline-block;
+  margin: 0 6px 0 -13px;
+  vertical-align: baseline;
+  fill: currentColor;
+}
+
+.Menu_separator {
+  margin: 3px 1px 4px;
+  border-top: 1px solid var(--shadow);
+  border-bottom: 1px solid var(--light);
+}
+.Digit_root {
+  position: relative;
+  background: var(--lcd);
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.Digit_digit {
+  display: inline-block;
+  vertical-align: top;
+  fill: var(--lcd-on);
+}
+
+.Digit_digit[data-n='-'] .Digit_t,
+.Digit_digit[data-n='-'] .Digit_rt,
+.Digit_digit[data-n='-'] .Digit_rb,
+.Digit_digit[data-n='-'] .Digit_b,
+.Digit_digit[data-n='-'] .Digit_lb,
+.Digit_digit[data-n='-'] .Digit_lt,
+.Digit_digit[data-n='0'] .Digit_m,
+.Digit_digit[data-n='1'] .Digit_t,
+.Digit_digit[data-n='1'] .Digit_b,
+.Digit_digit[data-n='1'] .Digit_lb,
+.Digit_digit[data-n='1'] .Digit_lt,
+.Digit_digit[data-n='1'] .Digit_m,
+.Digit_digit[data-n='2'] .Digit_rb,
+.Digit_digit[data-n='2'] .Digit_lt,
+.Digit_digit[data-n='3'] .Digit_lb,
+.Digit_digit[data-n='3'] .Digit_lt,
+.Digit_digit[data-n='4'] .Digit_t,
+.Digit_digit[data-n='4'] .Digit_b,
+.Digit_digit[data-n='4'] .Digit_lb,
+.Digit_digit[data-n='5'] .Digit_rt,
+.Digit_digit[data-n='5'] .Digit_lb,
+.Digit_digit[data-n='6'] .Digit_rt,
+.Digit_digit[data-n='7'] .Digit_b,
+.Digit_digit[data-n='7'] .Digit_lb,
+.Digit_digit[data-n='7'] .Digit_lt,
+.Digit_digit[data-n='7'] .Digit_m,
+.Digit_digit[data-n='9'] .Digit_lb {
+  fill: var(--lcd-off);
+}
+
+/*neon theme counter glitch and scanlines*/
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Digit_root {
+  animation: Digit_lcdGlitch 5.3s steps(1, end) infinite;
+}
+
+:root:is([data-theme='synthwave'], [data-theme='matrix']) .Digit_root::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background:
+    linear-gradient(
+        transparent,
+        color-mix(in srgb, var(--fringe-b) 35%, transparent) 50%,
+        transparent
+      )
+      0 -40% / 100% 35% no-repeat,
+    repeating-linear-gradient(transparent 0 1px, rgba(0, 0, 0, 0.45) 1px 2px);
+  pointer-events: none;
+  content: '';
+  animation:
+    Digit_lcdBand 2.2s linear infinite,
+    Digit_lcdFlicker 0.12s steps(2) infinite;
+}
+
+@keyframes Digit_lcdGlitch {
+  0% {
+    transform: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  18% {
+    transform: translateX(-2px);
+    filter: drop-shadow(3px 0 var(--fringe-a)) drop-shadow(-3px 0 var(--fringe-b));
+  }
+  20% {
+    transform: translate(2px, 1px) skewX(-6deg);
+    clip-path: inset(0 0 55% 0);
+  }
+  22% {
+    transform: none;
+    clip-path: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  57% {
+    transform: translateY(-1px);
+    clip-path: inset(40% 0 20% 0);
+    filter: drop-shadow(-3px 0 var(--fringe-a)) drop-shadow(3px 0 var(--fringe-b)) hue-rotate(60deg);
+  }
+  59% {
+    transform: none;
+    clip-path: none;
+    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b));
+  }
+  84% {
+    transform: translateX(3px) scaleX(1.04);
+  }
+  86% {
+    transform: none;
+  }
+}
+
+@keyframes Digit_lcdBand {
+  to {
+    background-position: 0 140%;
+  }
+}
+
+@keyframes Digit_lcdFlicker {
+  50% {
+    opacity: 0.6;
+  }
+}
+.Play_root {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 3px 3px 2px 2px;
+  background: var(--cell);
+  border: 1px solid var(--cell-shadow);
+  outline: 0;
+  cursor: pointer;
+}
+
+.Play_root::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.Play_root:active {
+  padding: 4px 1px 1px 4px;
+}
+
+.Play_root:active::before {
+  border-width: 1px 0 0 1px;
+  border-color: var(--cell-shadow);
+}
+
+.Play_down,
+.Play_root:active .Play_up {
+  display: none;
+}
+
+.Play_face,
+.Play_root:active .Play_down {
+  display: block;
+}
+
+.Play_face {
+  fill: var(--smiley-line);
+}
+
+.Play_skin {
+  fill: var(--smiley);
+}
+.Cell_root {
+  position: relative;
+  display: inline-block;
+  margin: 0;
+  padding: 0 1px 1px 0;
+  font: inherit;
+  font-weight: bold;
+  text-align: center;
+  vertical-align: top;
+  background: var(--cell);
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Cell_root::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.Cell_pressed {
+  padding: 1px 0 0 1px;
+}
+
+.Cell_pressed::before {
+  border: 1px solid var(--cell-shadow);
+  border-width: 1px 0 0 1px;
+}
+
+.Cell_image {
+  display: block;
+  fill: var(--glyph);
+}
+
+.Cell_hurt {
+  background: var(--hurt);
+}
+
+.Cell_n1 {
+  fill: var(--num-1);
+}
+
+.Cell_n2 {
+  fill: var(--num-2);
+}
+
+.Cell_n3 {
+  fill: var(--num-3);
+}
+
+.Cell_n4 {
+  fill: var(--num-4);
+}
+
+.Cell_n5 {
+  fill: var(--num-5);
+}
+
+.Cell_n6 {
+  fill: var(--num-6);
+}
+
+.Cell_n7 {
+  fill: var(--num-7);
+}
+
+.Cell_n8 {
+  fill: var(--num-8);
+}
+
+.Cell_flagCloth {
+  fill: var(--flag);
+}
+
+.Cell_wrong {
+  fill: var(--wrong);
+}
+
+.Cell_mine {
+  fill: var(--mine);
+}
+
+.Cell_shine {
+  fill: var(--mine-shine);
+}
+.Grip_bar {
+  display: flex;
+  justify-content: flex-end;
+  height: 12px;
+}
+
+/*windows 95 size grip, with a larger touch area than it shows*/
+.Grip_grip {
+  width: 22px;
+  height: 22px;
+  margin-top: -10px;
+  background: linear-gradient(
+      135deg,
+      transparent 0 34%,
+      var(--light) 34% 40%,
+      var(--shadow) 40% 48%,
+      transparent 48% 56%,
+      var(--light) 56% 62%,
+      var(--shadow) 62% 70%,
+      transparent 70% 78%,
+      var(--light) 78% 84%,
+      var(--shadow) 84% 92%,
+      transparent 92%
+    )
+    100% 100% / 12px 12px no-repeat;
+  cursor: nwse-resize;
+  touch-action: none;
+}
+.Winner_root {
+  width: 130px;
+  padding: 22px 10px;
+  text-align: center;
+}
+
+.Winner_text {
+  display: block;
+  margin: 0;
+  line-height: 13px;
+}
+
+.Winner_input {
+  padding: 22px 10px 12px;
+}
+
+.Winner_button {
+  display: block;
+  width: 44px;
+  padding: 4px 3px 3px 4px;
+}
+.Overlay_root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  outline: 0;
+  cursor: default;
+  -webkit-overflow-scrolling: touch;
+}
+
+.Overlay_table {
+  display: table;
+  width: 100%;
+  height: 100%;
+}
+
+.Overlay_cell {
+  display: table-cell;
+  text-align: center;
+  vertical-align: middle;
+}
+.Input_root {
+  display: block;
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.Input_input {
+  box-sizing: border-box;
+  width: 100%;
+  margin: 0;
+  padding: 0 2px;
+  color: inherit;
+  font: inherit;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--input-frame) var(--face) var(--face) var(--input-frame);
+  border-radius: 0;
+  outline: 0;
+  appearance: none;
+}
+.BestTime_root {
+  padding: 24px 8px 12px;
+  white-space: nowrap;
+}
+
+.BestTime_table {
+  width: 100%;
+  border: 0;
+  border-collapse: collapse;
+}
+
+.BestTime_cell {
+  padding: 0 8px;
+}
+
+.BestTime_cell:first-child::first-letter {
+  text-transform: uppercase;
+}
+
+.BestTime_footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 18px 0 0;
+  text-align: center;
+}
+
+.BestTime_button {
+  display: block;
+  min-width: 34px;
+  padding: 1px 5px 0;
+}
+.CustomField_root {
+  display: flex;
+  padding: 34px 16px;
+}
+
+.CustomField_row {
+  display: flex;
+  justify-content: space-between;
+  margin: 4px 0 0;
+}
+
+.CustomField_row:first-child {
+  margin: 0;
+}
+
+.CustomField_name {
+  padding: 2px 10px 2px 0;
+}
+
+.CustomField_value {
+  width: 40px;
+}
+
+.CustomField_footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 0 0 0 16px;
+}
+
+.CustomField_button {
+  display: block;
+  width: 50px;
+  padding: 4px 3px 3px 4px;
+}
