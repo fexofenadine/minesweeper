@@ -1,5 +1,6 @@
 import { h } from 'hyperapp'
 import s from './Grip.module.css'
+import { save } from './storage'
 
 const root = document.documentElement
 
@@ -7,7 +8,7 @@ export const clampScale = (scale) => Math.round(Math.min(4, Math.max(0.5, scale)
 
 const setScale = (scale) => {
   root.style.setProperty('--scale', scale)
-  localStorage.setItem('scale', scale)
+  save('scale', scale)
 }
 
 //the window is centred, so its corner moves half as far as it grows

@@ -5,6 +5,7 @@ import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
 import { placeMines } from './mines'
+import { load, save, remove } from './storage'
 
 const levels = {
   beginner: {
@@ -107,7 +108,7 @@ const customLevel = (data, defaults) => {
 }
 
 const loadLevel = () => {
-  const level = localStorage.getItem('level')
+  const level = load('level')
   if (typeof level !== 'string') return levels.beginner
   if (levels[level]) return levels[level]
   const data = level.split(',')
@@ -115,7 +116,7 @@ const loadLevel = () => {
 }
 
 const loadTheme = () => {
-  const theme = localStorage.getItem('theme')
+  const theme = load('theme')
   return themes.includes(theme) ? theme : 'classic'
 }
 
@@ -127,9 +128,9 @@ const prevent = (event) => {
 export const state = {
   menu: null,
   game: createGame(loadLevel()),
-  marks: Boolean(localStorage.getItem('marks')),
-  safeStart: localStorage.getItem('safeStart') !== 'off',
-  noGuess: Boolean(localStorage.getItem('noGuess')),
+  marks: Boolean(load('marks')),
+  safeStart: load('safeStart') !== 'off',
+  noGuess: Boolean(load('noGuess')),
   theme: loadTheme(),
   winner: null,
   bestTime: null,
@@ -150,7 +151,7 @@ export const actions = {
     ({ game }) => {
       cancelAnimationFrame(game.raf)
       const params = (payload && levels[payload.level]) || payload || game
-      localStorage.setItem(
+      save(
         'level',
         params.level === 'custom'
           ? [params.width, params.height, params.mines].join()
@@ -382,7 +383,7 @@ export const actions = {
     () =>
     ({ game }) => {
       if (game.level === 'custom') return null
-      const time = parseInt(localStorage.getItem(game.level), 10)
+      const time = parseInt(load(game.level), 10)
       if (time && time <= game.time) return null
       return {
         winner: {
@@ -401,8 +402,8 @@ export const actions = {
     (event) =>
     ({ winner }, actions) => {
       event.preventDefault()
-      localStorage.setItem(winner.level, winner.time)
-      localStorage.setItem(`${winner.level}Name`, winner.name.trim())
+      save(winner.level, winner.time)
+      save(`${winner.level}Name`, winner.name.trim())
       actions.toggleBestTime()
       return { winner: null }
     },
@@ -415,8 +416,8 @@ export const actions = {
         : {
             levels: levelNames.map((level) => ({
               level,
-              name: localStorage.getItem(`${level}Name`) || 'Anonymous',
-              time: Math.min(999, parseInt(localStorage.getItem(level), 10) || 0) || 999,
+              name: load(`${level}Name`) || 'Anonymous',
+              time: Math.min(999, parseInt(load(level), 10) || 0) || 999,
             })),
           },
     }),
@@ -424,8 +425,8 @@ export const actions = {
     bestTime: {
       levels: levelNames.map((level) => ({
         level,
-        name: localStorage.removeItem(`${level}Name`) || 'Anonymous',
-        time: localStorage.removeItem(level) || 999,
+        name: remove(`${level}Name`) || 'Anonymous',
+        time: remove(level) || 999,
       })),
     },
   }),
@@ -455,24 +456,24 @@ export const actions = {
     },
   toggleSafeStart: () => (state) => {
     const safeStart = !state.safeStart
-    localStorage.setItem('safeStart', safeStart ? '' : 'off')
+    save('safeStart', safeStart ? '' : 'off')
     return { menu: null, safeStart }
   },
   toggleNoGuess: () => (state) => {
     const noGuess = !state.noGuess
-    localStorage.setItem('noGuess', noGuess ? 'yes' : '')
+    save('noGuess', noGuess ? 'yes' : '')
     return { menu: null, noGuess }
   },
   toggleMarks: () => (state) => {
     const marks = !state.marks
-    localStorage.setItem('marks', marks ? 'yes' : '')
+    save('marks', marks ? 'yes' : '')
     return {
       menu: null,
       marks,
     }
   },
   setTheme: (theme) => () => {
-    localStorage.setItem('theme', theme)
+    save('theme', theme)
     document.documentElement.dataset.theme = theme
     return {
       menu: null,
