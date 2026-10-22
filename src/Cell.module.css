@@ -99,7 +99,8 @@
 .hintSource::after,
 .hintSafe::after,
 .hintMine::after,
-.hintWrong::after {
+.hintWrong::after,
+.hintUnsure::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -127,4 +128,13 @@
 
 .hintWrong {
   --hint-color: #ffb000;
+}
+
+/*cells where some of the missing flags belong, which ones is not known*/
+.hintUnsure {
+  --hint-color: #c45cff;
+}
+
+.hintUnsure::after {
+  border-style: dashed;
 }

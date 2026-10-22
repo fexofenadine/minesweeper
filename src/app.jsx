@@ -4,9 +4,11 @@ import Game from './Game'
 import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
+import BackgroundSettings from './BackgroundSettings'
 import { placeMines } from './mines'
-import { findHint, noHint } from './hint'
+import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
+import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
 
 const levels = {
   beginner: {
@@ -31,7 +33,7 @@ const levels = {
 
 const levelNames = Object.keys(levels)
 
-const themes = ['classic', 'synthwave', 'solarized', 'matrix']
+const themes = ['classic', 'synthwave', 'solarized', 'matrix', 'nord']
 
 const createGame = ({ level, width, height, mines }) => {
   const field = new Array(height)
@@ -66,6 +68,7 @@ const createGame = ({ level, width, height, mines }) => {
     win: false,
     touch: false,
     hinted: false,
+    openedAt: { x: -1, y: -1, time: 0 },
   }
 }
 
@@ -160,6 +163,8 @@ export const state = {
   winner: null,
   bestTime: null,
   customField: null,
+  backgrounds: loadSettings(),
+  backgroundSettings: null,
 }
 
 export const actions = {
@@ -168,7 +173,8 @@ export const actions = {
   },
   press: (event) => (state, actions) => {
     //leave typing in a dialog and browser shortcuts alone
-    if (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey || event.altKey) return
+    const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
+    if (typing || event.ctrlKey || event.metaKey || event.altKey) return
     if (event.keyCode === 113 || event.keyCode === 78) {
       actions.reset()
     } else if (event.keyCode === 72) {
@@ -310,7 +316,14 @@ export const actions = {
   chord:
     ({ x, y }) =>
     ({ game }, actions) => {
-      if (game.win || game.lose || !openable(game, x, y)) return null
+      if (game.win || game.lose) return null
+      if (!openable(game, x, y)) {
+        //the first click of a double click on a hidden cell just opened it, that is no failed chord
+        const { openedAt } = game
+        const fresh =
+          openedAt.x === x && openedAt.y === y && performance.now() - openedAt.time < 500
+        return fresh ? null : { hint: explainChord(game, x, y) }
+      }
       actions.aim({ x, y })
       actions.up()
       return null
@@ -385,15 +398,23 @@ export const actions = {
       }
 
       const cell = field[pressedY][pressedX]
+      const wasOpened = cell.opened
+      let chordHint = null
 
       if (game.group) {
         if (cell.opened) {
           const flags = calcNear(pressedX, pressedY, (c) => c.flag)
           if (flags === cell.num) {
             left -= revealRange(pressedX, pressedY, reveal)
+          } else {
+            chordHint = explainChord({ field, width, height }, pressedX, pressedY)
           }
         }
       } else if (game.pressed) {
+        //on touch screens a tap on a number is the chord
+        if (game.touch && wasOpened) {
+          chordHint = explainChord({ field, width, height }, pressedX, pressedY)
+        }
         left -= reveal(pressedX, pressedY)
       }
 
@@ -404,11 +425,15 @@ export const actions = {
       }
 
       return {
-        hint: null,
+        hint: chordHint,
         game: {
           ...game,
           left,
           field,
+          openedAt:
+            !wasOpened && cell.opened
+              ? { x: pressedX, y: pressedY, time: performance.now() }
+              : game.openedAt,
           pressed: false,
           group: false,
           start: begin ? performance.now() : game.start,
@@ -515,6 +540,34 @@ export const actions = {
       marks,
     }
   },
+  //the dialog edits a draft that previews live, cancel puts the saved settings back
+  toggleBackgroundSettings:
+    () =>
+    ({ theme, backgrounds, backgroundSettings }) => {
+      if (backgroundSettings) {
+        configure(backgroundSettings.id, backgrounds[backgroundSettings.id])
+        return { backgroundSettings: null }
+      }
+      const id = backgroundFor(theme)
+      return { menu: null, backgroundSettings: id && { id, draft: { ...backgrounds[id] } } }
+    },
+  changeBackgroundSettings:
+    (values) =>
+    ({ backgroundSettings: { id, draft } }) => {
+      const next = { ...draft, ...values }
+      configure(id, next)
+      return { backgroundSettings: { id, draft: next } }
+    },
+  resetBackgroundSettings: () => (state, actions) =>
+    actions.changeBackgroundSettings(defaults(state.backgroundSettings.id)),
+  submitBackgroundSettings:
+    (event) =>
+    ({ backgrounds, backgroundSettings: { id, draft } }) => {
+      event.preventDefault()
+      const next = { ...backgrounds, [id]: draft }
+      saveSettings(next)
+      return { backgrounds: next, backgroundSettings: null }
+    },
   setTheme: (theme) => () => {
     save('theme', theme)
     document.documentElement.dataset.theme = theme
@@ -546,5 +599,8 @@ export const view = (state, actions) => (
     {state.winner && <Winner key="b" state={state.winner} actions={actions} />}
     {state.bestTime && <BestTime key="c" state={state.bestTime} actions={actions} />}
     {state.customField && <CustomField key="d" state={state.customField} actions={actions} />}
+    {state.backgroundSettings && (
+      <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
+    )}
   </main>
 )

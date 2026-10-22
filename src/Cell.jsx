@@ -98,6 +98,7 @@ const hintClass = {
   safe: s.hintSafe,
   mine: s.hintMine,
   wrong: s.hintWrong,
+  unsure: s.hintUnsure,
 }
 
 const isPressed = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose }) =>

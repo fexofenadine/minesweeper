@@ -1,5 +1,6 @@
 import { h } from 'hyperapp'
 import s from './Menu.module.css'
+import { backgroundFor } from './backgrounds'
 
 const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
   <li key={key} class={s.item}>
@@ -100,6 +101,15 @@ const Menu = ({ state, actions }) => (
         checked={state.theme === 'matrix'}
         onClick={() => actions.setTheme('matrix')}
       />
+      <SubMenuItem
+        name="Nord"
+        checked={state.theme === 'nord'}
+        onClick={() => actions.setTheme('nord')}
+      />
+      {backgroundFor(state.theme) && <Separator />}
+      {backgroundFor(state.theme) && (
+        <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
+      )}
     </MenuItem>
   </ul>
 )

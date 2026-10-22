@@ -2,7 +2,7 @@
   "name": "minesweeper",
   "version": "0.1.0",
   "private": true,
-  "description": "Windows style minesweeper with classic, synthwave, solarized dark and matrix themes",
+  "description": "Windows style minesweeper with classic, synthwave, solarized dark, matrix and nord themes",
   "homepage": "https://fexofenadine.github.io/minesweeper/",
   "repository": "github:fexofenadine/minesweeper",
   "license": "MIT",

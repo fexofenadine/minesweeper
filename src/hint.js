@@ -13,8 +13,13 @@ const where = (a, b, width) => {
 }
 
 //marks says what each highlighted cell is for, by index
-const hint = (kind, cells, sources, text) => {
-  const role = { clear: 'safe', mine: 'mine', conflict: 'wrong' }[kind]
+const hint = (
+  kind,
+  cells,
+  sources,
+  text,
+  role = { clear: 'safe', mine: 'mine', conflict: 'wrong' }[kind],
+) => {
   const marks = {}
   sources.forEach((i) => (marks[i] = 'source'))
   cells.forEach((i) => (marks[i] = role))
@@ -22,6 +27,41 @@ const hint = (kind, cells, sources, text) => {
 }
 
 export const noHint = (text) => hint('none', [], [], text)
+
+//why a chord on the number at x, y opens nothing, or null when it is fine
+export const explainChord = ({ field, width, height }, x, y) => {
+  const i = y * width + x
+  const { opened, num } = field[y][x]
+  if (!opened || !num) return null
+  const hidden = []
+  const flagged = []
+  for (const n of neighboursOf(width, height)[i]) {
+    const c = field[Math.floor(n / width)][n % width]
+    if (c.flag) flagged.push(n)
+    else if (!c.opened) hidden.push(n)
+  }
+  const rule = 'Chording needs exactly as many flags around a number as it shows.'
+  if (flagged.length > num) {
+    return hint(
+      'chord',
+      flagged,
+      [i],
+      `${rule} This ${num} touches ${count(flagged.length, 'flag')}, so at least one of the highlighted flags is wrong.`,
+      'wrong',
+    )
+  }
+  if (flagged.length < num && hidden.length) {
+    const has = flagged.length ? `only ${count(flagged.length, 'flag')}` : 'none'
+    return hint(
+      'chord',
+      hidden,
+      [i],
+      `${rule} This ${num} has ${has}, so flag ${count(num - flagged.length, 'more mine')} among the highlighted cells first.`,
+      'unsure',
+    )
+  }
+  return null
+}
 
 //a certain move from what is on the board, with the reasoning behind it
 //only the numbers and the player's flags are used, never the real mines

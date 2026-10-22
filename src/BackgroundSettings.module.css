@@ -1,0 +1,77 @@
+.root {
+  padding: 16px 16px 12px;
+  white-space: nowrap;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-height: 22px;
+}
+
+.name {
+  padding: 2px 0;
+}
+
+.range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.slider {
+  width: 120px;
+  margin: 0;
+  accent-color: var(--highlight);
+}
+
+/*room for the widest value so the slider does not move while dragging*/
+.value {
+  min-width: 80px;
+  text-align: right;
+}
+
+.check {
+  margin: 0;
+  accent-color: var(--highlight);
+}
+
+.frame {
+  display: block;
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.select {
+  display: block;
+  margin: 0;
+  padding: 0 2px;
+  color: var(--text);
+  font: inherit;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--input-frame) var(--face) var(--face) var(--input-frame);
+  border-radius: 0;
+  outline: 0;
+}
+
+.credit {
+  max-width: 300px;
+  margin: 12px 0 0;
+  white-space: normal;
+  opacity: 0.75;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 0 0;
+}
+
+.button {
+  display: block;
+  width: 60px;
+  padding: 4px 3px 3px 4px;
+}

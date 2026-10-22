@@ -194,3 +194,82 @@ it('ignores shortcut keys while typing or with a modifier held', () => {
   key(78)
   expect(game().start).toBe(-1)
 })
+
+it('explains a chord on a number without enough flags', () => {
+  start({ game: chordGame(false) })
+  wired.chord({ x: 1, y: 1 })
+  wired.peek()
+  expect(current.hint.text).toMatch(
+    /This 1 has none, so flag 1 more mine among the highlighted cells first/,
+  )
+  expect(current.hint.marks[1 * 9 + 1]).toBe('source')
+  expect(current.hint.marks[0]).toBe('unsure')
+  expect(game().hinted).toBe(false)
+})
+
+it('explains a chord on a number with too many flags', () => {
+  const extra = chordGame()
+  extra.field[0][1].flag = true
+  start({ game: extra })
+  wired.chord({ x: 1, y: 1 })
+  wired.peek()
+  expect(current.hint.text).toMatch(/touches 2 flags/)
+  expect(current.hint.marks[0]).toBe('wrong')
+  expect(current.hint.marks[1]).toBe('wrong')
+})
+
+it('explains a failed chord with both buttons', () => {
+  start({ game: chordGame(false) })
+  wired.down({ event: { button: 0, buttons: 3 }, x: 1, y: 1 })
+  wired.up()
+  wired.peek()
+  expect(current.hint.text).toMatch(/Chording needs exactly/)
+})
+
+it('does not call the double click that opened a number a failed chord', () => {
+  start({ game: chordGame(false) })
+  wired.down({ event: { button: 0, buttons: 1 }, x: 3, y: 2 })
+  wired.up()
+  expect(game().field[2][3].num).toBe(3)
+  wired.chord({ x: 3, y: 2 })
+  wired.peek()
+  expect(current.hint).toBe(null)
+})
+
+it('previews background settings live and only saves them on OK', () => {
+  localStorage.clear()
+  start({ theme: 'nord' })
+  wired.toggleBackgroundSettings()
+  wired.peek()
+  expect(current.backgroundSettings.id).toBe('substrate')
+  wired.changeBackgroundSettings({ maxCracks: 50 })
+  wired.peek()
+  expect(current.backgroundSettings.draft.maxCracks).toBe(50)
+  expect(current.backgrounds.substrate.maxCracks).toBe(100)
+  wired.toggleBackgroundSettings()
+  wired.peek()
+  expect(current.backgroundSettings).toBe(null)
+  expect(localStorage.getItem('backgrounds')).toBe(null)
+
+  wired.toggleBackgroundSettings()
+  wired.changeBackgroundSettings({ wireframe: true })
+  wired.submitBackgroundSettings({ preventDefault() {} })
+  wired.peek()
+  expect(current.backgrounds.substrate.wireframe).toBe(true)
+  const stored = JSON.parse(localStorage.getItem('backgrounds'))
+  expect(stored.substrate.wireframe).toBe(true)
+  expect(stored.matrix.density).toBe(44)
+
+  wired.toggleBackgroundSettings()
+  wired.resetBackgroundSettings()
+  wired.peek()
+  expect(current.backgroundSettings.draft.wireframe).toBe(false)
+  localStorage.clear()
+})
+
+it('has no background settings for themes without one', () => {
+  start({ theme: 'classic' })
+  wired.toggleBackgroundSettings()
+  wired.peek()
+  expect(current.backgroundSettings).toBe(null)
+})
