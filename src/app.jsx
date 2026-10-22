@@ -321,9 +321,10 @@ export const actions = {
         return revealRange(x, y, reveal) + 1
       }
 
-      const begin = game.start < 0
+      //mines are only placed once a cell is actually opened
+      //a flag or chord first must not pick the start cell for safe start or no guessing
+      const begin = game.start < 0 && game.pressed && !game.group && !field[pressedY][pressedX].flag
       if (begin) {
-        //mines are only placed once the first cell is chosen
         const { mined } = placeMines({
           width,
           height,

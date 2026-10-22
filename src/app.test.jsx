@@ -109,6 +109,33 @@ it('safe first click never loses on the first click', () => {
   }
 })
 
+it('flagging or chording before the first click does not start the game', () => {
+  start({ safeStart: true, noGuess: true })
+  wired.down({ event: { button: 2, buttons: 2 }, x: 0, y: 0 })
+  wired.up()
+  wired.down({ event: { button: 0, buttons: 1, shiftKey: true }, x: 8, y: 8 })
+  wired.up()
+  const { start: began, field } = game()
+  expect(began).toBe(-1)
+  expect(field.flat().some((c) => c.mined)).toBe(false)
+  expect(field[0][0].flag).toBe(true)
+})
+
+it('no guessing deals a solvable board from the first opened cell after a flag', () => {
+  for (let run = 0; run < 20; run++) {
+    start({ safeStart: false, noGuess: true })
+    wired.down({ event: { button: 2, buttons: 2 }, x: 0, y: 0 })
+    wired.up()
+    wired.down({ event: { button: 0, buttons: 1 }, x: 6, y: 6 })
+    wired.up()
+    const { field, width, height, lose } = game()
+    expect(lose).toBe(false)
+    expect(field[6][6].num).toBe(0)
+    const mined = Uint8Array.from(field.flat(), (c) => (c.mined ? 1 : 0))
+    expect(solvable(mined, width, height, 6 * width + 6)).toBe(true)
+  }
+})
+
 it('no guessing opens an area on the first click and deals a solvable board', () => {
   for (let run = 0; run < 20; run++) {
     const { field, width, height, lose } = firstClick({ safeStart: false, noGuess: true })
