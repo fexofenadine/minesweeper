@@ -1231,7 +1231,7 @@ var actions = {
 			if (c.num) return 1;
 			return revealRange(x, y, reveal) + 1;
 		};
-		const begin = game.start < 0;
+		const begin = game.start < 0 && game.pressed && !game.group && !field[pressedY][pressedX].flag;
 		if (begin) {
 			const { mined } = placeMines({
 				width,
