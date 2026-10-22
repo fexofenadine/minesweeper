@@ -267,6 +267,607 @@ var Menu_module_default = {
 	separator: "Menu_separator"
 };
 //#endregion
+//#region src/storage.js
+var load = (key) => {
+	try {
+		return localStorage.getItem(key);
+	} catch {
+		return null;
+	}
+};
+var save = (key, value) => {
+	try {
+		localStorage.setItem(key, value);
+	} catch {}
+};
+var remove = (key) => {
+	try {
+		localStorage.removeItem(key);
+	} catch {}
+};
+//#endregion
+//#region src/backgrounds/matrix.js
+var GRID_SIZE = 70;
+var GRID_DEPTH = 35;
+var WAVE_SIZE = 22;
+var SPLASH_RATIO = .7;
+var TICK = 30;
+var encodings = {
+	matrix: [..."ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789"],
+	binary: [..."01"],
+	hexadecimal: [..."0123456789ABCDEF"],
+	decimal: [..."0123456789"],
+	dna: [..."ACGT"]
+};
+var frand$1 = (n) => Math.random() * n;
+var bellrand = (n) => (frand$1(n) + frand$1(n) + frand$1(n)) / 3;
+var randomGlyph = (count) => Math.floor(Math.random() * count) + 1;
+var ramp = Array.from({ length: WAVE_SIZE }, (_, i) => {
+	return .2 + Math.sin((WAVE_SIZE - i) / 21 * Math.PI / 2) * .8;
+});
+var resetStrip = (s, count) => {
+	s.x = frand$1(GRID_SIZE) - GRID_SIZE / 2;
+	s.y = GRID_SIZE / 2 + bellrand(.5);
+	s.z = GRID_DEPTH * .2 - frand$1(GRID_DEPTH * .7);
+	s.dz = bellrand(.02);
+	s.erasing = false;
+	s.spinnerY = 0;
+	s.spinnerSpeed = bellrand(.3);
+	s.spinnerGlyph = -randomGlyph(count);
+	s.spinSpeed = Math.floor(bellrand(2)) + 1;
+	s.spinTick = 0;
+	s.wavePosition = 0;
+	s.waveSpeed = Math.floor(bellrand(3)) + 1;
+	s.waveTick = 0;
+	s.glyphs = Array.from({ length: GRID_SIZE }, () => {
+		if (!Math.floor(Math.random() * 7)) return 0;
+		const g = randomGlyph(count);
+		return Math.floor(Math.random() * 20) ? g : -g;
+	});
+};
+var tickStrip = (s, count) => {
+	s.z += s.dz;
+	if (s.z > GRID_DEPTH * SPLASH_RATIO) return resetStrip(s, count);
+	s.spinnerY += s.spinnerSpeed;
+	if (s.spinnerY >= GRID_SIZE) {
+		if (s.erasing) return resetStrip(s, count);
+		s.erasing = true;
+		s.spinnerY = 0;
+		s.spinnerSpeed /= 2;
+	}
+	if (++s.spinTick > s.spinSpeed) {
+		s.spinTick = 0;
+		s.spinnerGlyph = -randomGlyph(count);
+		s.glyphs.forEach((g, i) => {
+			if (g >= 0) return;
+			s.glyphs[i] = Math.floor(Math.random() * 800) ? -randomGlyph(count) : randomGlyph(count);
+		});
+	}
+	if (++s.waveTick > s.waveSpeed) {
+		s.waveTick = 0;
+		s.wavePosition = (s.wavePosition + 1) % WAVE_SIZE;
+	}
+};
+var newStrip = (count) => {
+	const s = {};
+	resetStrip(s, count);
+	s.erasing = Math.random() < .5;
+	s.spinnerY = frand$1(GRID_SIZE);
+	return s;
+};
+var PAD = 1.6;
+var buildAtlas = (glyphs, cell) => {
+	const atlas = document.createElement("canvas");
+	atlas.width = cell * glyphs.length;
+	atlas.height = cell * 2;
+	const context = atlas.getContext("2d");
+	context.font = `${Math.round(cell / PAD * .8)}px monospace`;
+	context.textAlign = "center";
+	context.textBaseline = "middle";
+	["#2cff6e", "#d4ffe0"].forEach((colour, row) => {
+		context.fillStyle = colour;
+		context.shadowColor = colour;
+		glyphs.forEach((glyph, i) => {
+			context.save();
+			context.translate((i + .5) * cell, (row + .5) * cell);
+			context.scale(-1, 1);
+			context.shadowBlur = cell * .3;
+			context.fillText(glyph, 0, 0);
+			context.fillText(glyph, 0, 0);
+			context.shadowBlur = cell * .07;
+			context.fillText(glyph, 0, 0);
+			context.restore();
+		});
+	});
+	return atlas;
+};
+var matrix_default = {
+	name: "GLMatrix",
+	credit: "Ported from GLMatrix by Jamie Zawinski, part of xscreensaver",
+	filter: "blur(0.6px)",
+	ratio: () => Math.min(window.devicePixelRatio || 1, 1.5),
+	options: [
+		{
+			key: "density",
+			label: "Density",
+			type: "range",
+			min: 10,
+			max: 100,
+			step: 1,
+			value: 44
+		},
+		{
+			key: "speed",
+			label: "Speed",
+			type: "range",
+			min: .25,
+			max: 3,
+			step: .25,
+			value: 1,
+			format: (v) => `${v}×`
+		},
+		{
+			key: "encoding",
+			label: "Glyphs",
+			type: "select",
+			choices: [
+				["matrix", "Matrix"],
+				["binary", "Binary"],
+				["hexadecimal", "Hexadecimal"],
+				["decimal", "Decimal"],
+				["dna", "DNA"]
+			],
+			value: "matrix"
+		},
+		{
+			key: "fog",
+			label: "Fog",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "waves",
+			label: "Waves",
+			type: "toggle",
+			value: true
+		}
+	],
+	create: (context, settings) => {
+		const cell = 96;
+		let options = settings;
+		let glyphs = encodings[options.encoding];
+		let atlas = null;
+		let strips = [];
+		let width = 0;
+		let height = 0;
+		let last = 0;
+		const configure = (next) => {
+			if (next.encoding !== options.encoding || !strips.length) {
+				glyphs = encodings[next.encoding];
+				atlas = null;
+				strips = [];
+			}
+			options = next;
+			while (strips.length < options.density) strips.push(newStrip(glyphs.length));
+			strips.length = options.density;
+		};
+		const draw = () => {
+			context.globalCompositeOperation = "source-over";
+			context.globalAlpha = 1;
+			context.fillStyle = "#000";
+			context.fillRect(0, 0, width, height);
+			context.globalCompositeOperation = "lighter";
+			const focal = height / 2 / Math.tan(40 * Math.PI / 180);
+			const glyph = (g, x, y, z, brightness) => {
+				const changing = g < 0;
+				if (changing) brightness *= 1.5;
+				if (options.fog) brightness *= .2 + (z / GRID_DEPTH + .5) * .8;
+				if (z > GRID_DEPTH / 2) {
+					const ratio = (z - GRID_DEPTH / 2) / (GRID_DEPTH * SPLASH_RATIO - GRID_DEPTH / 2);
+					brightness *= ramp[Math.min(21, Math.max(0, Math.floor(ratio * WAVE_SIZE)))];
+				}
+				const top = y + 1;
+				const depth = 25 - z;
+				if (depth < 1) return;
+				const scale = focal / depth;
+				const sx = width / 2 + x * scale;
+				const sy = height / 2 - top * scale;
+				if (scale < 2 || sx > width || sy > height || sx + scale < 0 || sy + scale < 0) return;
+				context.globalAlpha = Math.min(1, brightness);
+				const index = Math.abs(g) - 1;
+				const size = scale * PAD;
+				const offset = (size - scale) / 2;
+				context.drawImage(atlas, index * cell, changing ? cell : 0, cell, cell, sx - offset, sy - offset, size, size);
+			};
+			for (const s of strips) {
+				s.glyphs.forEach((g, i) => {
+					const passed = s.erasing ? s.spinnerY < i : s.spinnerY >= i;
+					if (!g || !passed) return;
+					const wave = WAVE_SIZE - (i + (GRID_SIZE - s.wavePosition)) % WAVE_SIZE;
+					glyph(g, s.x, s.y - i, s.z, options.waves ? ramp[Math.min(wave, 21)] : 1);
+				});
+				if (!s.erasing) glyph(s.spinnerGlyph, s.x, s.y - s.spinnerY, s.z, 1);
+			}
+		};
+		configure(settings);
+		return {
+			configure,
+			resize: (w, h) => {
+				width = w;
+				height = h;
+				last = performance.now();
+			},
+			frame: (now) => {
+				const tick = TICK / options.speed;
+				if (now - last < tick) return;
+				const ticks = Math.min(3, Math.floor((now - last) / tick));
+				last = now;
+				for (let n = 0; n < ticks; n++) strips.forEach((s) => tickStrip(s, glyphs.length));
+				atlas ??= buildAtlas(glyphs, cell);
+				draw();
+			}
+		};
+	}
+};
+//#endregion
+//#region src/backgrounds/substrate.js
+var STEP = .42;
+var EMPTY = 10001;
+var palettes = {
+	nord: [
+		"#8fbcbb",
+		"#88c0d0",
+		"#81a1c1",
+		"#5e81ac",
+		"#bf616a",
+		"#d08770",
+		"#ebcb8b",
+		"#a3be8c",
+		"#b48ead"
+	],
+	frost: [
+		"#8fbcbb",
+		"#88c0d0",
+		"#81a1c1",
+		"#5e81ac"
+	],
+	aurora: [
+		"#bf616a",
+		"#d08770",
+		"#ebcb8b",
+		"#a3be8c",
+		"#b48ead"
+	]
+};
+var BACKGROUND = "#2e3440";
+var FOREGROUND = "#d8dee9";
+var frand = (n) => Math.random() * n;
+var random = (n) => Math.floor(Math.random() * n);
+var radians = (degrees) => degrees * Math.PI / 180;
+//#endregion
+//#region src/backgrounds/index.js
+var backgrounds = {
+	matrix: matrix_default,
+	substrate: {
+		name: "Substrate",
+		credit: "Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver",
+		ratio: () => 1,
+		options: [
+			{
+				key: "growthDelay",
+				label: "Growth delay",
+				type: "range",
+				min: 0,
+				max: 50,
+				step: 1,
+				value: 18,
+				format: (v) => `${v} ms`
+			},
+			{
+				key: "initialCracks",
+				label: "Initial cracks",
+				type: "range",
+				min: 3,
+				max: 20,
+				step: 1,
+				value: 3
+			},
+			{
+				key: "maxCracks",
+				label: "Max cracks",
+				type: "range",
+				min: 11,
+				max: 300,
+				step: 1,
+				value: 100
+			},
+			{
+				key: "sandGrains",
+				label: "Sand grains",
+				type: "range",
+				min: 2,
+				max: 256,
+				step: 1,
+				value: 64
+			},
+			{
+				key: "circlePercent",
+				label: "Circular cracks",
+				type: "range",
+				min: 0,
+				max: 100,
+				step: 1,
+				value: 33,
+				format: (v) => `${v}%`
+			},
+			{
+				key: "maxCycles",
+				label: "Restart after",
+				type: "range",
+				min: 0,
+				max: 5e4,
+				step: 1e3,
+				value: 1e4,
+				format: (v) => v ? `${v} cycles` : "never"
+			},
+			{
+				key: "palette",
+				label: "Colours",
+				type: "select",
+				choices: [
+					["nord", "Frost and aurora"],
+					["frost", "Frost"],
+					["aurora", "Aurora"]
+				],
+				value: "nord"
+			},
+			{
+				key: "wireframe",
+				label: "Wireframe",
+				type: "toggle",
+				value: false
+			},
+			{
+				key: "seamless",
+				label: "Seamless",
+				type: "toggle",
+				value: false
+			}
+		],
+		create: (context, settings) => {
+			let f = settings;
+			let width = 0;
+			let height = 0;
+			let cgrid = /* @__PURE__ */ new Int32Array(0);
+			let cracks = [];
+			let cycles = 0;
+			let last = 0;
+			const plot = (x, y, colour, alpha) => {
+				if (x < 0 || x >= width || y < 0 || y >= height) return;
+				context.globalAlpha = Math.min(1, alpha);
+				context.fillStyle = colour;
+				context.fillRect(x, y, 1, 1);
+			};
+			const startCrack = (cr) => {
+				let px = 0;
+				let py = 0;
+				let found = false;
+				let timeout = 0;
+				while (!found && timeout++ < 1e4) {
+					px = random(width);
+					py = random(height);
+					if (cgrid[py * width + px] < 1e4) found = true;
+				}
+				if (!found) {
+					px = Math.min(width - 1, Math.max(0, Math.trunc(cr.x)));
+					py = Math.min(height - 1, Math.max(0, Math.trunc(cr.y)));
+					cgrid[py * width + px] = cr.t;
+				}
+				let a = cgrid[py * width + px];
+				if (random(100) < 50) a -= 90 + (frand(4.1) - 2);
+				else a += 90 + (frand(4.1) - 2);
+				if (random(100) < f.circlePercent) {
+					cr.curved = true;
+					cr.degreesDrawn = 0;
+					let r = 10 + random(Math.floor((width + height) / 2));
+					if (random(100) < 50) r *= -1;
+					const radianInc = STEP / r;
+					cr.tInc = radianInc * 360 / 2 / Math.PI;
+					cr.ys = r * Math.sin(radianInc);
+					cr.xs = r * (1 - Math.cos(radianInc));
+				} else cr.curved = false;
+				cr.x = px + .61 * Math.cos(radians(a));
+				cr.y = py + .61 * Math.sin(radians(a));
+				cr.t = a;
+			};
+			const makeCrack = () => {
+				if (cracks.length >= f.maxCracks) return;
+				const colours = palettes[f.palette];
+				const cr = {
+					sandp: 0,
+					sandg: frand(.2) - .01,
+					sandcolor: colours[random(colours.length)],
+					curved: false,
+					degreesDrawn: 0,
+					x: random(width),
+					y: random(height),
+					t: random(360)
+				};
+				startCrack(cr);
+				cracks.push(cr);
+			};
+			const regionColor = (cr) => {
+				let rx = cr.x;
+				let ry = cr.y;
+				for (let steps = (width + height) * 4; steps > 0; steps--) {
+					rx += .81 * Math.sin(radians(cr.t));
+					ry -= .81 * Math.cos(radians(cr.t));
+					let cx = Math.trunc(rx);
+					let cy = Math.trunc(ry);
+					if (f.seamless) {
+						cx %= width;
+						cy %= height;
+					}
+					if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
+					if (cgrid[cy * width + cx] <= 1e4) break;
+				}
+				cr.sandg = Math.min(1, Math.max(0, cr.sandg + frand(.1) - .05));
+				const grains = f.sandGrains;
+				const w = cr.sandg / (grains - 1);
+				for (let i = 0; i < grains; i++) {
+					const s = Math.sin(cr.sandp + Math.sin(i * w));
+					let drawx = cr.x + (rx - cr.x) * s;
+					let drawy = cr.y + (ry - cr.y) * s;
+					if (f.seamless) {
+						drawx = (drawx + width) % width;
+						drawy = (drawy + height) % height;
+					}
+					plot(Math.trunc(drawx), Math.trunc(drawy), cr.sandcolor, .1 - i / (grains * 10));
+				}
+			};
+			const restartCrack = (cr) => {
+				startCrack(cr);
+				makeCrack();
+			};
+			const moveDrawCrack = (cr) => {
+				if (!cr.curved) {
+					cr.x += STEP * Math.cos(radians(cr.t));
+					cr.y += STEP * Math.sin(radians(cr.t));
+				} else {
+					cr.x += cr.ys * Math.cos(radians(cr.t));
+					cr.y += cr.ys * Math.sin(radians(cr.t));
+					cr.x += cr.xs * Math.cos(radians(cr.t) - Math.PI / 2);
+					cr.y += cr.xs * Math.sin(radians(cr.t) - Math.PI / 2);
+					cr.t += cr.tInc;
+					cr.degreesDrawn += Math.abs(cr.tInc);
+				}
+				if (f.seamless) {
+					cr.x = (cr.x + width) % width;
+					cr.y = (cr.y + height) % height;
+				}
+				let cx = Math.trunc(cr.x + frand(.66) - .33);
+				let cy = Math.trunc(cr.y + frand(.66) - .33);
+				if (f.seamless) {
+					cx %= width;
+					cy %= height;
+				}
+				if (cx < 0 || cx >= width || cy < 0 || cy >= height) {
+					cr.x = random(width);
+					cr.y = random(height);
+					cr.t = random(360);
+					restartCrack(cr);
+					return;
+				}
+				if (!f.wireframe) regionColor(cr);
+				plot(cx, cy, FOREGROUND, 1);
+				const here = cy * width + cx;
+				if (cr.curved && cr.degreesDrawn > 360) restartCrack(cr);
+				else if (cgrid[here] > 1e4 || Math.abs(cgrid[here] - cr.t) < 5) cgrid[here] = Math.trunc(cr.t);
+				else if (Math.abs(cgrid[here] - cr.t) > 2) restartCrack(cr);
+			};
+			const build = () => {
+				context.globalAlpha = 1;
+				context.fillStyle = BACKGROUND;
+				context.fillRect(0, 0, width, height);
+				cgrid.fill(EMPTY);
+				cracks = [];
+				cycles = 0;
+				for (let n = 0; n < f.initialCracks; n++) makeCrack();
+			};
+			return {
+				configure: (next) => {
+					f = next;
+					if (width) build();
+				},
+				resize: (w, h) => {
+					width = w;
+					height = h;
+					cgrid = new Int32Array(w * h);
+					last = performance.now();
+					build();
+				},
+				frame: (now) => {
+					const delay = Math.max(1, f.growthDelay);
+					const due = Math.min(8, Math.floor((now - last) / delay));
+					if (!due) return;
+					last = now - delay > last + due * delay ? now : last + due * delay;
+					for (let n = 0; n < due; n++) {
+						for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
+						if (++cycles >= f.maxCycles && f.maxCycles) build();
+					}
+				}
+			};
+		}
+	}
+};
+var themeBackgrounds = {
+	matrix: "matrix",
+	nord: "substrate"
+};
+var backgroundFor = (theme) => themeBackgrounds[theme] || null;
+var defaults = (id) => Object.fromEntries(backgrounds[id].options.map((option) => [option.key, option.value]));
+var clean = (option, value) => {
+	if (option.type === "toggle") return typeof value === "boolean" ? value : option.value;
+	if (option.type === "select") return option.choices.some(([choice]) => choice === value) ? value : option.value;
+	const number = Number(value);
+	if (value === null || value === "" || !Number.isFinite(number)) return option.value;
+	return Math.min(option.max, Math.max(option.min, number));
+};
+var loadSettings = () => {
+	let stored = {};
+	try {
+		stored = JSON.parse(load("backgrounds")) || {};
+	} catch {}
+	return Object.fromEntries(Object.entries(backgrounds).map(([id, { options }]) => [id, Object.fromEntries(options.map((option) => [option.key, clean(option, stored[id]?.[option.key])]))]));
+};
+var saveSettings = (settings) => save("backgrounds", JSON.stringify(settings));
+var settings = loadSettings();
+var instances = {};
+var configure = (id, values) => {
+	settings = {
+		...settings,
+		[id]: values
+	};
+	instances[id]?.configure(values);
+};
+var startBackgrounds = () => {
+	const root = document.documentElement;
+	const canvas = document.createElement("canvas");
+	canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none";
+	document.body.prepend(canvas);
+	const context = canvas.getContext("2d");
+	let active = null;
+	let frame = null;
+	const loop = (now) => {
+		frame = requestAnimationFrame(loop);
+		instances[active].frame(now);
+	};
+	const resize = () => {
+		const ratio = backgrounds[active].ratio();
+		canvas.width = Math.round(innerWidth * ratio);
+		canvas.height = Math.round(innerHeight * ratio);
+		instances[active].resize(canvas.width, canvas.height);
+	};
+	const update = () => {
+		const id = backgroundFor(root.dataset.theme);
+		if (id === active) return;
+		cancelAnimationFrame(frame);
+		active = id;
+		canvas.style.display = id ? "block" : "none";
+		if (!id) return;
+		canvas.style.filter = backgrounds[id].filter || "none";
+		instances[id] ??= backgrounds[id].create(context, settings[id]);
+		resize();
+		frame = requestAnimationFrame(loop);
+	};
+	new MutationObserver(update).observe(root, {
+		attributes: true,
+		attributeFilter: ["data-theme"]
+	});
+	window.addEventListener("resize", () => active && resize());
+	update();
+};
+//#endregion
 //#region src/Menu.jsx
 var SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => /* @__PURE__ */ h("li", {
 	key,
@@ -362,6 +963,13 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	name: "Matrix",
 	checked: state.theme === "matrix",
 	onClick: () => actions.setTheme("matrix")
+}), /* @__PURE__ */ h(SubMenuItem, {
+	name: "Nord",
+	checked: state.theme === "nord",
+	onClick: () => actions.setTheme("nord")
+}), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
+	name: "Background Settings...",
+	onClick: actions.toggleBackgroundSettings
 })));
 var Digit_module_default = {
 	root: "Digit_root",
@@ -481,7 +1089,8 @@ var Cell_module_default = {
 	hintSource: "Cell_hintSource",
 	hintSafe: "Cell_hintSafe",
 	hintMine: "Cell_hintMine",
-	hintWrong: "Cell_hintWrong"
+	hintWrong: "Cell_hintWrong",
+	hintUnsure: "Cell_hintUnsure"
 };
 //#endregion
 //#region src/Cell.jsx
@@ -566,7 +1175,8 @@ var hintClass = {
 	source: Cell_module_default.hintSource,
 	safe: Cell_module_default.hintSafe,
 	mine: Cell_module_default.hintMine,
-	wrong: Cell_module_default.hintWrong
+	wrong: Cell_module_default.hintWrong,
+	unsure: Cell_module_default.hintUnsure
 };
 var isPressed = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose }) => opened || pressed && !flag && pressedX === x && pressedY === y || group && !flag && inRange(x, y, pressedX, pressedY) || lose && (!flag && mined || flag && !mined);
 var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mark, num, lose, hint, onDown, onMove, onTouch, onChord }) => /* @__PURE__ */ h("button", {
@@ -633,37 +1243,18 @@ var Grip_module_default = {
 	grip: "Grip_grip"
 };
 //#endregion
-//#region src/storage.js
-var load = (key) => {
-	try {
-		return localStorage.getItem(key);
-	} catch {
-		return null;
-	}
-};
-var save = (key, value) => {
-	try {
-		localStorage.setItem(key, value);
-	} catch {}
-};
-var remove = (key) => {
-	try {
-		localStorage.removeItem(key);
-	} catch {}
-};
-//#endregion
 //#region src/Grip.jsx
-var root$5 = document.documentElement;
+var root$6 = document.documentElement;
 var clampScale = (scale) => Math.round(Math.min(4, Math.max(.5, scale)) * 20) / 20;
 var setScale = (scale) => {
-	root$5.style.setProperty("--scale", scale);
+	root$6.style.setProperty("--scale", scale);
 	save("scale", scale);
 };
 var resize = (event) => {
 	event.preventDefault();
 	const grip = event.currentTarget;
 	const rect = grip.offsetParent.getBoundingClientRect();
-	const scale = parseFloat(root$5.style.getPropertyValue("--scale")) || 1;
+	const scale = parseFloat(root$6.style.getPropertyValue("--scale")) || 1;
 	const move = ({ clientX, clientY }) => {
 		const wide = (rect.width + 2 * (clientX - event.clientX)) / rect.width;
 		const tall = (rect.height + 2 * (clientY - event.clientY)) / rect.height;
@@ -863,6 +1454,70 @@ var CustomField = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 	type: "button",
 	onClick: actions.toggleCustomField
 }, /* @__PURE__ */ h("span", { class: CustomField_module_default.button }, "Cancel"))))));
+var BackgroundSettings_module_default = {
+	root: "BackgroundSettings_root",
+	row: "BackgroundSettings_row",
+	name: "BackgroundSettings_name",
+	range: "BackgroundSettings_range",
+	slider: "BackgroundSettings_slider",
+	value: "BackgroundSettings_value",
+	check: "BackgroundSettings_check",
+	frame: "BackgroundSettings_frame",
+	select: "BackgroundSettings_select",
+	credit: "BackgroundSettings_credit",
+	footer: "BackgroundSettings_footer",
+	button: "BackgroundSettings_button"
+};
+//#endregion
+//#region src/BackgroundSettings.jsx
+var Control = ({ option, value, onChange }) => {
+	if (option.type === "toggle") return /* @__PURE__ */ h("input", {
+		type: "checkbox",
+		class: BackgroundSettings_module_default.check,
+		checked: value,
+		onchange: (event) => onChange(event.target.checked)
+	});
+	if (option.type === "select") return /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.frame }, /* @__PURE__ */ h("select", {
+		class: BackgroundSettings_module_default.select,
+		onchange: (event) => onChange(event.target.value)
+	}, option.choices.map(([choice, name]) => /* @__PURE__ */ h("option", {
+		value: choice,
+		selected: choice === value
+	}, name))));
+	return /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.range }, /* @__PURE__ */ h("input", {
+		type: "range",
+		class: BackgroundSettings_module_default.slider,
+		min: option.min,
+		max: option.max,
+		step: option.step,
+		value,
+		oninput: (event) => onChange(Number(event.target.value))
+	}), /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.value }, option.format ? option.format(value) : value));
+};
+var BackgroundSettings = ({ key, state, actions }) => {
+	const background = backgrounds[state.id];
+	return /* @__PURE__ */ h(Overlay, {
+		key,
+		onKeyDown: (event) => event.keyCode === 27 && actions.toggleBackgroundSettings()
+	}, /* @__PURE__ */ h(Dialog, {
+		title: `${background.name} Settings`,
+		onClose: actions.toggleBackgroundSettings
+	}, /* @__PURE__ */ h("form", {
+		class: BackgroundSettings_module_default.root,
+		autocomplete: "off",
+		onsubmit: actions.submitBackgroundSettings
+	}, background.options.map((option) => /* @__PURE__ */ h("label", { class: BackgroundSettings_module_default.row }, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.name }, option.label, ":"), /* @__PURE__ */ h(Control, {
+		option,
+		value: state.draft[option.key],
+		onChange: (value) => actions.changeBackgroundSettings({ [option.key]: value })
+	}))), /* @__PURE__ */ h("p", { class: BackgroundSettings_module_default.credit }, background.credit), /* @__PURE__ */ h("div", { class: BackgroundSettings_module_default.footer }, /* @__PURE__ */ h(Button, { onCreate: (el) => el.focus() }, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.button }, "OK")), /* @__PURE__ */ h(Button, {
+		type: "button",
+		onClick: actions.toggleBackgroundSettings
+	}, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.button }, "Cancel")), /* @__PURE__ */ h(Button, {
+		type: "button",
+		onClick: actions.resetBackgroundSettings
+	}, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.button }, "Defaults"))))));
+};
 //#endregion
 //#region src/mines.js
 var neighbourCache = /* @__PURE__ */ new Map();
@@ -1021,12 +1676,11 @@ var where = (a, b, width) => {
 	if (v && h) return `${v} and to the ${h} of it`;
 	return v ? `${v} it` : `to the ${h} of it`;
 };
-var hint = (kind, cells, sources, text) => {
-	const role = {
-		clear: "safe",
-		mine: "mine",
-		conflict: "wrong"
-	}[kind];
+var hint = (kind, cells, sources, text, role = {
+	clear: "safe",
+	mine: "mine",
+	conflict: "wrong"
+}[kind]) => {
 	const marks = {};
 	sources.forEach((i) => marks[i] = "source");
 	cells.forEach((i) => marks[i] = role);
@@ -1039,6 +1693,25 @@ var hint = (kind, cells, sources, text) => {
 	};
 };
 var noHint = (text) => hint("none", [], [], text);
+var explainChord = ({ field, width, height }, x, y) => {
+	const i = y * width + x;
+	const { opened, num } = field[y][x];
+	if (!opened || !num) return null;
+	const hidden = [];
+	const flagged = [];
+	for (const n of neighboursOf(width, height)[i]) {
+		const c = field[Math.floor(n / width)][n % width];
+		if (c.flag) flagged.push(n);
+		else if (!c.opened) hidden.push(n);
+	}
+	const rule = "Chording needs exactly as many flags around a number as it shows.";
+	if (flagged.length > num) return hint("chord", flagged, [i], `${rule} This ${num} touches ${count(flagged.length, "flag")}, so at least one of the highlighted flags is wrong.`, "wrong");
+	if (flagged.length < num && hidden.length) {
+		const has = flagged.length ? `only ${count(flagged.length, "flag")}` : "none";
+		return hint("chord", hidden, [i], `${rule} This ${num} has ${has}, so flag ${count(num - flagged.length, "more mine")} among the highlighted cells first.`, "unsure");
+	}
+	return null;
+};
 var findHint = ({ field, width, height, minesLeft }) => {
 	const around = neighboursOf(width, height);
 	const cells = field.flat();
@@ -1121,7 +1794,8 @@ var themes = [
 	"classic",
 	"synthwave",
 	"solarized",
-	"matrix"
+	"matrix",
+	"nord"
 ];
 var createGame = ({ level, width, height, mines }) => {
 	const field = new Array(height);
@@ -1153,7 +1827,12 @@ var createGame = ({ level, width, height, mines }) => {
 		lose: false,
 		win: false,
 		touch: false,
-		hinted: false
+		hinted: false,
+		openedAt: {
+			x: -1,
+			y: -1,
+			time: 0
+		}
 	};
 };
 var openable = (game, x, y) => {
@@ -1227,14 +1906,20 @@ var state = {
 	theme: loadTheme(),
 	winner: null,
 	bestTime: null,
-	customField: null
+	customField: null,
+	backgrounds: loadSettings(),
+	backgroundSettings: null
 };
 var actions = {
 	init: () => (state, actions) => {
 		window.addEventListener("keydown", actions.press);
 	},
 	press: (event) => (state, actions) => {
-		if (event.target.tagName === "INPUT" || event.ctrlKey || event.metaKey || event.altKey) return;
+		if ([
+			"INPUT",
+			"SELECT",
+			"TEXTAREA"
+		].includes(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
 		if (event.keyCode === 113 || event.keyCode === 78) actions.reset();
 		else if (event.keyCode === 72) actions.hint();
 	},
@@ -1363,7 +2048,11 @@ var actions = {
 		};
 	},
 	chord: ({ x, y }) => ({ game }, actions) => {
-		if (game.win || game.lose || !openable(game, x, y)) return null;
+		if (game.win || game.lose) return null;
+		if (!openable(game, x, y)) {
+			const { openedAt } = game;
+			return openedAt.x === x && openedAt.y === y && performance.now() - openedAt.time < 500 ? null : { hint: explainChord(game, x, y) };
+		}
 		actions.aim({
 			x,
 			y
@@ -1430,22 +2119,41 @@ var actions = {
 			game.raf = requestAnimationFrame(actions.tick);
 		}
 		const cell = field[pressedY][pressedX];
+		const wasOpened = cell.opened;
+		let chordHint = null;
 		if (game.group) {
 			if (cell.opened) {
 				if (calcNear(pressedX, pressedY, (c) => c.flag) === cell.num) left -= revealRange(pressedX, pressedY, reveal);
+				else chordHint = explainChord({
+					field,
+					width,
+					height
+				}, pressedX, pressedY);
 			}
-		} else if (game.pressed) left -= reveal(pressedX, pressedY);
+		} else if (game.pressed) {
+			if (game.touch && wasOpened) chordHint = explainChord({
+				field,
+				width,
+				height
+			}, pressedX, pressedY);
+			left -= reveal(pressedX, pressedY);
+		}
 		const win = left <= 0;
 		if (win || lose) {
 			cancelAnimationFrame(game.raf);
 			if (!lose) actions.win();
 		}
 		return {
-			hint: null,
+			hint: chordHint,
 			game: {
 				...game,
 				left,
 				field,
+				openedAt: !wasOpened && cell.opened ? {
+					x: pressedX,
+					y: pressedY,
+					time: performance.now()
+				} : game.openedAt,
 				pressed: false,
 				group: false,
 				start: begin ? performance.now() : game.start,
@@ -1546,6 +2254,44 @@ var actions = {
 			marks
 		};
 	},
+	toggleBackgroundSettings: () => ({ theme, backgrounds, backgroundSettings }) => {
+		if (backgroundSettings) {
+			configure(backgroundSettings.id, backgrounds[backgroundSettings.id]);
+			return { backgroundSettings: null };
+		}
+		const id = backgroundFor(theme);
+		return {
+			menu: null,
+			backgroundSettings: id && {
+				id,
+				draft: { ...backgrounds[id] }
+			}
+		};
+	},
+	changeBackgroundSettings: (values) => ({ backgroundSettings: { id, draft } }) => {
+		const next = {
+			...draft,
+			...values
+		};
+		configure(id, next);
+		return { backgroundSettings: {
+			id,
+			draft: next
+		} };
+	},
+	resetBackgroundSettings: () => (state, actions) => actions.changeBackgroundSettings(defaults(state.backgroundSettings.id)),
+	submitBackgroundSettings: (event) => ({ backgrounds, backgroundSettings: { id, draft } }) => {
+		event.preventDefault();
+		const next = {
+			...backgrounds,
+			[id]: draft
+		};
+		saveSettings(next);
+		return {
+			backgrounds: next,
+			backgroundSettings: null
+		};
+	},
 	setTheme: (theme) => () => {
 		save("theme", theme);
 		document.documentElement.dataset.theme = theme;
@@ -1582,184 +2328,14 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	key: "d",
 	state: state.customField,
 	actions
+}), state.backgroundSettings && /* @__PURE__ */ h(BackgroundSettings, {
+	key: "e",
+	state: state.backgroundSettings,
+	actions
 }));
-//#endregion
-//#region src/rain.js
-var GRID_SIZE = 70;
-var GRID_DEPTH = 35;
-var WAVE_SIZE = 22;
-var SPLASH_RATIO = .7;
-var STRIPS = 44;
-var TICK = 30;
-var glyphs = [..."ﾊﾐﾋｰｳｼﾅﾓﾆｻﾜﾂｵﾘｱﾎﾃﾏｹﾒｴｶｷﾑﾕﾗｾﾈｽﾀﾇﾍ0123456789"];
-var frand = (n) => Math.random() * n;
-var bellrand = (n) => (frand(n) + frand(n) + frand(n)) / 3;
-var randomGlyph = () => Math.floor(Math.random() * glyphs.length) + 1;
-var ramp = Array.from({ length: WAVE_SIZE }, (_, i) => {
-	return .2 + Math.sin((WAVE_SIZE - i) / 21 * Math.PI / 2) * .8;
-});
-var resetStrip = (s) => {
-	s.x = frand(GRID_SIZE) - GRID_SIZE / 2;
-	s.y = GRID_SIZE / 2 + bellrand(.5);
-	s.z = GRID_DEPTH * .2 - frand(GRID_DEPTH * .7);
-	s.dz = bellrand(.02);
-	s.erasing = false;
-	s.spinnerY = 0;
-	s.spinnerSpeed = bellrand(.3);
-	s.spinnerGlyph = -randomGlyph();
-	s.spinSpeed = Math.floor(bellrand(2)) + 1;
-	s.spinTick = 0;
-	s.wavePosition = 0;
-	s.waveSpeed = Math.floor(bellrand(3)) + 1;
-	s.waveTick = 0;
-	s.glyphs = Array.from({ length: GRID_SIZE }, () => {
-		if (!Math.floor(Math.random() * 7)) return 0;
-		const g = randomGlyph();
-		return Math.floor(Math.random() * 20) ? g : -g;
-	});
-};
-var tickStrip = (s) => {
-	s.z += s.dz;
-	if (s.z > GRID_DEPTH * SPLASH_RATIO) return resetStrip(s);
-	s.spinnerY += s.spinnerSpeed;
-	if (s.spinnerY >= GRID_SIZE) {
-		if (s.erasing) return resetStrip(s);
-		s.erasing = true;
-		s.spinnerY = 0;
-		s.spinnerSpeed /= 2;
-	}
-	if (++s.spinTick > s.spinSpeed) {
-		s.spinTick = 0;
-		s.spinnerGlyph = -randomGlyph();
-		s.glyphs.forEach((g, i) => {
-			if (g >= 0) return;
-			s.glyphs[i] = Math.floor(Math.random() * 800) ? -randomGlyph() : randomGlyph();
-		});
-	}
-	if (++s.waveTick > s.waveSpeed) {
-		s.waveTick = 0;
-		s.wavePosition = (s.wavePosition + 1) % WAVE_SIZE;
-	}
-};
-var PAD = 1.6;
-var buildAtlas = (cell) => {
-	const atlas = document.createElement("canvas");
-	atlas.width = cell * glyphs.length;
-	atlas.height = cell * 2;
-	const context = atlas.getContext("2d");
-	context.font = `${Math.round(cell / PAD * .8)}px monospace`;
-	context.textAlign = "center";
-	context.textBaseline = "middle";
-	["#2cff6e", "#d4ffe0"].forEach((colour, row) => {
-		context.fillStyle = colour;
-		context.shadowColor = colour;
-		glyphs.forEach((glyph, i) => {
-			context.save();
-			context.translate((i + .5) * cell, (row + .5) * cell);
-			context.scale(-1, 1);
-			context.shadowBlur = cell * .3;
-			context.fillText(glyph, 0, 0);
-			context.fillText(glyph, 0, 0);
-			context.shadowBlur = cell * .07;
-			context.fillText(glyph, 0, 0);
-			context.restore();
-		});
-	});
-	return atlas;
-};
-var startRain = () => {
-	const root = document.documentElement;
-	const canvas = document.createElement("canvas");
-	canvas.style.cssText = "position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;pointer-events:none;display:none;filter:blur(0.6px)";
-	document.body.prepend(canvas);
-	const context = canvas.getContext("2d");
-	const cell = 96;
-	let atlas = null;
-	const strips = Array.from({ length: STRIPS }, () => {
-		const s = {};
-		resetStrip(s);
-		s.erasing = Math.random() < .5;
-		s.spinnerY = frand(GRID_SIZE);
-		return s;
-	});
-	let width = 0;
-	let height = 0;
-	const resize = () => {
-		const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
-		width = canvas.width = Math.round(innerWidth * ratio);
-		height = canvas.height = Math.round(innerHeight * ratio);
-	};
-	const draw = () => {
-		context.globalCompositeOperation = "source-over";
-		context.globalAlpha = 1;
-		context.fillStyle = "#000";
-		context.fillRect(0, 0, width, height);
-		context.globalCompositeOperation = "lighter";
-		const focal = height / 2 / Math.tan(40 * Math.PI / 180);
-		const glyph = (g, x, y, z, brightness) => {
-			const changing = g < 0;
-			if (changing) brightness *= 1.5;
-			brightness *= .2 + (z / GRID_DEPTH + .5) * .8;
-			if (z > GRID_DEPTH / 2) {
-				const ratio = (z - GRID_DEPTH / 2) / (GRID_DEPTH * SPLASH_RATIO - GRID_DEPTH / 2);
-				brightness *= ramp[Math.min(21, Math.max(0, Math.floor(ratio * WAVE_SIZE)))];
-			}
-			const top = y + 1;
-			const depth = 25 - z;
-			if (depth < 1) return;
-			const scale = focal / depth;
-			const sx = width / 2 + x * scale;
-			const sy = height / 2 - top * scale;
-			if (scale < 2 || sx > width || sy > height || sx + scale < 0 || sy + scale < 0) return;
-			context.globalAlpha = Math.min(1, brightness);
-			const index = Math.abs(g) - 1;
-			const size = scale * PAD;
-			const offset = (size - scale) / 2;
-			context.drawImage(atlas, index * cell, changing ? cell : 0, cell, cell, sx - offset, sy - offset, size, size);
-		};
-		for (const s of strips) {
-			s.glyphs.forEach((g, i) => {
-				const passed = s.erasing ? s.spinnerY < i : s.spinnerY >= i;
-				if (!g || !passed) return;
-				const wave = WAVE_SIZE - (i + (GRID_SIZE - s.wavePosition)) % WAVE_SIZE;
-				glyph(g, s.x, s.y - i, s.z, ramp[Math.min(wave, 21)]);
-			});
-			if (!s.erasing) glyph(s.spinnerGlyph, s.x, s.y - s.spinnerY, s.z, 1);
-		}
-	};
-	let frame = null;
-	let last = 0;
-	const loop = (now) => {
-		frame = requestAnimationFrame(loop);
-		if (now - last < TICK) return;
-		const ticks = Math.min(3, Math.floor((now - last) / TICK));
-		last = now;
-		for (let n = 0; n < ticks; n++) strips.forEach(tickStrip);
-		draw();
-	};
-	const update = () => {
-		const on = root.dataset.theme === "matrix";
-		canvas.style.display = on ? "block" : "none";
-		if (on && !frame) {
-			atlas ??= buildAtlas(cell);
-			resize();
-			last = performance.now();
-			frame = requestAnimationFrame(loop);
-		} else if (!on && frame) {
-			cancelAnimationFrame(frame);
-			frame = null;
-		}
-	};
-	new MutationObserver(update).observe(root, {
-		attributes: true,
-		attributeFilter: ["data-theme"]
-	});
-	window.addEventListener("resize", () => frame && resize());
-	update();
-};
 //#endregion
 //#region src/index.js
 app(state, actions, view, document.getElementById("app"));
-startRain();
+startBackgrounds();
 if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("service-worker.js").catch(() => {});
 //#endregion

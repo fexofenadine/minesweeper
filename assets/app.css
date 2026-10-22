@@ -266,6 +266,56 @@
   --fringe-b: rgba(196, 255, 210, 0.6);
 }
 
+:root[data-theme='nord'] {
+  /*nord dark: polar night surfaces, snow storm text, frost accents and aurora clues*/
+  color-scheme: dark;
+  --ui-font: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  --title-font: var(--ui-font);
+  --text-font: var(--ui-font);
+  --font-size: 12px;
+  --font-smoothing: auto;
+  --desktop: #2e3440;
+  --text: #d8dee9;
+  --face: #3b4252;
+  --light: #4c566a;
+  --shadow: #2e3440;
+  --dark-shadow: #242933;
+  --frame: #88c0d0;
+  --window-frame: #242933;
+  --title-start: #5e81ac;
+  --title-end: #88c0d0;
+  --title-text: #eceff4;
+  --highlight: #88c0d0;
+  --highlight-text: #2e3440;
+  --menu-shadow: rgba(0, 0, 0, 0.45);
+  --input: #2e3440;
+  --input-frame: #242933;
+  --panel: #3b4252;
+  --cell: #434c5e;
+  --cell-light: #616e88;
+  --cell-shadow: #2e3440;
+  --cell-open: #373e4c;
+  --lcd: #2e3440;
+  --lcd-on: #bf616a;
+  --lcd-off: rgba(191, 97, 106, 0.18);
+  --num-1: #81a1c1;
+  --num-2: #a3be8c;
+  --num-3: #bf616a;
+  --num-4: #b48ead;
+  --num-5: #d08770;
+  --num-6: #8fbcbb;
+  --num-7: #eceff4;
+  --num-8: #7b88a1;
+  --glyph: #d8dee9;
+  --flag: #bf616a;
+  --mine: #eceff4;
+  --mine-shine: #2e3440;
+  --hurt: #bf616a;
+  --wrong: #bf616a;
+  --smiley: #ebcb8b;
+  --smiley-line: #2e3440;
+}
+
 html,
 body,
 #app {
@@ -413,8 +463,8 @@ main::before {
   }
 }
 
-/*the code rain canvas shows through*/
-:root[data-theme='matrix'] main::before {
+/*the code rain and substrate canvases show through*/
+:root:is([data-theme='matrix'], [data-theme='nord']) main::before {
   background: none;
 }
 
@@ -1116,7 +1166,8 @@ main::before {
 .Cell_hintSource::after,
 .Cell_hintSafe::after,
 .Cell_hintMine::after,
-.Cell_hintWrong::after {
+.Cell_hintWrong::after,
+.Cell_hintUnsure::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -1144,6 +1195,15 @@ main::before {
 
 .Cell_hintWrong {
   --hint-color: #ffb000;
+}
+
+/*cells where some of the missing flags belong, which ones is not known*/
+.Cell_hintUnsure {
+  --hint-color: #c45cff;
+}
+
+.Cell_hintUnsure::after {
+  border-style: dashed;
 }
 .Grip_bar {
   display: flex;
@@ -1327,5 +1387,82 @@ main::before {
 .CustomField_button {
   display: block;
   width: 50px;
+  padding: 4px 3px 3px 4px;
+}
+.BackgroundSettings_root {
+  padding: 16px 16px 12px;
+  white-space: nowrap;
+}
+
+.BackgroundSettings_row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  min-height: 22px;
+}
+
+.BackgroundSettings_name {
+  padding: 2px 0;
+}
+
+.BackgroundSettings_range {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.BackgroundSettings_slider {
+  width: 120px;
+  margin: 0;
+  accent-color: var(--highlight);
+}
+
+/*room for the widest value so the slider does not move while dragging*/
+.BackgroundSettings_value {
+  min-width: 80px;
+  text-align: right;
+}
+
+.BackgroundSettings_check {
+  margin: 0;
+  accent-color: var(--highlight);
+}
+
+.BackgroundSettings_frame {
+  display: block;
+  border: 1px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.BackgroundSettings_select {
+  display: block;
+  margin: 0;
+  padding: 0 2px;
+  color: var(--text);
+  font: inherit;
+  background: var(--input);
+  border: 1px solid;
+  border-color: var(--input-frame) var(--face) var(--face) var(--input-frame);
+  border-radius: 0;
+  outline: 0;
+}
+
+.BackgroundSettings_credit {
+  max-width: 300px;
+  margin: 12px 0 0;
+  white-space: normal;
+  opacity: 0.75;
+}
+
+.BackgroundSettings_footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 14px 0 0;
+}
+
+.BackgroundSettings_button {
+  display: block;
+  width: 60px;
   padding: 4px 3px 3px 4px;
 }
