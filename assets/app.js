@@ -218,7 +218,8 @@ var Game_module_default = {
 	jitter: "Game_jitter",
 	chroma: "Game_chroma",
 	band: "Game_band",
-	flicker: "Game_flicker"
+	flicker: "Game_flicker",
+	hint: "Game_hint"
 };
 var Dialog_module_default = {
 	a: "Dialog_a",
@@ -305,6 +306,10 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	name: "New",
 	hotKey: "F2",
 	onClick: () => actions.reset()
+}), /* @__PURE__ */ h(SubMenuItem, {
+	name: "Hint",
+	hotKey: "H",
+	onClick: () => actions.hint()
 }), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Beginner",
 	checked: state.game.level === "beginner",
@@ -472,7 +477,11 @@ var Cell_module_default = {
 	flagCloth: "Cell_flagCloth",
 	wrong: "Cell_wrong",
 	mine: "Cell_mine",
-	shine: "Cell_shine"
+	shine: "Cell_shine",
+	hintSource: "Cell_hintSource",
+	hintSafe: "Cell_hintSafe",
+	hintMine: "Cell_hintMine",
+	hintWrong: "Cell_hintWrong"
 };
 //#endregion
 //#region src/Cell.jsx
@@ -553,9 +562,27 @@ var Symbol = ({ opened, mined, flag, mark, num, lose }) => {
 	if (mark) return /* @__PURE__ */ h(Mark, null);
 	return null;
 };
-var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mark, num, lose, onDown, onMove, onTouch, onChord }) => /* @__PURE__ */ h("button", {
+var hintClass = {
+	source: Cell_module_default.hintSource,
+	safe: Cell_module_default.hintSafe,
+	mine: Cell_module_default.hintMine,
+	wrong: Cell_module_default.hintWrong
+};
+var isPressed = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose }) => opened || pressed && !flag && pressedX === x && pressedY === y || group && !flag && inRange(x, y, pressedX, pressedY) || lose && (!flag && mined || flag && !mined);
+var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mark, num, lose, hint, onDown, onMove, onTouch, onChord }) => /* @__PURE__ */ h("button", {
 	type: "button",
-	class: opened || pressed && !flag && pressedX === x && pressedY === y || group && !flag && inRange(x, y, pressedX, pressedY) || lose && (!flag && mined || flag && !mined) ? Cell_module_default.pressed : Cell_module_default.root,
+	class: [isPressed({
+		x,
+		y,
+		pressed,
+		pressedX,
+		pressedY,
+		group,
+		opened,
+		mined,
+		flag,
+		lose
+	}) ? Cell_module_default.pressed : Cell_module_default.root, hint && hintClass[hint]].filter(Boolean).join(" "),
 	tabindex: -1,
 	onmousedown: (event) => {
 		onDown({
@@ -683,12 +710,16 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	flag: cell.flag,
 	mark: cell.mark,
 	num: cell.num,
+	hint: state.hint && state.hint.marks[y * state.game.width + x],
 	lose: state.game.lose,
 	onDown: actions.down,
 	onMove: actions.move,
 	onTouch: actions.touch,
 	onChord: actions.chord
-})))))), /* @__PURE__ */ h(Grip, null));
+}))))), state.hint && /* @__PURE__ */ h("p", {
+	class: Game_module_default.hint,
+	role: "status"
+}, state.hint.text)), /* @__PURE__ */ h(Grip, null));
 var Winner_module_default = {
 	root: "Winner_root",
 	text: "Winner_text",
@@ -735,7 +766,7 @@ var Winner = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, { key }, /*
 }, /* @__PURE__ */ h("label", {
 	for: "winner",
 	class: Winner_module_default.text
-}, "You have the fastest time for ", state.level, " level."), /* @__PURE__ */ h("label", {
+}, "You have the fastest time for ", state.level, " level", state.hinted ? " with hints" : "", "."), /* @__PURE__ */ h("label", {
 	for: "winner",
 	class: Winner_module_default.text
 }, "Please enter your name."), /* @__PURE__ */ h("div", { class: Winner_module_default.input }, /* @__PURE__ */ h(Input, {
@@ -755,17 +786,37 @@ var BestTime_module_default = {
 	table: "BestTime_table",
 	cell: "BestTime_cell",
 	footer: "BestTime_footer",
-	button: "BestTime_button"
+	button: "BestTime_button",
+	tabs: "BestTime_tabs",
+	tab: "BestTime_tab",
+	tabActive: "BestTime_tabActive BestTime_tab"
 };
 //#endregion
 //#region src/BestTime.jsx
+var tabs = [{
+	id: "clean",
+	name: "No hints"
+}, {
+	id: "hinted",
+	name: "Hints used"
+}];
 var BestTime = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 	key,
 	onKeyDown: (event) => event.keyCode === 27 && actions.toggleBestTime()
 }, /* @__PURE__ */ h(Dialog, {
 	title: "Fastest Mine Sweepers",
 	onClose: actions.toggleBestTime
-}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state.levels.map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
+}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("div", {
+	class: BestTime_module_default.tabs,
+	role: "tablist"
+}, tabs.map((tab) => /* @__PURE__ */ h("button", {
+	type: "button",
+	role: "tab",
+	tabindex: -1,
+	"aria-selected": state.tab === tab.id,
+	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
+	onclick: () => actions.setBestTimeTab(tab.id)
+}, tab.name))), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
 	onClick: actions.resetBestTime
 }, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "Reset Scores")), /* @__PURE__ */ h(Button, {
@@ -960,6 +1011,90 @@ var placeMines = ({ width, height, mines, x, y, safe, noGuess, budget = 1500 }) 
 	};
 };
 //#endregion
+//#region src/hint.js
+var count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+var where = (a, b, width) => {
+	const dx = b % width - a % width;
+	const dy = Math.floor(b / width) - Math.floor(a / width);
+	const v = dy < 0 ? "above" : dy > 0 ? "below" : "";
+	const h = dx < 0 ? "left" : dx > 0 ? "right" : "";
+	if (v && h) return `${v} and to the ${h} of it`;
+	return v ? `${v} it` : `to the ${h} of it`;
+};
+var hint = (kind, cells, sources, text) => {
+	const role = {
+		clear: "safe",
+		mine: "mine",
+		conflict: "wrong"
+	}[kind];
+	const marks = {};
+	sources.forEach((i) => marks[i] = "source");
+	cells.forEach((i) => marks[i] = role);
+	return {
+		kind,
+		cells,
+		sources,
+		marks,
+		text
+	};
+};
+var noHint = (text) => hint("none", [], [], text);
+var findHint = ({ field, width, height, minesLeft }) => {
+	const around = neighboursOf(width, height);
+	const cells = field.flat();
+	const numbered = [];
+	for (let i = 0; i < width * height; i++) if (cells[i].opened && cells[i].num) numbered.push(i);
+	const look = (i) => {
+		const hidden = [];
+		const flagged = [];
+		for (const n of around[i]) if (cells[n].flag) flagged.push(n);
+		else if (!cells[n].opened) hidden.push(n);
+		return {
+			hidden,
+			flagged,
+			need: cells[i].num - flagged.length
+		};
+	};
+	const seen = new Map(numbered.map((i) => [i, look(i)]));
+	for (const i of numbered) {
+		const { flagged, need } = seen.get(i);
+		if (need < 0) return hint("conflict", flagged, [i], `The highlighted ${cells[i].num} touches ${count(flagged.length, "flag")}, more than its number, so at least one of those flags is wrong.`);
+	}
+	for (const i of numbered) {
+		const { hidden, flagged, need } = seen.get(i);
+		if (!hidden.length) continue;
+		const num = cells[i].num;
+		if (need === 0) return hint("clear", hidden, [i], `The highlighted ${num} already has ${count(flagged.length, "flag")} around it, so its other hidden neighbours are safe.`);
+		if (need === hidden.length) {
+			const needs = flagged.length ? `touches ${count(flagged.length, "flag")} and needs ${count(need, "more mine")}` : `needs ${count(need, "mine")}`;
+			const last = need === 1 ? "it is a mine" : "they are all mines";
+			return hint("mine", hidden, [i], `The highlighted ${num} ${needs}, and has exactly ${count(need, "hidden neighbour")} left, so ${last}.`);
+		}
+	}
+	for (const a of numbered) {
+		const A = seen.get(a);
+		if (!A.hidden.length) continue;
+		const nearby = new Set(A.hidden.flatMap((u) => around[u]));
+		for (const b of nearby) {
+			const B = seen.get(b);
+			if (b === a || !B || B.hidden.length <= A.hidden.length) continue;
+			if (!A.hidden.every((u) => B.hidden.includes(u))) continue;
+			const rest = B.hidden.filter((u) => !A.hidden.includes(u));
+			const extra = B.need - A.need;
+			if (extra !== 0 && extra !== rest.length) continue;
+			const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width)}. Those shared cells hold exactly ${count(A.need, "mine")}`;
+			if (extra === 0) return hint("clear", rest, [a, b], `${shared}, which is all the ${cells[b].num} needs, so its other hidden neighbours are safe.`);
+			const last = rest.length === 1 ? "it is a mine" : "they are all mines";
+			return hint("mine", rest, [a, b], `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, "other hidden neighbour")}, and ${last}.`);
+		}
+	}
+	const left = [];
+	cells.forEach((c, i) => !c.opened && !c.flag && left.push(i));
+	if (left.length && minesLeft === 0) return hint("clear", left, [], "The mine counter is at 0, so every hidden cell without a flag is safe.");
+	if (left.length && minesLeft === left.length) return hint("mine", left, [], `The mine counter shows ${minesLeft} and exactly ${count(left.length, "hidden cell")} without a flag ${left.length === 1 ? "is" : "are"} left, so ${left.length === 1 ? "it is a mine" : "they are all mines"}.`);
+	return noHint("Nothing on the board can be worked out for certain right now, so this needs a guess.");
+};
+//#endregion
 //#region src/app.jsx
 var levels = {
 	beginner: {
@@ -1017,7 +1152,8 @@ var createGame = ({ level, width, height, mines }) => {
 		raf: null,
 		lose: false,
 		win: false,
-		touch: false
+		touch: false,
+		hinted: false
 	};
 };
 var openable = (game, x, y) => {
@@ -1060,12 +1196,30 @@ var loadTheme = () => {
 	const theme = load("theme");
 	return themes.includes(theme) ? theme : "classic";
 };
+var timeKey = (level, hinted) => hinted ? `${level}Hints` : level;
+var bestTimes = (hinted) => levelNames.map((level) => {
+	const key = timeKey(level, hinted);
+	return {
+		level,
+		name: load(`${key}Name`) || "Anonymous",
+		time: Math.min(999, parseInt(load(key), 10) || 0) || 999
+	};
+});
+var clearBestTimes = (hinted) => {
+	levelNames.forEach((level) => {
+		const key = timeKey(level, hinted);
+		remove(key);
+		remove(`${key}Name`);
+	});
+	return bestTimes(hinted);
+};
 var prevent = (event) => {
 	event.preventDefault();
 	return false;
 };
 var state = {
 	menu: null,
+	hint: null,
 	game: createGame(loadLevel()),
 	marks: Boolean(load("marks")),
 	safeStart: load("safeStart") !== "off",
@@ -1080,7 +1234,9 @@ var actions = {
 		window.addEventListener("keydown", actions.press);
 	},
 	press: (event) => (state, actions) => {
+		if (event.target.tagName === "INPUT" || event.ctrlKey || event.metaKey || event.altKey) return;
 		if (event.keyCode === 113 || event.keyCode === 78) actions.reset();
+		else if (event.keyCode === 72) actions.hint();
 	},
 	reset: (payload) => ({ game }) => {
 		cancelAnimationFrame(game.raf);
@@ -1092,7 +1248,29 @@ var actions = {
 		].join() : params.level);
 		return {
 			menu: null,
+			hint: null,
 			game: createGame(params)
+		};
+	},
+	hint: () => ({ game }) => {
+		if (game.win || game.lose) return { menu: null };
+		if (game.start < 0) return {
+			menu: null,
+			hint: noHint("Open a cell first, then ask for a hint.")
+		};
+		const { field, width, height, flags } = game;
+		return {
+			menu: null,
+			hint: findHint({
+				field,
+				width,
+				height,
+				minesLeft: flags
+			}),
+			game: {
+				...game,
+				hinted: true
+			}
 		};
 	},
 	touch: ({ event, x, y }) => ({ game }, actions) => {
@@ -1121,14 +1299,17 @@ var actions = {
 		window.addEventListener("touchmove", move);
 		window.addEventListener("touchend", stop);
 		window.addEventListener("touchcancel", stop);
-		return { game: {
-			...game,
-			pressed: true,
-			pressedX: x,
-			pressedY: y,
-			group: event.shiftKey || openable(game, x, y),
-			touch: true
-		} };
+		return {
+			hint: null,
+			game: {
+				...game,
+				pressed: true,
+				pressedX: x,
+				pressedY: y,
+				group: event.shiftKey || openable(game, x, y),
+				touch: true
+			}
+		};
 	},
 	flag: () => ({ game, marks }) => {
 		const { pressedX, pressedY, field, flags } = game;
@@ -1168,15 +1349,18 @@ var actions = {
 			field[y][x] = nextCell;
 			flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1);
 		}
-		return { game: {
-			...game,
-			field,
-			pressed: event.button !== 2,
-			pressedX: x,
-			pressedY: y,
-			group: event.shiftKey || event.buttons > 2,
-			flags
-		} };
+		return {
+			hint: null,
+			game: {
+				...game,
+				field,
+				pressed: event.button !== 2,
+				pressedX: x,
+				pressedY: y,
+				group: event.shiftKey || event.buttons > 2,
+				flags
+			}
+		};
 	},
 	chord: ({ x, y }) => ({ game }, actions) => {
 		if (game.win || game.lose || !openable(game, x, y)) return null;
@@ -1256,18 +1440,21 @@ var actions = {
 			cancelAnimationFrame(game.raf);
 			if (!lose) actions.win();
 		}
-		return { game: {
-			...game,
-			left,
-			field,
-			pressed: false,
-			group: false,
-			start: begin ? performance.now() : game.start,
-			time: begin ? 1 : game.time,
-			lose,
-			win,
-			touch: false
-		} };
+		return {
+			hint: null,
+			game: {
+				...game,
+				left,
+				field,
+				pressed: false,
+				group: false,
+				start: begin ? performance.now() : game.start,
+				time: begin ? 1 : game.time,
+				lose,
+				win,
+				touch: false
+			}
+		};
 	},
 	tick: (now) => ({ game }, actions) => {
 		game.raf = requestAnimationFrame(actions.tick);
@@ -1280,12 +1467,13 @@ var actions = {
 	},
 	win: () => ({ game }) => {
 		if (game.level === "custom") return null;
-		const time = parseInt(load(game.level), 10);
+		const time = parseInt(load(timeKey(game.level, game.hinted)), 10);
 		if (time && time <= game.time) return null;
 		return { winner: {
 			name: "Anonymous",
 			time: game.time,
-			level: game.level
+			level: game.level,
+			hinted: game.hinted
 		} };
 	},
 	changeWinner: (payload) => ({ winner }) => ({ winner: {
@@ -1294,24 +1482,29 @@ var actions = {
 	} }),
 	submitBestTime: (event) => ({ winner }, actions) => {
 		event.preventDefault();
-		save(winner.level, winner.time);
-		save(`${winner.level}Name`, winner.name.trim());
+		const key = timeKey(winner.level, winner.hinted);
+		save(key, winner.time);
+		save(`${key}Name`, winner.name.trim());
 		actions.toggleBestTime();
+		actions.setBestTimeTab(winner.hinted ? "hinted" : "clean");
 		return { winner: null };
 	},
 	toggleBestTime: () => ({ bestTime }) => ({
 		menu: null,
-		bestTime: bestTime ? null : { levels: levelNames.map((level) => ({
-			level,
-			name: load(`${level}Name`) || "Anonymous",
-			time: Math.min(999, parseInt(load(level), 10) || 0) || 999
-		})) }
+		bestTime: bestTime ? null : {
+			tab: "clean",
+			clean: bestTimes(false),
+			hinted: bestTimes(true)
+		}
 	}),
-	resetBestTime: () => ({ bestTime: { levels: levelNames.map((level) => ({
-		level,
-		name: remove(`${level}Name`) || "Anonymous",
-		time: remove(level) || 999
-	})) } }),
+	setBestTimeTab: (tab) => (state) => state.bestTime ? { bestTime: {
+		...state.bestTime,
+		tab
+	} } : null,
+	resetBestTime: () => ({ bestTime }) => ({ bestTime: {
+		...bestTime,
+		[bestTime.tab]: clearBestTimes(bestTime.tab === "hinted")
+	} }),
 	toggleCustomField: () => ({ game, customField }) => ({
 		menu: null,
 		customField: customField ? null : {
@@ -1481,7 +1674,7 @@ var startRain = () => {
 	document.body.prepend(canvas);
 	const context = canvas.getContext("2d");
 	const cell = 96;
-	const atlas = buildAtlas(cell);
+	let atlas = null;
 	const strips = Array.from({ length: STRIPS }, () => {
 		const s = {};
 		resetStrip(s);
@@ -1548,6 +1741,7 @@ var startRain = () => {
 		const on = root.dataset.theme === "matrix";
 		canvas.style.display = on ? "block" : "none";
 		if (on && !frame) {
+			atlas ??= buildAtlas(cell);
 			resize();
 			last = performance.now();
 			frame = requestAnimationFrame(loop);
@@ -1567,5 +1761,5 @@ var startRain = () => {
 //#region src/index.js
 app(state, actions, view, document.getElementById("app"));
 startRain();
-if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("service-worker.js");
+if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("service-worker.js").catch(() => {});
 //#endregion
