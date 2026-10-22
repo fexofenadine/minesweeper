@@ -37,6 +37,7 @@ const Game = ({ key, state, actions }) => (
                 flag={cell.flag}
                 mark={cell.mark}
                 num={cell.num}
+                hint={state.hint && state.hint.marks[y * state.game.width + x]}
                 lose={state.game.lose}
                 onDown={actions.down}
                 onMove={actions.move}
@@ -47,6 +48,11 @@ const Game = ({ key, state, actions }) => (
           </div>
         ))}
       </div>
+      {state.hint && (
+        <p class={s.hint} role="status">
+          {state.hint.text}
+        </p>
+      )}
     </div>
     <Grip />
   </Dialog>

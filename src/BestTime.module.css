@@ -1,5 +1,5 @@
 .root {
-  padding: 24px 8px 12px;
+  padding: 12px 8px 12px;
   white-space: nowrap;
 }
 
@@ -28,4 +28,30 @@
   display: block;
   min-width: 34px;
   padding: 1px 5px 0;
+}
+
+.tabs {
+  display: flex;
+  gap: 2px;
+  margin: 0 8px 12px;
+  border-bottom: 1px solid var(--shadow);
+}
+
+.tab {
+  margin: 0 0 -1px;
+  padding: 2px 8px 3px;
+  color: inherit;
+  font: inherit;
+  background: var(--face);
+  border: 1px solid;
+  border-color: var(--light) var(--shadow) var(--shadow) var(--light);
+  cursor: pointer;
+}
+
+/*the open tab stands a little taller and merges into the page below it*/
+.tabActive {
+  composes: tab;
+  margin-top: -2px;
+  padding-bottom: 5px;
+  border-bottom-color: var(--face);
 }

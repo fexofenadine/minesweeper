@@ -31,6 +31,8 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 - **Double-click chording**: double-click (or tap) a revealed number whose mines are all flagged to open every unflagged neighbour.
 - **Safe First Click** (on by default): mines are only placed after the first click, never under it.
 - **No Guessing**: the first click opens an empty area and every board can be solved with logic alone. A solver checks each board and redeals until it finds one, usually in a few milliseconds even on Expert.
+- **Hint** (Game menu or `H`): highlights a move that follows with certainty and explains the reasoning under the board. Blue marks the numbers it reasons from, green cells are safe, red cells are mines and amber marks flags that contradict a number. It only uses the visible numbers and your flags, and says so when only a guess is left. The F2, N and H shortcuts are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
+- **Best times** are kept in two tabs, one for games played without hints and one for games where a hint was used.
 
 ### Window and display
 

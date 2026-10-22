@@ -93,6 +93,19 @@ const Symbol = ({ opened, mined, flag, mark, num, lose }) => {
   return null
 }
 
+const hintClass = {
+  source: s.hintSource,
+  safe: s.hintSafe,
+  mine: s.hintMine,
+  wrong: s.hintWrong,
+}
+
+const isPressed = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose }) =>
+  opened ||
+  (pressed && !flag && pressedX === x && pressedY === y) ||
+  (group && !flag && inRange(x, y, pressedX, pressedY)) ||
+  (lose && ((!flag && mined) || (flag && !mined)))
+
 const Cell = ({
   x,
   y,
@@ -106,6 +119,7 @@ const Cell = ({
   mark,
   num,
   lose,
+  hint,
   onDown,
   onMove,
   onTouch,
@@ -113,14 +127,14 @@ const Cell = ({
 }) => (
   <button
     type="button"
-    class={
-      opened ||
-      (pressed && !flag && pressedX === x && pressedY === y) ||
-      (group && !flag && inRange(x, y, pressedX, pressedY)) ||
-      (lose && ((!flag && mined) || (flag && !mined)))
+    class={[
+      isPressed({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose })
         ? s.pressed
-        : s.root
-    }
+        : s.root,
+      hint && hintClass[hint],
+    ]
+      .filter(Boolean)
+      .join(' ')}
     tabindex={-1}
     onmousedown={(event) => {
       onDown({ event, x, y })

@@ -153,3 +153,17 @@
     opacity: 0.4;
   }
 }
+
+/*explanation under the field, as wide as the field so it never stretches the window*/
+.hint {
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
+  margin: 6px 0 0;
+  padding: 3px 4px 4px;
+  color: var(--text);
+  line-height: 1.3;
+  background: var(--input);
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}

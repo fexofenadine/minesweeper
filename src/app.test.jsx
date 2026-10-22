@@ -145,3 +145,52 @@ it('no guessing opens an area on the first click and deals a solvable board', ()
     expect(solvable(mined, width, height, 4 * width + 4)).toBe(true)
   }
 })
+
+it('asking for a hint marks the game as hinted and shows the reasoning', () => {
+  wired.hint()
+  wired.peek()
+  expect(current.game.hinted).toBe(true)
+  expect(current.hint.text).toBeTruthy()
+})
+
+it('a hint before the first click does not count as used', () => {
+  start({ game: { ...chordGame(), start: -1 } })
+  wired.hint()
+  expect(game().hinted).toBe(false)
+})
+
+it('keeps best times with and without hints apart', () => {
+  localStorage.clear()
+  const finish = (hinted, time) => {
+    start({ game: { ...chordGame(), level: 'beginner', hinted, time } })
+    wired.win()
+    wired.submitBestTime({ preventDefault() {} })
+    wired.peek()
+  }
+  finish(false, 90)
+  finish(true, 50)
+  expect(localStorage.getItem('beginner')).toBe('90')
+  expect(localStorage.getItem('beginnerHints')).toBe('50')
+  expect(current.bestTime.tab).toBe('hinted')
+  expect(current.bestTime.clean[0].time).toBe(90)
+  expect(current.bestTime.hinted[0].time).toBe(50)
+  wired.resetBestTime()
+  wired.peek()
+  expect(current.bestTime.hinted[0].time).toBe(999)
+  expect(current.bestTime.clean[0].time).toBe(90)
+  localStorage.clear()
+})
+
+it('ignores shortcut keys while typing or with a modifier held', () => {
+  start({ game: chordGame() })
+  const key = (keyCode, extra) => wired.press({ keyCode, target: { tagName: 'BODY' }, ...extra })
+  key(78, { target: { tagName: 'INPUT' } })
+  key(78, { ctrlKey: true })
+  key(72, { ctrlKey: true })
+  expect(game().start).toBe(0)
+  expect(current.hint).toBe(null)
+  key(72)
+  expect(game().hinted).toBe(true)
+  key(78)
+  expect(game().start).toBe(-1)
+})

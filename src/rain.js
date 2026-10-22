@@ -117,7 +117,8 @@ export const startRain = () => {
   document.body.prepend(canvas)
   const context = canvas.getContext('2d')
   const cell = 96
-  const atlas = buildAtlas(cell)
+  //drawing the glowing glyphs is slow, so only do it once the theme is first used
+  let atlas = null
 
   //start every strip part way through so the screen is already full of rain
   const strips = Array.from({ length: STRIPS }, () => {
@@ -211,6 +212,7 @@ export const startRain = () => {
     const on = root.dataset.theme === 'matrix'
     canvas.style.display = on ? 'block' : 'none'
     if (on && !frame) {
+      atlas ??= buildAtlas(cell)
       resize()
       last = performance.now()
       frame = requestAnimationFrame(loop)

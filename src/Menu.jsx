@@ -46,6 +46,7 @@ const Menu = ({ state, actions }) => (
   <ul class={s.root} tabindex={-1} onfocusout={actions.toggleMenu}>
     <MenuItem name="Game" type="game" active={state.menu} onChange={actions.toggleMenu}>
       <SubMenuItem name="New" hotKey="F2" onClick={() => actions.reset()} />
+      <SubMenuItem name="Hint" hotKey="H" onClick={() => actions.hint()} />
       <Separator />
       <SubMenuItem
         name="Beginner"

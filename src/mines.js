@@ -1,7 +1,7 @@
 const neighbourCache = new Map()
 
 //index lists of the up to 8 cells around each cell, built once per board size
-const neighboursOf = (width, height) => {
+export const neighboursOf = (width, height) => {
   const key = `${width}x${height}`
   if (!neighbourCache.has(key)) {
     const list = []

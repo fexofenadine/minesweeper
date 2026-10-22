@@ -6,5 +6,6 @@ app(state, actions, view, document.getElementById('app'))
 startRain()
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  navigator.serviceWorker.register('service-worker.js')
+  //browsers that block site storage refuse to register, the game works without it
+  navigator.serviceWorker.register('service-worker.js').catch(() => {})
 }

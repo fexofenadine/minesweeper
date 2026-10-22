@@ -5,6 +5,7 @@ import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
 import { placeMines } from './mines'
+import { findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
 
 const levels = {
@@ -64,6 +65,7 @@ const createGame = ({ level, width, height, mines }) => {
     lose: false,
     win: false,
     touch: false,
+    hinted: false,
   }
 }
 
@@ -120,6 +122,28 @@ const loadTheme = () => {
   return themes.includes(theme) ? theme : 'classic'
 }
 
+//best times are kept apart for games played with and without hints
+const timeKey = (level, hinted) => (hinted ? `${level}Hints` : level)
+
+const bestTimes = (hinted) =>
+  levelNames.map((level) => {
+    const key = timeKey(level, hinted)
+    return {
+      level,
+      name: load(`${key}Name`) || 'Anonymous',
+      time: Math.min(999, parseInt(load(key), 10) || 0) || 999,
+    }
+  })
+
+const clearBestTimes = (hinted) => {
+  levelNames.forEach((level) => {
+    const key = timeKey(level, hinted)
+    remove(key)
+    remove(`${key}Name`)
+  })
+  return bestTimes(hinted)
+}
+
 const prevent = (event) => {
   event.preventDefault()
   return false
@@ -127,6 +151,7 @@ const prevent = (event) => {
 
 export const state = {
   menu: null,
+  hint: null,
   game: createGame(loadLevel()),
   marks: Boolean(load('marks')),
   safeStart: load('safeStart') !== 'off',
@@ -142,8 +167,12 @@ export const actions = {
     window.addEventListener('keydown', actions.press)
   },
   press: (event) => (state, actions) => {
+    //leave typing in a dialog and browser shortcuts alone
+    if (event.target.tagName === 'INPUT' || event.ctrlKey || event.metaKey || event.altKey) return
     if (event.keyCode === 113 || event.keyCode === 78) {
       actions.reset()
+    } else if (event.keyCode === 72) {
+      actions.hint()
     }
   },
   reset:
@@ -159,7 +188,22 @@ export const actions = {
       )
       return {
         menu: null,
+        hint: null,
         game: createGame(params),
+      }
+    },
+  hint:
+    () =>
+    ({ game }) => {
+      if (game.win || game.lose) return { menu: null }
+      if (game.start < 0) {
+        return { menu: null, hint: noHint('Open a cell first, then ask for a hint.') }
+      }
+      const { field, width, height, flags } = game
+      return {
+        menu: null,
+        hint: findHint({ field, width, height, minesLeft: flags }),
+        game: { ...game, hinted: true },
       }
     },
   touch:
@@ -195,6 +239,7 @@ export const actions = {
       window.addEventListener('touchend', stop)
       window.addEventListener('touchcancel', stop)
       return {
+        hint: null,
         game: {
           ...game,
           pressed: true,
@@ -250,6 +295,7 @@ export const actions = {
         flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1)
       }
       return {
+        hint: null,
         game: {
           ...game,
           field,
@@ -358,6 +404,7 @@ export const actions = {
       }
 
       return {
+        hint: null,
         game: {
           ...game,
           left,
@@ -384,13 +431,14 @@ export const actions = {
     () =>
     ({ game }) => {
       if (game.level === 'custom') return null
-      const time = parseInt(load(game.level), 10)
+      const time = parseInt(load(timeKey(game.level, game.hinted)), 10)
       if (time && time <= game.time) return null
       return {
         winner: {
           name: 'Anonymous',
           time: game.time,
           level: game.level,
+          hinted: game.hinted,
         },
       }
     },
@@ -403,9 +451,11 @@ export const actions = {
     (event) =>
     ({ winner }, actions) => {
       event.preventDefault()
-      save(winner.level, winner.time)
-      save(`${winner.level}Name`, winner.name.trim())
+      const key = timeKey(winner.level, winner.hinted)
+      save(key, winner.time)
+      save(`${key}Name`, winner.name.trim())
       actions.toggleBestTime()
+      actions.setBestTimeTab(winner.hinted ? 'hinted' : 'clean')
       return { winner: null }
     },
   toggleBestTime:
@@ -414,23 +464,15 @@ export const actions = {
       menu: null,
       bestTime: bestTime
         ? null
-        : {
-            levels: levelNames.map((level) => ({
-              level,
-              name: load(`${level}Name`) || 'Anonymous',
-              time: Math.min(999, parseInt(load(level), 10) || 0) || 999,
-            })),
-          },
+        : { tab: 'clean', clean: bestTimes(false), hinted: bestTimes(true) },
     }),
-  resetBestTime: () => ({
-    bestTime: {
-      levels: levelNames.map((level) => ({
-        level,
-        name: remove(`${level}Name`) || 'Anonymous',
-        time: remove(level) || 999,
-      })),
-    },
-  }),
+  setBestTimeTab: (tab) => (state) =>
+    state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
+  resetBestTime:
+    () =>
+    ({ bestTime }) => ({
+      bestTime: { ...bestTime, [bestTime.tab]: clearBestTimes(bestTime.tab === 'hinted') },
+    }),
   toggleCustomField:
     () =>
     ({ game, customField }) => ({

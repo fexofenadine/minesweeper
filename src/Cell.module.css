@@ -94,3 +94,37 @@
 .shine {
   fill: var(--mine-shine);
 }
+
+/*hint highlights, drawn over the cell with a dark edge so they read on every theme*/
+.hintSource::after,
+.hintSafe::after,
+.hintMine::after,
+.hintWrong::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
+}
+
+.hintSource {
+  --hint-color: #2e8bff;
+}
+
+.hintSafe {
+  --hint-color: #12d12a;
+}
+
+.hintMine {
+  --hint-color: #ff3b3b;
+}
+
+.hintWrong {
+  --hint-color: #ffb000;
+}
