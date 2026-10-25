@@ -230,22 +230,32 @@ var Dialog_module_default = {
 	header: "Dialog_header",
 	title: "Dialog_title",
 	button: "Dialog_button",
+	controls: "Dialog_controls",
 	close: "Dialog_close"
 };
 var Button_module_default = { root: "Button_root" };
 //#endregion
 //#region src/Button.jsx
-var Button = ({ key, type, tabIndex, onClick, onCreate }, children) => /* @__PURE__ */ h("button", {
+var Button = ({ key, type, tabIndex, title, disabled, onClick, onCreate }, children) => /* @__PURE__ */ h("button", {
 	key,
 	class: Button_module_default.root,
 	type,
 	tabindex: tabIndex,
+	title,
+	disabled,
 	onclick: onClick,
 	oncreate: onCreate
 }, children);
 //#endregion
 //#region src/Dialog.jsx
-var Dialog = ({ key, title, onClose }, children) => /* @__PURE__ */ h("div", { key }, /* @__PURE__ */ h("div", { class: Dialog_module_default.a }, /* @__PURE__ */ h("div", { class: Dialog_module_default.b }, /* @__PURE__ */ h("div", { class: Dialog_module_default.dialog }, /* @__PURE__ */ h("div", { class: Dialog_module_default.container }, title && /* @__PURE__ */ h("div", { class: Dialog_module_default.header }, /* @__PURE__ */ h("h1", { class: Dialog_module_default.title }, title), onClose && /* @__PURE__ */ h("div", { class: Dialog_module_default.button }, /* @__PURE__ */ h(Button, {
+var Dialog = ({ key, title, titleHint, onTitleDoubleClick, controls, onClose, onCreate }, children) => /* @__PURE__ */ h("div", { key }, /* @__PURE__ */ h("div", { class: Dialog_module_default.a }, /* @__PURE__ */ h("div", { class: Dialog_module_default.b }, /* @__PURE__ */ h("div", {
+	class: Dialog_module_default.dialog,
+	oncreate: onCreate
+}, /* @__PURE__ */ h("div", { class: Dialog_module_default.container }, title && /* @__PURE__ */ h("div", { class: Dialog_module_default.header }, /* @__PURE__ */ h("h1", {
+	class: Dialog_module_default.title,
+	title: titleHint,
+	ondblclick: onTitleDoubleClick
+}, title), controls && /* @__PURE__ */ h("div", { class: Dialog_module_default.controls }, controls), onClose && /* @__PURE__ */ h("div", { class: Dialog_module_default.button }, /* @__PURE__ */ h(Button, {
 	tabIndex: -1,
 	onClick: onClose
 }, /* @__PURE__ */ h("svg", {
@@ -924,6 +934,10 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	checked: state.game.level === "expert",
 	onClick: () => actions.reset({ level: "expert" })
 }), /* @__PURE__ */ h(SubMenuItem, {
+	name: "Extreme",
+	checked: state.game.level === "extreme",
+	onClick: () => actions.reset({ level: "extreme" })
+}), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Custom...",
 	checked: state.game.level === "custom",
 	onClick: actions.toggleCustomField
@@ -1238,49 +1252,104 @@ var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mar
 	num,
 	lose
 })));
-var Grip_module_default = {
-	bar: "Grip_bar",
-	grip: "Grip_grip"
-};
 //#endregion
-//#region src/Grip.jsx
+//#region src/zoom.js
 var root$6 = document.documentElement;
-var clampScale = (scale) => Math.round(Math.min(4, Math.max(.5, scale)) * 20) / 20;
-var setScale = (scale) => {
-	root$6.style.setProperty("--scale", scale);
-	save("scale", scale);
+var steps = [
+	.5,
+	.625,
+	.75,
+	.875,
+	1,
+	1.25,
+	1.5,
+	1.75,
+	2,
+	2.5,
+	3,
+	4
+];
+var MIN_FIT = .625;
+var loadZoom = () => {
+	const scale = parseFloat(load("scale"));
+	return Number.isFinite(scale) ? Math.min(4, Math.max(.5, scale)) : 1;
 };
-var resize = (event) => {
-	event.preventDefault();
-	const grip = event.currentTarget;
-	const rect = grip.offsetParent.getBoundingClientRect();
-	const scale = parseFloat(root$6.style.getPropertyValue("--scale")) || 1;
-	const move = ({ clientX, clientY }) => {
-		const wide = (rect.width + 2 * (clientX - event.clientX)) / rect.width;
-		const tall = (rect.height + 2 * (clientY - event.clientY)) / rect.height;
-		setScale(clampScale(scale * (Math.abs(wide - 1) > Math.abs(tall - 1) ? wide : tall)));
+var stepZoom = (scale, direction) => direction > 0 ? steps.find((step) => step > scale + .001) ?? steps[steps.length - 1] : steps.findLast((step) => step < scale - .001) ?? steps[0];
+var fitZoom = (chosen, fit) => fit >= chosen ? chosen : Math.min(chosen, Math.max(MIN_FIT, Math.floor(fit * 50) / 50));
+var applyZoom = (scale) => root$6.style.setProperty("--scale", scale);
+var saveZoom = (scale) => save("scale", scale);
+var gameWindow = null;
+var measureFit = (scale) => {
+	const rect = gameWindow && gameWindow.getBoundingClientRect();
+	if (!rect || !rect.width || !rect.height) return {
+		fit: Infinity,
+		size: null
 	};
-	const stop = () => {
-		grip.removeEventListener("pointermove", move);
-		grip.removeEventListener("pointerup", stop);
-		grip.removeEventListener("pointercancel", stop);
+	const frame = getComputedStyle(gameWindow.parentElement.parentElement);
+	const width = innerWidth - parseFloat(frame.marginLeft) - parseFloat(frame.marginRight);
+	const height = innerHeight - parseFloat(frame.marginTop) - parseFloat(frame.marginBottom);
+	const size = {
+		width: rect.width / scale,
+		height: rect.height / scale,
+		room: `${width}x${height}`
 	};
-	grip.setPointerCapture(event.pointerId);
-	grip.addEventListener("pointermove", move);
-	grip.addEventListener("pointerup", stop);
-	grip.addEventListener("pointercancel", stop);
+	return {
+		fit: Math.min(width / size.width, height / size.height) * .99,
+		size
+	};
 };
-var Grip = () => /* @__PURE__ */ h("div", { class: Grip_module_default.bar }, /* @__PURE__ */ h("div", {
-	class: Grip_module_default.grip,
-	title: "Drag to resize, double click to reset",
-	onpointerdown: resize,
-	ondblclick: () => setScale(1)
-}));
+var sameSize = (a, b) => Boolean(a && b) && a.room === b.room && Math.abs(a.width / b.width - 1) < .03 && Math.abs(a.height / b.height - 1) < .03;
+var watchWindow = (dialog, refit) => {
+	gameWindow = dialog;
+	if (typeof ResizeObserver !== "undefined") new ResizeObserver(() => refit()).observe(dialog);
+	window.addEventListener("resize", () => refit());
+};
 //#endregion
 //#region src/Game.jsx
+var Zoom = ({ scale, onZoom }) => [/* @__PURE__ */ h(Button, {
+	tabIndex: -1,
+	title: "Zoom out",
+	disabled: scale <= .5,
+	onClick: () => onZoom(-1)
+}, /* @__PURE__ */ h("svg", {
+	width: "13",
+	height: "11"
+}, /* @__PURE__ */ h("path", { d: "M3 5h8v2H3z" }))), /* @__PURE__ */ h(Button, {
+	tabIndex: -1,
+	title: "Zoom in",
+	disabled: scale >= 4,
+	onClick: () => onZoom(1)
+}, /* @__PURE__ */ h("svg", {
+	width: "13",
+	height: "11"
+}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))];
+var transposed = ({ portrait, game }) => portrait && game.width > game.height;
+var rowsOf = (state) => {
+	const { field } = state.game;
+	if (!transposed(state)) return field.map((row, y) => row.map((cell, x) => ({
+		cell,
+		x,
+		y
+	})));
+	return field[0].map((_, x) => field.map((row, y) => ({
+		cell: row[x],
+		x,
+		y
+	})));
+};
 var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	key,
-	title: "Minesweeper"
+	title: "Minesweeper",
+	titleHint: "Double-click for 100% zoom",
+	onTitleDoubleClick: () => actions.zoom(0),
+	controls: /* @__PURE__ */ h(Zoom, {
+		scale: state.zoom.scale,
+		onZoom: actions.zoom
+	}),
+	onCreate: (dialog) => {
+		watchWindow(dialog, actions.fit);
+		actions.fit();
+	}
 }, /* @__PURE__ */ h(Menu, {
 	state,
 	actions
@@ -1289,7 +1358,7 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	lose: state.game.lose,
 	win: state.game.win,
 	onReset: actions.reset
-}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, state.game.field.map((row, y) => /* @__PURE__ */ h("div", { class: state.game.win || state.game.lose ? Game_module_default.inactive : Game_module_default.active }, row.map((cell, x) => /* @__PURE__ */ h(Cell, {
+}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: state.game.win || state.game.lose ? Game_module_default.inactive : Game_module_default.active }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
 	x,
 	y,
 	pressed: state.game.pressed,
@@ -1310,7 +1379,7 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 }))))), state.hint && /* @__PURE__ */ h("p", {
 	class: Game_module_default.hint,
 	role: "status"
-}, state.hint.text)), /* @__PURE__ */ h(Grip, null));
+}, state.hint.text)));
 var Winner_module_default = {
 	root: "Winner_root",
 	text: "Winner_text",
@@ -1668,9 +1737,10 @@ var placeMines = ({ width, height, mines, x, y, safe, noGuess, budget = 1500 }) 
 //#endregion
 //#region src/hint.js
 var count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
-var where = (a, b, width) => {
-	const dx = b % width - a % width;
-	const dy = Math.floor(b / width) - Math.floor(a / width);
+var where = (a, b, width, transposed) => {
+	const across = b % width - a % width;
+	const down = Math.floor(b / width) - Math.floor(a / width);
+	const [dx, dy] = transposed ? [down, across] : [across, down];
 	const v = dy < 0 ? "above" : dy > 0 ? "below" : "";
 	const h = dx < 0 ? "left" : dx > 0 ? "right" : "";
 	if (v && h) return `${v} and to the ${h} of it`;
@@ -1712,7 +1782,7 @@ var explainChord = ({ field, width, height }, x, y) => {
 	}
 	return null;
 };
-var findHint = ({ field, width, height, minesLeft }) => {
+var findHint = ({ field, width, height, minesLeft, transposed = false }) => {
 	const around = neighboursOf(width, height);
 	const cells = field.flat();
 	const numbered = [];
@@ -1755,7 +1825,7 @@ var findHint = ({ field, width, height, minesLeft }) => {
 			const rest = B.hidden.filter((u) => !A.hidden.includes(u));
 			const extra = B.need - A.need;
 			if (extra !== 0 && extra !== rest.length) continue;
-			const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width)}. Those shared cells hold exactly ${count(A.need, "mine")}`;
+			const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width, transposed)}. Those shared cells hold exactly ${count(A.need, "mine")}`;
 			if (extra === 0) return hint("clear", rest, [a, b], `${shared}, which is all the ${cells[b].num} needs, so its other hidden neighbours are safe.`);
 			const last = rest.length === 1 ? "it is a mine" : "they are all mines";
 			return hint("mine", rest, [a, b], `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, "other hidden neighbour")}, and ${last}.`);
@@ -1787,6 +1857,12 @@ var levels = {
 		width: 30,
 		height: 16,
 		mines: 99
+	},
+	extreme: {
+		level: "extreme",
+		width: 39,
+		height: 21,
+		mines: 169
 	}
 };
 var levelNames = Object.keys(levels);
@@ -1908,12 +1984,20 @@ var state = {
 	bestTime: null,
 	customField: null,
 	backgrounds: loadSettings(),
-	backgroundSettings: null
+	backgroundSettings: null,
+	zoom: {
+		chosen: loadZoom(),
+		scale: loadZoom(),
+		seen: null
+	},
+	portrait: Boolean(window.matchMedia && matchMedia("(orientation: portrait)").matches)
 };
 var actions = {
 	init: () => (state, actions) => {
 		window.addEventListener("keydown", actions.press);
+		if (window.matchMedia) matchMedia("(orientation: portrait)").addEventListener("change", (event) => actions.setPortrait(event.matches));
 	},
+	setPortrait: (portrait) => ({ portrait }),
 	press: (event) => (state, actions) => {
 		if ([
 			"INPUT",
@@ -1937,7 +2021,8 @@ var actions = {
 			game: createGame(params)
 		};
 	},
-	hint: () => ({ game }) => {
+	hint: () => (state) => {
+		const { game } = state;
 		if (game.win || game.lose) return { menu: null };
 		if (game.start < 0) return {
 			menu: null,
@@ -1950,7 +2035,8 @@ var actions = {
 				field,
 				width,
 				height,
-				minesLeft: flags
+				minesLeft: flags,
+				transposed: transposed(state)
 			}),
 			game: {
 				...game,
@@ -2291,6 +2377,29 @@ var actions = {
 			backgrounds: next,
 			backgroundSettings: null
 		};
+	},
+	fit: () => ({ zoom }) => {
+		const { fit, size } = measureFit(zoom.scale);
+		if (sameSize(size, zoom.seen)) return null;
+		const scale = fitZoom(zoom.chosen, fit);
+		applyZoom(scale);
+		return { zoom: {
+			...zoom,
+			scale,
+			seen: size
+		} };
+	},
+	zoom: (direction) => ({ zoom }) => {
+		const { fit, size } = measureFit(zoom.scale);
+		const chosen = direction ? stepZoom(zoom.scale, direction) : 1;
+		const scale = direction ? chosen : fitZoom(chosen, fit);
+		saveZoom(chosen);
+		applyZoom(scale);
+		return { zoom: {
+			chosen,
+			scale,
+			seen: size
+		} };
 	},
 	setTheme: (theme) => () => {
 		save("theme", theme);
