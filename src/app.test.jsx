@@ -273,3 +273,50 @@ it('has no background settings for themes without one', () => {
   wired.peek()
   expect(current.backgroundSettings).toBe(null)
 })
+
+it('has an extreme level at expert density, 30% wider and taller', () => {
+  start({})
+  wired.reset({ level: 'extreme' })
+  const { width, height, mines } = game()
+  expect([width, height, mines]).toEqual([39, 21, 169])
+  expect(Math.abs(mines / (width * height) - 99 / (30 * 16))).toBeLessThan(0.001)
+  expect(current.game.field.flat()).toHaveLength(39 * 21)
+})
+
+it('zooms in steps from the size shown and remembers the choice', () => {
+  localStorage.clear()
+  start({ zoom: { chosen: 1, scale: 0.8, seen: null } })
+  wired.zoom(1)
+  wired.peek()
+  expect(current.zoom).toMatchObject({ chosen: 0.875, scale: 0.875 })
+  expect(localStorage.getItem('scale')).toBe('0.875')
+  wired.zoom(0)
+  wired.peek()
+  expect(current.zoom).toMatchObject({ chosen: 1, scale: 1 })
+  localStorage.clear()
+})
+
+it('shows a wide board transposed on a portrait screen, keeping each cell its own place', () => {
+  const container = document.createElement('div')
+  const cellsOf = (portrait) =>
+    new Promise((resolve) => {
+      const shown = { ...state, game: chordGame(), portrait }
+      shown.game.field = shown.game.field.slice(0, 3)
+      shown.game.height = 3
+      const testView = () => (
+        <div
+          oncreate={(el) => {
+            const rows = [...el.querySelectorAll('[class*=active]')]
+            resolve(rows.map((row) => row.children.length))
+          }}
+        >
+          {view(shown, actions)}
+        </div>
+      )
+      app(shown, actions, testView, container)
+    })
+  return Promise.all([cellsOf(false), cellsOf(true)]).then(([wide, tall]) => {
+    expect(wide).toEqual([9, 9, 9])
+    expect(tall).toEqual(Array(9).fill(3))
+  })
+})

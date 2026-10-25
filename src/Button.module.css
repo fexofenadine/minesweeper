@@ -38,6 +38,11 @@
   border-color: var(--shadow) var(--face) var(--face) var(--shadow);
 }
 
+.root:disabled {
+  color: var(--shadow);
+  cursor: default;
+}
+
 .root:focus {
   border-color: var(--frame);
 }

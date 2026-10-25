@@ -3,9 +3,11 @@ import { neighboursOf } from './mines'
 const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
 
 //where cell b sits seen from cell a, so two equal numbers can be told apart
-const where = (a, b, width) => {
-  const dx = (b % width) - (a % width)
-  const dy = Math.floor(b / width) - Math.floor(a / width)
+//a board shown transposed swaps across and down
+const where = (a, b, width, transposed) => {
+  const across = (b % width) - (a % width)
+  const down = Math.floor(b / width) - Math.floor(a / width)
+  const [dx, dy] = transposed ? [down, across] : [across, down]
   const v = dy < 0 ? 'above' : dy > 0 ? 'below' : ''
   const h = dx < 0 ? 'left' : dx > 0 ? 'right' : ''
   if (v && h) return `${v} and to the ${h} of it`
@@ -65,7 +67,7 @@ export const explainChord = ({ field, width, height }, x, y) => {
 
 //a certain move from what is on the board, with the reasoning behind it
 //only the numbers and the player's flags are used, never the real mines
-export const findHint = ({ field, width, height, minesLeft }) => {
+export const findHint = ({ field, width, height, minesLeft, transposed = false }) => {
   const around = neighboursOf(width, height)
   const cells = field.flat()
   const numbered = []
@@ -135,7 +137,7 @@ export const findHint = ({ field, width, height, minesLeft }) => {
       const rest = B.hidden.filter((u) => !A.hidden.includes(u))
       const extra = B.need - A.need
       if (extra !== 0 && extra !== rest.length) continue
-      const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width)}. Those shared cells hold exactly ${count(A.need, 'mine')}`
+      const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width, transposed)}. Those shared cells hold exactly ${count(A.need, 'mine')}`
       if (extra === 0) {
         return hint(
           'clear',

@@ -1,6 +1,6 @@
 import { h } from 'hyperapp'
 import './app.css'
-import Game from './Game'
+import Game, { transposed } from './Game'
 import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
@@ -9,6 +9,7 @@ import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
+import { applyZoom, fitZoom, loadZoom, measureFit, sameSize, saveZoom, stepZoom } from './zoom'
 
 const levels = {
   beginner: {
@@ -28,6 +29,13 @@ const levels = {
     width: 30,
     height: 16,
     mines: 99,
+  },
+  //expert grown by 30% each way at the same mine density
+  extreme: {
+    level: 'extreme',
+    width: 39,
+    height: 21,
+    mines: 169,
   },
 }
 
@@ -165,12 +173,20 @@ export const state = {
   customField: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
+  zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null },
+  portrait: Boolean(window.matchMedia && matchMedia('(orientation: portrait)').matches),
 }
 
 export const actions = {
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
+    if (window.matchMedia) {
+      matchMedia('(orientation: portrait)').addEventListener('change', (event) =>
+        actions.setPortrait(event.matches),
+      )
+    }
   },
+  setPortrait: (portrait) => ({ portrait }),
   press: (event) => (state, actions) => {
     //leave typing in a dialog and browser shortcuts alone
     const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
@@ -198,20 +214,19 @@ export const actions = {
         game: createGame(params),
       }
     },
-  hint:
-    () =>
-    ({ game }) => {
-      if (game.win || game.lose) return { menu: null }
-      if (game.start < 0) {
-        return { menu: null, hint: noHint('Open a cell first, then ask for a hint.') }
-      }
-      const { field, width, height, flags } = game
-      return {
-        menu: null,
-        hint: findHint({ field, width, height, minesLeft: flags }),
-        game: { ...game, hinted: true },
-      }
-    },
+  hint: () => (state) => {
+    const { game } = state
+    if (game.win || game.lose) return { menu: null }
+    if (game.start < 0) {
+      return { menu: null, hint: noHint('Open a cell first, then ask for a hint.') }
+    }
+    const { field, width, height, flags } = game
+    return {
+      menu: null,
+      hint: findHint({ field, width, height, minesLeft: flags, transposed: transposed(state) }),
+      game: { ...game, hinted: true },
+    }
+  },
   touch:
     ({ event, x, y }) =>
     ({ game }, actions) => {
@@ -567,6 +582,28 @@ export const actions = {
       const next = { ...backgrounds, [id]: draft }
       saveSettings(next)
       return { backgrounds: next, backgroundSettings: null }
+    },
+  //the zoom picked with the title bar buttons, shrunk when the window would not fit
+  //only a new level, theme or browser size refits, so zooming in past the fit can scroll
+  fit:
+    () =>
+    ({ zoom }) => {
+      const { fit, size } = measureFit(zoom.scale)
+      if (sameSize(size, zoom.seen)) return null
+      const scale = fitZoom(zoom.chosen, fit)
+      applyZoom(scale)
+      return { zoom: { ...zoom, scale, seen: size } }
+    },
+  //step in or out from the size shown, or back to 100% (which still fits the window)
+  zoom:
+    (direction) =>
+    ({ zoom }) => {
+      const { fit, size } = measureFit(zoom.scale)
+      const chosen = direction ? stepZoom(zoom.scale, direction) : 1
+      const scale = direction ? chosen : fitZoom(chosen, fit)
+      saveZoom(chosen)
+      applyZoom(scale)
+      return { zoom: { chosen, scale, seen: size } }
     },
   setTheme: (theme) => () => {
     save('theme', theme)

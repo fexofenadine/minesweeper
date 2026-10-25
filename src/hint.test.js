@@ -66,3 +66,8 @@ it('says where the second number is so equal numbers can be told apart', () => {
   expect(h.text).toMatch(/next to the 1 below it/)
   expect(h.marks).toEqual({ 0: 'source', 2: 'source', 4: 'safe', 5: 'safe' })
 })
+
+it('describes directions as shown when the board is transposed', () => {
+  const h = findHint({ ...board(['1#', '1#', '##']), transposed: true })
+  expect(h.text).toMatch(/next to the 1 to the right of it/)
+})

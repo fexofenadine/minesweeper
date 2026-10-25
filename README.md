@@ -32,6 +32,7 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 ### Gameplay
 
 - **Double-click chording**: double-click (or tap) a revealed number whose mines are all flagged to open every unflagged neighbour. If the flags don't match the number, the reason is shown under the board: too many flags are outlined in amber, and the cells where the missing flags belong in dashed violet.
+- **Extreme level**: 39 × 21 with 169 mines, Expert grown by 30% each way at the same mine density. It has its own best time.
 - **Safe First Click** (on by default): mines are only placed after the first click, never under it.
 - **No Guessing**: the first click opens an empty area and every board can be solved with logic alone. A solver checks each board and redeals until it finds one, usually in a few milliseconds even on Expert.
 - **Hint** (Game menu or `H`): highlights a move that follows with certainty and explains the reasoning under the board. Blue marks the numbers it reasons from, green cells are safe, red cells are mines and amber marks flags that contradict a number. It only uses the visible numbers and your flags, and says so when only a guess is left. The F2, N and H shortcuts are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
@@ -39,7 +40,9 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 
 ### Window and display
 
-- **Resizable window**: drag the grip in the bottom right corner to scale the whole window up or down, keeping its aspect ratio so the cells stay square. Double-click the grip to reset. The size is remembered.
+- **Zoom**: the − and + buttons in the title bar scale the whole window in steps from 50% to 400%, and double-clicking the title bar goes back to 100%. The zoom is remembered.
+- **Fits the screen**: when a level, custom grid, theme or browser size would make the window too big, it shrinks to fit, but never below 62.5% (about 10 pixel cells), where the page scrolls instead. Zooming in past the fitted size is allowed and scrolls too. On small screens the margin around the window shrinks as well.
+- **Portrait screens**: on a screen taller than it is wide, a board that is wider than tall (Expert, Extreme or a wide custom grid) is shown turned on its side, columns as rows, so it fills the screen instead of shrinking. Numbers stay upright, and it switches back when the screen turns to landscape.
 - **Full-screen backgrounds**: wallpapers always cover the browser window, whatever its size, zoom or orientation.
 - **Background settings** (Theme menu, Matrix and Nord): the animated xscreensaver backgrounds have the same options as the originals, such as density, speed, glyph set, fog and waves for GLMatrix, and growth delay, crack counts, sand grains, circular cracks and wireframe for Substrate. Changes preview live, Cancel puts them back and Defaults restores the original look. Settings for every background are saved together.
 

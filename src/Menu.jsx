@@ -65,6 +65,11 @@ const Menu = ({ state, actions }) => (
         onClick={() => actions.reset({ level: 'expert' })}
       />
       <SubMenuItem
+        name="Extreme"
+        checked={state.game.level === 'extreme'}
+        onClick={() => actions.reset({ level: 'extreme' })}
+      />
+      <SubMenuItem
         name="Custom..."
         checked={state.game.level === 'custom'}
         onClick={actions.toggleCustomField}

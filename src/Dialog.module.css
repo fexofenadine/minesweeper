@@ -2,6 +2,13 @@
   margin: 50px;
 }
 
+/*small screens keep the room for the window rather than the margin*/
+@media (max-width: 600px), (max-height: 600px) {
+  .a {
+    margin: 8px;
+  }
+}
+
 .b {
   margin-top: env(safe-area-inset-top);
   margin-right: env(safe-area-inset-right);
@@ -62,6 +69,19 @@
 .button {
   padding: 2px 2px 2px 0;
   line-height: 9px;
+}
+
+/*title bar buttons other than close, drawn like it*/
+.controls {
+  display: flex;
+  gap: 2px;
+  padding: 2px 4px 2px 0;
+  line-height: 9px;
+}
+
+.controls svg {
+  display: block;
+  fill: currentColor;
 }
 
 .close {

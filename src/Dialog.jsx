@@ -2,15 +2,21 @@ import { h } from 'hyperapp'
 import s from './Dialog.module.css'
 import Button from './Button'
 
-const Dialog = ({ key, title, onClose }, children) => (
+const Dialog = (
+  { key, title, titleHint, onTitleDoubleClick, controls, onClose, onCreate },
+  children,
+) => (
   <div key={key}>
     <div class={s.a}>
       <div class={s.b}>
-        <div class={s.dialog}>
+        <div class={s.dialog} oncreate={onCreate}>
           <div class={s.container}>
             {title && (
               <div class={s.header}>
-                <h1 class={s.title}>{title}</h1>
+                <h1 class={s.title} title={titleHint} ondblclick={onTitleDoubleClick}>
+                  {title}
+                </h1>
+                {controls && <div class={s.controls}>{controls}</div>}
                 {onClose && (
                   <div class={s.button}>
                     <Button tabIndex={-1} onClick={onClose}>
