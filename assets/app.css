@@ -13,24 +13,24 @@
 
 /*theme fonts, all under the sil open font license, see src/fonts*/
 @font-face {
-  font-family: 'Monoton';
-  font-weight: 400;
+  font-family: 'Orbitron';
+  font-weight: 400 900;
   font-display: swap;
-  src: url(./monoton.woff2) format('woff2');
+  src: url(./orbitron.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Audiowide';
+  font-family: 'Courier Prime';
   font-weight: 400;
   font-display: swap;
-  src: url(./audiowide.woff2) format('woff2');
+  src: url(./courier-prime.woff2) format('woff2');
 }
 
 @font-face {
-  font-family: 'Share Tech Mono';
-  font-weight: 400;
+  font-family: 'Courier Prime';
+  font-weight: 700;
   font-display: swap;
-  src: url(./share-tech-mono.woff2) format('woff2');
+  src: url(./courier-prime-bold.woff2) format('woff2');
 }
 
 @font-face {
@@ -104,11 +104,11 @@
 }
 
 :root[data-theme='synthwave'] {
-  /*synthwave '84 palette with neon fonts*/
-  --ui-font: 'Audiowide', var(--pixel-font);
-  --title-font: 'Monoton', var(--pixel-font);
+  /*synthwave '84 palette with eighties sci-fi lettering*/
+  --ui-font: 'Orbitron', var(--pixel-font);
+  --title-font: 'Orbitron', var(--pixel-font);
   --title-weight: normal;
-  --text-font: 'Audiowide', Tahoma, sans-serif;
+  --text-font: 'Orbitron', Tahoma, sans-serif;
   --font-smoothing: auto;
   --text-glow: 0 0 3px #ff7edb, 0 0 8px rgba(54, 249, 246, 0.7);
   --title-glow: 0 0 4px #ff7edb, 0 0 10px #f92aad;
@@ -207,63 +207,63 @@
 }
 
 :root[data-theme='matrix'] {
-  /*monochrome phosphor green on black with a terminal font*/
-  --ui-font: 'Share Tech Mono', monospace;
-  --title-font: 'Share Tech Mono', monospace;
+  /*soft phosphor green on black in a film terminal typewriter face*/
+  --ui-font: 'Courier Prime', monospace;
+  --title-font: 'Courier Prime', monospace;
   --title-weight: normal;
-  --text-font: 'Share Tech Mono', monospace;
-  --font-size: 12px;
+  --text-font: 'Courier Prime', monospace;
+  --font-size: 13px;
   --font-smoothing: auto;
-  --text-glow: 0 0 4px #00ff41, 0 0 9px rgba(0, 255, 65, 0.6);
-  --title-glow: 0 0 4px #00ff41;
+  --text-glow: 0 0 3px rgba(57, 210, 107, 0.55);
+  --title-glow: 0 0 3px rgba(57, 210, 107, 0.7);
   color-scheme: dark;
   --desktop: #000;
-  --text: #00ff41;
-  --face: #020d05;
-  --light: #0f5c25;
+  --text: #39d26b;
+  --face: #030d06;
+  --light: #145c2a;
   --shadow: #000;
   --dark-shadow: #000;
-  --frame: #00ff41;
+  --frame: #2fae5a;
   --window-frame: #000;
-  --title-start: #003b00;
-  --title-end: #008f11;
-  --title-text: #d7ffdf;
-  --highlight: #00ff41;
+  --title-start: #00300a;
+  --title-end: #0b6e24;
+  --title-text: #c9f2d4;
+  --highlight: #39d26b;
   --highlight-text: #000;
-  --menu-shadow: rgba(0, 255, 65, 0.25);
+  --menu-shadow: rgba(57, 210, 107, 0.18);
   --input: #000;
-  --input-frame: #003b00;
-  --panel: #010a03;
-  /*raised tiles stand out from dug out ones, and each clue has its own hue*/
-  --cell: #0b3d19;
-  --cell-light: #34b85a;
+  --input-frame: #00300a;
+  --panel: #020a04;
+  /*raised tiles stand out from dug out ones, clues keep distinct but muted hues*/
+  --cell: #0a3316;
+  --cell-light: #2a8f4a;
   --cell-shadow: #000;
   --cell-open: #010803;
   --lcd: #000;
-  --lcd-on: #00ff41;
-  --lcd-off: rgba(0, 255, 65, 0.12);
-  --num-1: #3dff6e;
-  --num-2: #4ff0ff;
-  --num-3: #f2ff4d;
-  --num-4: #ffffff;
-  --num-5: #ffa53d;
-  --num-6: #6dffcf;
-  --num-7: #c8c8c8;
-  --num-8: #7fa37f;
-  --glyph: #00ff41;
-  --flag: #f0fff2;
-  --mine: #9dffb0;
+  --lcd-on: #39d26b;
+  --lcd-off: rgba(57, 210, 107, 0.1);
+  --num-1: #5ee08a;
+  --num-2: #6cc6c0;
+  --num-3: #d8cf6a;
+  --num-4: #c8f0d2;
+  --num-5: #d99a5b;
+  --num-6: #7bd1b0;
+  --num-7: #a9b9aa;
+  --num-8: #6f8a72;
+  --glyph: #39d26b;
+  --flag: #d8f5df;
+  --mine: #8fd9a5;
   --mine-shine: #000;
-  --hurt: #b31212;
-  --wrong: #ff5c5c;
-  --smiley: #00ff41;
+  --hurt: #9c1a1a;
+  --wrong: #e06060;
+  --smiley: #39d26b;
   --smiley-line: #000;
   --glow-dim:
-    0 0 0 1px #00ff41, 0 0 18px 4px rgba(0, 255, 65, 0.6), 0 0 48px 16px rgba(0, 255, 65, 0.25);
+    0 0 0 1px #2fae5a, 0 0 14px 3px rgba(57, 210, 107, 0.35), 0 0 40px 12px rgba(57, 210, 107, 0.12);
   --glow-bright:
-    0 0 0 1px #8affa8, 0 0 24px 8px rgba(0, 255, 65, 0.85), 0 0 72px 26px rgba(0, 255, 65, 0.4);
-  --fringe-a: rgba(0, 255, 65, 0.8);
-  --fringe-b: rgba(196, 255, 210, 0.6);
+    0 0 0 1px #6fe39a, 0 0 18px 5px rgba(57, 210, 107, 0.5), 0 0 56px 18px rgba(57, 210, 107, 0.2);
+  --fringe-a: rgba(57, 210, 107, 0.5);
+  --fringe-b: rgba(196, 255, 210, 0.4);
 }
 
 :root[data-theme='nord'] {
