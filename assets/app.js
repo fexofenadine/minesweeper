@@ -394,6 +394,7 @@ var buildAtlas = (glyphs, cell) => {
 var matrix_default = {
 	name: "GLMatrix",
 	credit: "Ported from GLMatrix by Jamie Zawinski, part of xscreensaver",
+	wallpaper: true,
 	filter: (pixels) => `blur(${.6 / pixels}px)`,
 	ratio: (pixels) => Math.min(pixels, 2),
 	options: [
@@ -515,11 +516,6 @@ var matrix_default = {
 				for (let n = 0; n < ticks; n++) strips.forEach((s) => tickStrip(s, glyphs.length));
 				atlas ??= buildAtlas(glyphs, cell);
 				draw();
-			},
-			still: () => {
-				atlas ??= buildAtlas(glyphs, cell);
-				draw();
-				return true;
 			}
 		};
 	}
@@ -571,7 +567,7 @@ var radians = (degrees) => degrees * Math.PI / 180;
 var substrate_default = {
 	name: "Substrate",
 	credit: "Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver",
-	ratio: (pixels) => pixels,
+	ratio: (pixels, { detail }) => detail === "sharp" ? pixels : detail === "balanced" ? Math.min(pixels, 1.5) : 1,
 	options: [
 		{
 			key: "growthDelay",
@@ -652,6 +648,17 @@ var substrate_default = {
 			label: "Seamless",
 			type: "toggle",
 			value: false
+		},
+		{
+			key: "detail",
+			label: "Detail",
+			type: "select",
+			choices: [
+				["balanced", "Balanced"],
+				["sharp", "Sharp (slow on big screens)"],
+				["original", "Original"]
+			],
+			value: "balanced"
 		}
 	],
 	create: (context, settings) => {
@@ -663,6 +670,8 @@ var substrate_default = {
 		let cycles = 0;
 		let last = 0;
 		let pace = 1;
+		let owed = 0;
+		let style = null;
 		let pixelsOf = null;
 		const plot = (x, y, colour, alpha) => {
 			if (x < 0 || x >= width || y < 0 || y >= height) return;
@@ -677,7 +686,7 @@ var substrate_default = {
 				return;
 			}
 			context.globalAlpha = a;
-			context.fillStyle = colour;
+			if (colour !== style) context.fillStyle = style = colour;
 			context.fillRect(x, y, 1, 1);
 		};
 		const startCrack = (cr) => {
@@ -731,9 +740,11 @@ var substrate_default = {
 		const regionColor = (cr) => {
 			let rx = cr.x;
 			let ry = cr.y;
+			const sx = .81 * Math.sin(radians(cr.t));
+			const sy = .81 * Math.cos(radians(cr.t));
 			for (let steps = (width + height) * 4; steps > 0; steps--) {
-				rx += .81 * Math.sin(radians(cr.t));
-				ry -= .81 * Math.cos(radians(cr.t));
+				rx += sx;
+				ry -= sy;
 				let cx = Math.trunc(rx);
 				let cy = Math.trunc(ry);
 				if (f.seamless) {
@@ -800,7 +811,7 @@ var substrate_default = {
 		const build = () => {
 			pixelsOf = null;
 			context.globalAlpha = 1;
-			context.fillStyle = BACKGROUND$2;
+			context.fillStyle = style = BACKGROUND$2;
 			context.fillRect(0, 0, width, height);
 			cgrid.fill(EMPTY);
 			cracks = [];
@@ -815,7 +826,8 @@ var substrate_default = {
 			resize: (w, h, pixels = 1) => {
 				width = w;
 				height = h;
-				pace = Math.max(1, Math.round(pixels * pixels));
+				pace = Math.max(1, pixels);
+				owed = 0;
 				cgrid = new Int32Array(w * h);
 				last = performance.now();
 				build();
@@ -825,7 +837,8 @@ var substrate_default = {
 				const due = Math.min(8, Math.floor((now - last) / delay));
 				if (!due) return;
 				last = now - delay > last + due * delay ? now : last + due * delay;
-				for (let n = 0; n < due * pace; n++) {
+				owed += due * pace;
+				for (; owed >= 1; owed--) {
 					for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
 					if (++cycles >= f.maxCycles * pace && f.maxCycles) build();
 				}
@@ -1312,9 +1325,9 @@ var sources = /* #__PURE__ */ Object.assign({
 	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
 	"../app.jsx": () => __vitePreload(() => import("./app-CX1TIamD.js").then((m) => m["default"]), [], import.meta.url),
 	"./hill.js": () => __vitePreload(() => import("./hill-z0PhJZqK.js").then((m) => m["default"]), [], import.meta.url),
-	"./index.js": () => __vitePreload(() => import("./backgrounds-Bpjqmyq2.js").then((m) => m["default"]), [], import.meta.url),
-	"./matrix.js": () => __vitePreload(() => import("./matrix-QNhpOqfS.js").then((m) => m["default"]), [], import.meta.url),
-	"./substrate.js": () => __vitePreload(() => import("./substrate-Yi5Qozwe.js").then((m) => m["default"]), [], import.meta.url),
+	"./index.js": () => __vitePreload(() => import("./backgrounds-y8fCa31h.js").then((m) => m["default"]), [], import.meta.url),
+	"./matrix.js": () => __vitePreload(() => import("./matrix-D_vYPxu0.js").then((m) => m["default"]), [], import.meta.url),
+	"./substrate.js": () => __vitePreload(() => import("./substrate-CETR7kLC.js").then((m) => m["default"]), [], import.meta.url),
 	"./truchet.js": () => __vitePreload(() => import("./truchet-BRKY3zWa.js").then((m) => m["default"]), [], import.meta.url),
 	"../hint.js": () => __vitePreload(() => import("./hint-Sn72Q7dE.js").then((m) => m["default"]), [], import.meta.url),
 	"../index.js": () => __vitePreload(() => import("./src-BXMJwuxq.js").then((m) => m["default"]), [], import.meta.url),
@@ -1990,7 +2003,7 @@ var startBackgrounds = () => {
 	const resize = () => {
 		const { ratio, filter } = backgrounds[active];
 		const pixels = window.devicePixelRatio || 1;
-		const scale = ratio(pixels);
+		const scale = ratio(pixels, settings[active]);
 		canvas.width = Math.round(innerWidth * scale);
 		canvas.height = Math.round(innerHeight * scale);
 		canvas.style.filter = filter ? filter(pixels) : "none";
