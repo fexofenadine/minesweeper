@@ -1310,6 +1310,7 @@ var rgb = (hex) => [
 var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
 var brightness = ([r, g, b]) => Math.max(r, g, b);
 var sources = /* #__PURE__ */ Object.assign({
+	"../About.jsx": () => __vitePreload(() => import("./About-D9CbMnRN.js").then((m) => m["default"]), [], import.meta.url),
 	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-D3giHqNw.js").then((m) => m["default"]), [], import.meta.url),
 	"../BestTime.jsx": () => __vitePreload(() => import("./BestTime-Ce22rTOt.js").then((m) => m["default"]), [], import.meta.url),
 	"../Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
@@ -1317,13 +1318,13 @@ var sources = /* #__PURE__ */ Object.assign({
 	"../CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"../Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
 	"../Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"../Game.jsx": () => __vitePreload(() => import("./Game-TTccPjEd.js").then((m) => m["default"]), [], import.meta.url),
+	"../Game.jsx": () => __vitePreload(() => import("./Game-rnd9BPSW.js").then((m) => m["default"]), [], import.meta.url),
 	"../Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
-	"../Menu.jsx": () => __vitePreload(() => import("./Menu-CSkFSVlA.js").then((m) => m["default"]), [], import.meta.url),
+	"../Menu.jsx": () => __vitePreload(() => import("./Menu-CM-8ws1g.js").then((m) => m["default"]), [], import.meta.url),
 	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-BtrJ3RPa.js").then((m) => m["default"]), [], import.meta.url),
 	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"../app.jsx": () => __vitePreload(() => import("./app-nchCqb_E.js").then((m) => m["default"]), [], import.meta.url),
+	"../app.jsx": () => __vitePreload(() => import("./app-UHd7D_YL.js").then((m) => m["default"]), [], import.meta.url),
 	"./hill.js": () => __vitePreload(() => import("./hill-z0PhJZqK.js").then((m) => m["default"]), [], import.meta.url),
 	"./index.js": () => __vitePreload(() => import("./backgrounds-y8fCa31h.js").then((m) => m["default"]), [], import.meta.url),
 	"./matrix.js": () => __vitePreload(() => import("./matrix-D_vYPxu0.js").then((m) => m["default"]), [], import.meta.url),
@@ -2155,6 +2156,14 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 }), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
 	name: "Background Settings...",
 	onClick: actions.toggleBackgroundSettings
+})), /* @__PURE__ */ h(MenuItem, {
+	name: "Help",
+	type: "help",
+	active: state.menu,
+	onChange: actions.toggleMenu
+}, /* @__PURE__ */ h(SubMenuItem, {
+	name: "About Minesweeper Plus...",
+	onClick: actions.toggleAbout
 })));
 var Digit_module_default = {
 	root: "Digit_root",
@@ -2425,7 +2434,7 @@ var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mar
 })));
 //#endregion
 //#region src/zoom.js
-var root$6 = document.documentElement;
+var root$7 = document.documentElement;
 var steps = [
 	.5,
 	.625,
@@ -2447,7 +2456,7 @@ var loadZoom = () => {
 };
 var stepZoom = (scale, direction) => direction > 0 ? steps.find((step) => step > scale + .001) ?? steps[steps.length - 1] : steps.findLast((step) => step < scale - .001) ?? steps[0];
 var fitZoom = (chosen, fit) => fit >= chosen ? chosen : Math.min(chosen, Math.max(MIN_FIT, Math.floor(fit * 50) / 50));
-var applyZoom = (scale) => root$6.style.setProperty("--scale", scale);
+var applyZoom = (scale) => root$7.style.setProperty("--scale", scale);
 var saveZoom = (scale) => save("scale", scale);
 var gameWindow = null;
 var measureFit = (scale) => {
@@ -2510,7 +2519,7 @@ var rowsOf = (state) => {
 };
 var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	key,
-	title: "Minesweeper",
+	title: state.theme === "classic" ? "Minesweeper" : "Minesweeper Plus",
 	titleHint: "Double-click for 100% zoom",
 	onTitleDoubleClick: () => actions.zoom(0),
 	controls: /* @__PURE__ */ h(Zoom, {
@@ -2758,6 +2767,32 @@ var BackgroundSettings = ({ key, state, actions }) => {
 		onClick: actions.resetBackgroundSettings
 	}, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.button }, "Defaults"))))));
 };
+var About_module_default = {
+	root: "About_root",
+	name: "About_name",
+	link: "About_link",
+	footer: "About_footer",
+	button: "About_button"
+};
+//#endregion
+//#region src/About.jsx
+var Link = ({ href }, children) => /* @__PURE__ */ h("a", {
+	class: About_module_default.link,
+	href,
+	target: "_blank",
+	rel: "noopener noreferrer"
+}, children);
+var About = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
+	key,
+	onKeyDown: (event) => event.keyCode === 27 && actions.toggleAbout()
+}, /* @__PURE__ */ h(Dialog, {
+	title: "About Minesweeper Plus",
+	onClose: actions.toggleAbout
+}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, "Minesweeper Plus"), /* @__PURE__ */ h("p", null, "A Windows style minesweeper with boards that never need a guess, hints that explain their reasoning, zoom, and animated themes ported from xscreensaver."), /* @__PURE__ */ h("p", null, "Based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov, extended by fexofenadine."), /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/minesweeperplus" }, "github.com/fexofenadine/minesweeperplus")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
+	type: "button",
+	onClick: actions.toggleAbout,
+	onCreate: (el) => el.focus()
+}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
 //#endregion
 //#region src/mines.js
 var neighbourCache = /* @__PURE__ */ new Map();
@@ -3154,6 +3189,7 @@ var state = {
 	theme: loadTheme(),
 	winner: null,
 	bestTime: null,
+	about: false,
 	customField: null,
 	backgrounds: loadSettings(),
 	backgroundSettings: null,
@@ -3456,6 +3492,10 @@ var actions = {
 		actions.setBestTimeTab(winner.hinted ? "hinted" : "clean");
 		return { winner: null };
 	},
+	toggleAbout: () => ({ about }) => ({
+		menu: null,
+		about: !about
+	}),
 	toggleBestTime: () => ({ bestTime }) => ({
 		menu: null,
 		bestTime: bestTime ? null : {
@@ -3613,6 +3653,9 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 }), state.backgroundSettings && /* @__PURE__ */ h(BackgroundSettings, {
 	key: "e",
 	state: state.backgroundSettings,
+	actions
+}), state.about && /* @__PURE__ */ h(About, {
+	key: "f",
 	actions
 }));
 //#endregion
