@@ -394,8 +394,8 @@ var buildAtlas = (glyphs, cell) => {
 var matrix_default = {
 	name: "GLMatrix",
 	credit: "Ported from GLMatrix by Jamie Zawinski, part of xscreensaver",
-	filter: "blur(0.6px)",
-	ratio: () => Math.min(window.devicePixelRatio || 1, 1.5),
+	filter: (pixels) => `blur(${.6 / pixels}px)`,
+	ratio: (pixels) => Math.min(pixels, 2),
 	options: [
 		{
 			key: "density",
@@ -561,7 +561,7 @@ var backgrounds = {
 	substrate: {
 		name: "Substrate",
 		credit: "Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver",
-		ratio: () => 1,
+		ratio: (pixels) => pixels,
 		options: [
 			{
 				key: "growthDelay",
@@ -652,6 +652,7 @@ var backgrounds = {
 			let cracks = [];
 			let cycles = 0;
 			let last = 0;
+			let pace = 1;
 			const plot = (x, y, colour, alpha) => {
 				if (x < 0 || x >= width || y < 0 || y >= height) return;
 				context.globalAlpha = Math.min(1, alpha);
@@ -789,9 +790,10 @@ var backgrounds = {
 					f = next;
 					if (width) build();
 				},
-				resize: (w, h) => {
+				resize: (w, h, pixels = 1) => {
 					width = w;
 					height = h;
+					pace = Math.max(1, Math.round(pixels * pixels));
 					cgrid = new Int32Array(w * h);
 					last = performance.now();
 					build();
@@ -801,9 +803,9 @@ var backgrounds = {
 					const due = Math.min(8, Math.floor((now - last) / delay));
 					if (!due) return;
 					last = now - delay > last + due * delay ? now : last + due * delay;
-					for (let n = 0; n < due; n++) {
+					for (let n = 0; n < due * pace; n++) {
 						for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
-						if (++cycles >= f.maxCycles && f.maxCycles) build();
+						if (++cycles >= f.maxCycles * pace && f.maxCycles) build();
 					}
 				}
 			};
@@ -853,10 +855,19 @@ var startBackgrounds = () => {
 		instances[active].frame(now);
 	};
 	const resize = () => {
-		const ratio = backgrounds[active].ratio();
-		canvas.width = Math.round(innerWidth * ratio);
-		canvas.height = Math.round(innerHeight * ratio);
-		instances[active].resize(canvas.width, canvas.height);
+		const { ratio, filter } = backgrounds[active];
+		const pixels = window.devicePixelRatio || 1;
+		const scale = ratio(pixels);
+		canvas.width = Math.round(innerWidth * scale);
+		canvas.height = Math.round(innerHeight * scale);
+		canvas.style.filter = filter ? filter(pixels) : "none";
+		instances[active].resize(canvas.width, canvas.height, scale);
+	};
+	const watchPixels = () => {
+		matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`).addEventListener("change", () => {
+			if (active) resize();
+			watchPixels();
+		}, { once: true });
 	};
 	const update = () => {
 		const id = backgroundFor(root.dataset.theme);
@@ -865,7 +876,6 @@ var startBackgrounds = () => {
 		active = id;
 		canvas.style.display = id ? "block" : "none";
 		if (!id) return;
-		canvas.style.filter = backgrounds[id].filter || "none";
 		instances[id] ??= backgrounds[id].create(context, settings[id]);
 		resize();
 		frame = requestAnimationFrame(loop);
@@ -875,6 +885,7 @@ var startBackgrounds = () => {
 		attributeFilter: ["data-theme"]
 	});
 	window.addEventListener("resize", () => active && resize());
+	watchPixels();
 	update();
 };
 //#endregion
