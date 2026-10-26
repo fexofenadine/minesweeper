@@ -1,10 +1,10 @@
 {
-  "name": "minesweeper",
+  "name": "minesweeperplus",
   "version": "0.1.0",
   "private": true,
   "description": "Windows style minesweeper with classic, synthwave, solarized truchet, solarized phosphor, matrix and nord themes",
-  "homepage": "https://fexofenadine.github.io/minesweeper/",
-  "repository": "github:fexofenadine/minesweeper",
+  "homepage": "https://fexofenadine.github.io/minesweeperplus/",
+  "repository": "github:fexofenadine/minesweeperplus",
   "license": "MIT",
   "contributors": [
     "Vladimir Kutepov (https://github.com/frenzzy)",
