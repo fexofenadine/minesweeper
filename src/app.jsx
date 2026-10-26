@@ -260,7 +260,6 @@ export const actions = {
       window.addEventListener('touchend', stop)
       window.addEventListener('touchcancel', stop)
       return {
-        hint: null,
         game: {
           ...game,
           pressed: true,
@@ -288,6 +287,7 @@ export const actions = {
       nextField[pressedY][pressedX] = nextCell
       const mines = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1)
       return {
+        hint: null,
         game: {
           ...game,
           field: nextField,
@@ -316,7 +316,8 @@ export const actions = {
         flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1)
       }
       return {
-        hint: null,
+        //a new flag changes the board, so an explanation of the old one goes
+        ...(field !== game.field && { hint: null }),
         game: {
           ...game,
           field,
@@ -439,8 +440,11 @@ export const actions = {
         if (!lose) actions.win()
       }
 
+      //an explanation stays until the board changes, so a click that does nothing never moves the board
+      //otherwise the second click of a double click could land on another cell
+      const changed = left !== game.left || lose || begin
       return {
-        hint: chordHint,
+        ...((chordHint || changed) && { hint: chordHint }),
         game: {
           ...game,
           left,

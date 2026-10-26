@@ -320,3 +320,15 @@ it('shows a wide board transposed on a portrait screen, keeping each cell its ow
     expect(tall).toEqual(Array(9).fill(3))
   })
 })
+
+it('keeps an explanation through clicks that change nothing, and clears it when the board changes', () => {
+  start({ game: chordGame(false) })
+  wired.chord({ x: 1, y: 1 })
+  wired.down({ event: { button: 0, buttons: 1 }, x: 1, y: 1 })
+  wired.up()
+  wired.peek()
+  expect(current.hint).not.toBe(null)
+  wired.down({ event: { button: 2, buttons: 2 }, x: 0, y: 0 })
+  wired.peek()
+  expect(current.hint).toBe(null)
+})
