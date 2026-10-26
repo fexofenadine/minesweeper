@@ -128,6 +128,8 @@ const buildAtlas = (glyphs, cell) => {
 export default {
   name: 'GLMatrix',
   credit: 'Ported from GLMatrix by Jamie Zawinski, part of xscreensaver',
+  //turned off, the theme shows its digital rain photo
+  wallpaper: true,
   //a soft phosphor blur of 0.6 screen pixels, whatever the display's pixel ratio
   filter: (pixels) => `blur(${0.6 / pixels}px)`,
   //up to twice the css resolution keeps the glyphs crisp without drawing far more than it shows
@@ -257,12 +259,6 @@ export default {
         for (let n = 0; n < ticks; n++) strips.forEach((s) => tickStrip(s, glyphs.length))
         atlas ??= buildAtlas(glyphs, cell)
         draw()
-      },
-      //one frame of rain, frozen
-      still: () => {
-        atlas ??= buildAtlas(glyphs, cell)
-        draw()
-        return true
       },
     }
   },

@@ -112,7 +112,7 @@ it('keeps working with every option at its extremes', () => {
   expect(points.every(([, , , , alpha]) => alpha === 1)).toBe(true)
 })
 
-it('grows at the same pace per screen area on a denser display', () => {
+it('runs more cycles on a finer canvas, in proportion to its scale', () => {
   //a fixed set of cracks without sand, so only the number of cycles differs
   const fixed = { maxCycles: 0, initialCracks: 11, maxCracks: 11, wireframe: true }
   const count = (pixels) => {
@@ -123,8 +123,10 @@ it('grows at the same pace per screen area on a denser display', () => {
     for (let n = 0; n < 40; n++) instance.frame((now += 20))
     return context.counts.fillRect
   }
-  //twice the pixels each way runs four times the cycles in the same time
-  expect(count(2) / count(1)).toBeGreaterThan(3.5)
+  //twice the pixels each way runs twice the cycles in the same time, not four times
+  const ratio = count(2) / count(1)
+  expect(ratio).toBeGreaterThan(1.7)
+  expect(ratio).toBeLessThan(2.4)
 })
 
 it('gives every background an animated switch, on by default except classic', () => {
@@ -254,4 +256,12 @@ it('draws the sky every frame and drifts the clouds', () => {
   let now = performance.now()
   for (let n = 0; n < 30; n++) instance.frame((now += 16))
   expect(context.counts.fillRect).toBeGreaterThanOrEqual(31)
+})
+
+it('draws substrate as finely as its detail setting asks', () => {
+  expect(substrate.ratio(2, { detail: 'original' })).toBe(1)
+  expect(substrate.ratio(2, { detail: 'balanced' })).toBe(1.5)
+  expect(substrate.ratio(1.25, { detail: 'balanced' })).toBe(1.25)
+  expect(substrate.ratio(2, { detail: 'sharp' })).toBe(2)
+  expect(defaults('substrate').detail).toBe('balanced')
 })

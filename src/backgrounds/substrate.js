@@ -65,7 +65,10 @@ export default {
   name: 'Substrate',
   credit: 'Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver',
   //like xscreensaver it draws in real screen pixels
-  ratio: (pixels) => pixels,
+  //how finely to draw: original is one canvas pixel per css pixel like before, sharp is every screen
+  //pixel, balanced goes up to 1.5 times, which looks crisp at a fraction of sharp's cost
+  ratio: (pixels, { detail }) =>
+    detail === 'sharp' ? pixels : detail === 'balanced' ? Math.min(pixels, 1.5) : 1,
   options: [
     {
       key: 'growthDelay',
@@ -137,6 +140,17 @@ export default {
     },
     { key: 'wireframe', label: 'Wireframe', type: 'toggle', value: false },
     { key: 'seamless', label: 'Seamless', type: 'toggle', value: false },
+    {
+      key: 'detail',
+      label: 'Detail',
+      type: 'select',
+      choices: [
+        ['balanced', 'Balanced'],
+        ['sharp', 'Sharp (slow on big screens)'],
+        ['original', 'Original'],
+      ],
+      value: 'balanced',
+    },
   ],
 
   create: (context, settings) => {
@@ -147,9 +161,12 @@ export default {
     let cracks = []
     let cycles = 0
     let last = 0
-    //a display with n times the pixels each way has n squared times the area to fill,
-    //so it runs that many cycles per growth delay and restarts that much later
+    //a finer canvas has more to fill, so it runs proportionally more cycles per growth delay
+    //and restarts that much later; linear rather than by area, which kept big screens too busy
     let pace = 1
+    let owed = 0
+    //the sand colour last set, so grains of one crack do not set it again each time
+    let style = null
 
     //while a still picture grows, points blend straight into its pixels like trans_point,
     //which is far quicker than a canvas call per grain of sand
@@ -168,7 +185,7 @@ export default {
         return
       }
       context.globalAlpha = a
-      context.fillStyle = colour
+      if (colour !== style) context.fillStyle = style = colour
       context.fillRect(x, y, 1, 1)
     }
 
@@ -235,11 +252,13 @@ export default {
       //synthesis of Crack::regionColor() and SandPainter::render()
       let rx = cr.x
       let ry = cr.y
+      //move perpendicular to crack, the step worked out once rather than at every pixel
+      const sx = 0.81 * Math.sin(radians(cr.t))
+      const sy = 0.81 * Math.cos(radians(cr.t))
       //seamless lines can wrap forever, so stop after a few screens
       for (let steps = (width + height) * 4; steps > 0; steps--) {
-        //move perpendicular to crack
-        rx += 0.81 * Math.sin(radians(cr.t))
-        ry -= 0.81 * Math.cos(radians(cr.t))
+        rx += sx
+        ry -= sy
         let cx = Math.trunc(rx)
         let cy = Math.trunc(ry)
         if (f.seamless) {
@@ -322,7 +341,7 @@ export default {
     const build = () => {
       pixelsOf = null
       context.globalAlpha = 1
-      context.fillStyle = BACKGROUND
+      context.fillStyle = style = BACKGROUND
       context.fillRect(0, 0, width, height)
       cgrid.fill(EMPTY)
       cracks = []
@@ -338,7 +357,8 @@ export default {
       resize: (w, h, pixels = 1) => {
         width = w
         height = h
-        pace = Math.max(1, Math.round(pixels * pixels))
+        pace = Math.max(1, pixels)
+        owed = 0
         cgrid = new Int32Array(w * h)
         last = performance.now()
         build()
@@ -349,7 +369,9 @@ export default {
         const due = Math.min(8, Math.floor((now - last) / delay))
         if (!due) return
         last = now - delay > last + due * delay ? now : last + due * delay
-        for (let n = 0; n < due * pace; n++) {
+        //a pace like 1.5 carries the part cycle over to the next frame
+        owed += due * pace
+        for (; owed >= 1; owed--) {
           //cracks started during this cycle also move in it, like the original
           for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i])
           if (++cycles >= f.maxCycles * pace && f.maxCycles) build()

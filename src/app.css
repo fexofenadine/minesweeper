@@ -468,8 +468,17 @@ main::before {
   }
 }
 
-/*the code rain and substrate canvases show through*/
-:root:is([data-theme='matrix'], [data-theme='nord']) main::before {
+/*the substrate canvas shows through*/
+:root[data-theme='nord'] main::before {
+  background: none;
+}
+
+/*digital rain photo by markus spiske (cc0), the static wallpaper when the code rain is turned off*/
+:root[data-theme='matrix'] main::before {
+  background: url(./matrix.jpg) 50% 50% / cover #000;
+}
+
+:root[data-theme='matrix'][data-background='animated'] main::before {
   background: none;
 }
 

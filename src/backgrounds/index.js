@@ -6,7 +6,7 @@ import phosphor from './phosphor'
 import hill from './hill'
 
 //animated xscreensaver ports drawn on a canvas behind the game
-//a background declares its options, ratio(devicePixelRatio) for its canvas resolution,
+//a background declares its options, ratio(devicePixelRatio, settings) for its canvas resolution,
 //an optional filter(devicePixelRatio) for css effects, wallpaper: true if its theme has a
 //static wallpaper to fall back to, and a create(context, settings) that returns
 //{ configure(settings), resize(width, height, scale), frame(now), still?(now) }, then gets listed here
@@ -102,7 +102,7 @@ export const startBackgrounds = () => {
   const resize = () => {
     const { ratio, filter } = backgrounds[active]
     const pixels = window.devicePixelRatio || 1
-    const scale = ratio(pixels)
+    const scale = ratio(pixels, settings[active])
     canvas.width = Math.round(innerWidth * scale)
     canvas.height = Math.round(innerHeight * scale)
     canvas.style.filter = filter ? filter(pixels) : 'none'
