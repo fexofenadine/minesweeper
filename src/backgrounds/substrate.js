@@ -54,7 +54,8 @@ const radians = (degrees) => (degrees * Math.PI) / 180
 export default {
   name: 'Substrate',
   credit: 'Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver',
-  ratio: () => 1,
+  //like xscreensaver it draws in real screen pixels
+  ratio: (pixels) => pixels,
   options: [
     {
       key: 'growthDelay',
@@ -136,6 +137,9 @@ export default {
     let cracks = []
     let cycles = 0
     let last = 0
+    //a display with n times the pixels each way has n squared times the area to fill,
+    //so it runs that many cycles per growth delay and restarts that much later
+    let pace = 1
 
     const plot = (x, y, colour, alpha) => {
       if (x < 0 || x >= width || y < 0 || y >= height) return
@@ -306,23 +310,24 @@ export default {
         f = next
         if (width) build()
       },
-      resize: (w, h) => {
+      resize: (w, h, pixels = 1) => {
         width = w
         height = h
+        pace = Math.max(1, Math.round(pixels * pixels))
         cgrid = new Int32Array(w * h)
         last = performance.now()
         build()
       },
       frame: (now) => {
-        //one substrate_draw per growth delay, a few at most per frame
+        //substrate_draw once per growth delay (pace times on dense displays), a few at most per frame
         const delay = Math.max(1, f.growthDelay)
         const due = Math.min(8, Math.floor((now - last) / delay))
         if (!due) return
         last = now - delay > last + due * delay ? now : last + due * delay
-        for (let n = 0; n < due; n++) {
+        for (let n = 0; n < due * pace; n++) {
           //cracks started during this cycle also move in it, like the original
           for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i])
-          if (++cycles >= f.maxCycles && f.maxCycles) build()
+          if (++cycles >= f.maxCycles * pace && f.maxCycles) build()
         }
       },
     }

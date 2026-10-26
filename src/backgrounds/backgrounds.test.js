@@ -92,3 +92,16 @@ it('keeps working with every option at its extremes', () => {
   expect(points.length).toBeGreaterThan(0)
   expect(points.every(([, , , , alpha]) => alpha === 1)).toBe(true)
 })
+
+it('grows at the same pace per screen area on a denser display', () => {
+  const count = (pixels) => {
+    const context = recorder()
+    const instance = substrate.create(context, { ...defaults('substrate'), maxCycles: 0 })
+    instance.resize(160 * pixels, 120 * pixels, pixels)
+    let now = performance.now()
+    for (let n = 0; n < 40; n++) instance.frame((now += 20))
+    return context.calls.filter(([, , , , alpha]) => alpha === 1).length
+  }
+  //twice the pixels each way draws about four times the crack pixels in the same time
+  expect(count(2) / count(1)).toBeGreaterThan(3)
+})

@@ -3,8 +3,9 @@ import matrix from './matrix'
 import substrate from './substrate'
 
 //animated xscreensaver ports drawn on a canvas behind the game
-//a background declares its options and a create(context, settings) that returns
-//{ configure(settings), resize(width, height), frame(now) }, then gets listed here
+//a background declares its options, ratio(devicePixelRatio) for its canvas resolution,
+//an optional filter(devicePixelRatio) for css effects, and a create(context, settings)
+//that returns { configure(settings), resize(width, height, scale), frame(now) }, then gets listed here
 export const backgrounds = { matrix, substrate }
 
 //which theme shows which background
@@ -71,11 +72,27 @@ export const startBackgrounds = () => {
     instances[active].frame(now)
   }
 
+  //draw at the display's own pixels, as far as the background allows, so it stays sharp
   const resize = () => {
-    const ratio = backgrounds[active].ratio()
-    canvas.width = Math.round(innerWidth * ratio)
-    canvas.height = Math.round(innerHeight * ratio)
-    instances[active].resize(canvas.width, canvas.height)
+    const { ratio, filter } = backgrounds[active]
+    const pixels = window.devicePixelRatio || 1
+    const scale = ratio(pixels)
+    canvas.width = Math.round(innerWidth * scale)
+    canvas.height = Math.round(innerHeight * scale)
+    canvas.style.filter = filter ? filter(pixels) : 'none'
+    instances[active].resize(canvas.width, canvas.height, scale)
+  }
+
+  //browser zoom and moving to another screen change the pixel ratio, sometimes without a resize
+  const watchPixels = () => {
+    matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`).addEventListener(
+      'change',
+      () => {
+        if (active) resize()
+        watchPixels()
+      },
+      { once: true },
+    )
   }
 
   const update = () => {
@@ -85,7 +102,6 @@ export const startBackgrounds = () => {
     active = id
     canvas.style.display = id ? 'block' : 'none'
     if (!id) return
-    canvas.style.filter = backgrounds[id].filter || 'none'
     instances[id] ??= backgrounds[id].create(context, settings[id])
     resize()
     frame = requestAnimationFrame(loop)
@@ -93,5 +109,6 @@ export const startBackgrounds = () => {
 
   new MutationObserver(update).observe(root, { attributes: true, attributeFilter: ['data-theme'] })
   window.addEventListener('resize', () => active && resize())
+  watchPixels()
   update()
 }

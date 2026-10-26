@@ -128,8 +128,10 @@ const buildAtlas = (glyphs, cell) => {
 export default {
   name: 'GLMatrix',
   credit: 'Ported from GLMatrix by Jamie Zawinski, part of xscreensaver',
-  filter: 'blur(0.6px)',
-  ratio: () => Math.min(window.devicePixelRatio || 1, 1.5),
+  //a soft phosphor blur of 0.6 screen pixels, whatever the display's pixel ratio
+  filter: (pixels) => `blur(${0.6 / pixels}px)`,
+  //up to twice the css resolution keeps the glyphs crisp without drawing far more than it shows
+  ratio: (pixels) => Math.min(pixels, 2),
   options: [
     { key: 'density', label: 'Density', type: 'range', min: 10, max: 100, step: 1, value: 44 },
     {
