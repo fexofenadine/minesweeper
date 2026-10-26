@@ -1,4 +1,4 @@
-/*windows 95 ui font, pixel conversion of wine's lgpl ms sans serif, see src/fonts*/
+/*windows 95 ui font from wine's ms sans serif, see src/fonts*/
 @font-face {
   font-family: 'Wine MS Sans Serif Pixel';
   font-weight: 400;
@@ -267,7 +267,7 @@
 }
 
 :root[data-theme='nord'] {
-  /*nord dark: polar night surfaces, snow storm text, frost accents and aurora clues*/
+  /*nord dark palette*/
   color-scheme: dark;
   --ui-font: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   --title-font: var(--ui-font);
@@ -344,7 +344,7 @@ main {
   user-select: none;
 }
 
-/*wallpaper layers are fixed to the viewport so they fill it at any size, zoom or rotation*/
+/*wallpaper layers fill the viewport at any size or zoom*/
 main::before,
 main::after {
   position: fixed;
@@ -357,17 +357,17 @@ main::after {
   content: '';
 }
 
-/*hill photo by chris barbalis on unsplash, colour matched to the windows xp wallpaper*/
+/*hill photo by chris barbalis on unsplash, colour matched to bliss*/
 main::before {
   background: url(./background.jpg) 50% 50% / cover;
 }
 
-/*classic's optional animated sky and hill replace the photo when turned on*/
+/*the optional animated hill replaces the photo*/
 :root[data-theme='classic'][data-background='animated'] main::before {
   background: none;
 }
 
-/*background by neeqolah creative works on unsplash, with film grain and tape wobble*/
+/*neeqolah creative works on unsplash, with grain and wobble*/
 :root[data-theme='synthwave'] main::before {
   top: -12px;
   right: -12px;
@@ -473,7 +473,7 @@ main::before {
   background: none;
 }
 
-/*digital rain photo by markus spiske (cc0), the static wallpaper when the code rain is turned off*/
+/*markus spiske's cc0 photo, shown when the rain is off*/
 :root[data-theme='matrix'] main::before {
   background: url(./matrix.jpg) 50% 50% / cover #000;
 }
@@ -498,8 +498,7 @@ main::before {
   }
 }
 
-/*code photo by chris ried on unsplash, muted under the solarized base*/
-/*it is the static wallpaper for both solarized themes, shown when their background is not animated*/
+/*chris ried's code photo on unsplash, the static solarized wallpaper*/
 :root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) main::before {
   background:
     linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
@@ -665,7 +664,7 @@ main::before {
   }
 }
 
-/*explanation under the field, as wide as the field so it never stretches the window*/
+/*explanation under the field, never wider than it*/
 .Game_hint {
   box-sizing: border-box;
   width: 0;
@@ -1207,7 +1206,7 @@ main::before {
   fill: var(--mine-shine);
 }
 
-/*hint highlights, drawn over the cell with a dark edge so they read on every theme*/
+/*hint outlines, dark edged to show on every theme*/
 .Cell_hintSource::after,
 .Cell_hintSafe::after,
 .Cell_hintMine::after,

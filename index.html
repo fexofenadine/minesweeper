@@ -32,7 +32,7 @@
       //apply the saved theme and window size before first paint
       try {
         document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
-        //animated backgrounds are the default except on classic, the script corrects this once it knows the settings
+        //assume animated off classic, the script corrects it
         if (document.documentElement.dataset.theme !== 'classic') {
           document.documentElement.dataset.background = 'animated'
         }
@@ -48,8 +48,8 @@
         document.body.append(note)
       })
     </script>
-    <script type="module" crossorigin src="./assets/app.js?v=6253ef1e"></script>
-    <link rel="stylesheet" crossorigin href="./assets/app.css?v=344c7ad6">
+    <script type="module" crossorigin src="./assets/app.js?v=2b8fc80a"></script>
+    <link rel="stylesheet" crossorigin href="./assets/app.css?v=60efa5fb">
   </head>
   <body>
     <div id="app">

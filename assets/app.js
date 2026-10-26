@@ -553,14 +553,11 @@ var palettes$1 = {
 var BACKGROUND$2 = "#2e3440";
 var FOREGROUND = "#d8dee9";
 var rgbCache = /* @__PURE__ */ new Map();
-var rgbOf = (hex) => {
-	if (!rgbCache.has(hex)) rgbCache.set(hex, [
-		1,
-		3,
-		5
-	].map((i) => parseInt(hex.slice(i, i + 2), 16)));
-	return rgbCache.get(hex);
-};
+var rgbOf = (hex) => rgbCache.get(hex) ?? rgbCache.set(hex, [
+	1,
+	3,
+	5
+].map((i) => parseInt(hex.slice(i, i + 2), 16))).get(hex);
 var frand = (n) => Math.random() * n;
 var random$1 = (n) => Math.floor(Math.random() * n);
 var radians = (degrees) => degrees * Math.PI / 180;
@@ -1084,7 +1081,7 @@ var truchet_default = {
 				count = 0;
 			}
 			overlap = f.scroll ? 400 * pixels : 0;
-			const kind = f.curves && f.angles ? random(2) ? "curve" : "angle" : f.curves || !f.angles ? "curve" : "angle";
+			const kind = f.angles && (!f.curves || random(2)) ? "angle" : "curve";
 			const colours = palettes[f.palette];
 			const cols = Math.ceil((width + overlap) / (w * pixels)) + 1;
 			const rows = Math.ceil((height + overlap) / (h * pixels)) + 1;
@@ -1311,30 +1308,31 @@ var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)}
 var brightness = ([r, g, b]) => Math.max(r, g, b);
 var sources = /* #__PURE__ */ Object.assign({
 	"../About.jsx": () => __vitePreload(() => import("./About-D9CbMnRN.js").then((m) => m["default"]), [], import.meta.url),
-	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-D3giHqNw.js").then((m) => m["default"]), [], import.meta.url),
+	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-Lz6_3lr6.js").then((m) => m["default"]), [], import.meta.url),
 	"../BestTime.jsx": () => __vitePreload(() => import("./BestTime-Ce22rTOt.js").then((m) => m["default"]), [], import.meta.url),
 	"../Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
 	"../Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
 	"../CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"../Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
 	"../Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"../Game.jsx": () => __vitePreload(() => import("./Game-rnd9BPSW.js").then((m) => m["default"]), [], import.meta.url),
+	"../Game.jsx": () => __vitePreload(() => import("./Game-B4itl_AX.js").then((m) => m["default"]), [], import.meta.url),
 	"../Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
-	"../Menu.jsx": () => __vitePreload(() => import("./Menu-CM-8ws1g.js").then((m) => m["default"]), [], import.meta.url),
+	"../Menu.jsx": () => __vitePreload(() => import("./Menu-B4hKNzU8.js").then((m) => m["default"]), [], import.meta.url),
 	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-BtrJ3RPa.js").then((m) => m["default"]), [], import.meta.url),
 	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"../app.jsx": () => __vitePreload(() => import("./app-UHd7D_YL.js").then((m) => m["default"]), [], import.meta.url),
-	"./hill.js": () => __vitePreload(() => import("./hill-z0PhJZqK.js").then((m) => m["default"]), [], import.meta.url),
-	"./index.js": () => __vitePreload(() => import("./backgrounds-y8fCa31h.js").then((m) => m["default"]), [], import.meta.url),
-	"./matrix.js": () => __vitePreload(() => import("./matrix-D_vYPxu0.js").then((m) => m["default"]), [], import.meta.url),
-	"./substrate.js": () => __vitePreload(() => import("./substrate-CETR7kLC.js").then((m) => m["default"]), [], import.meta.url),
-	"./truchet.js": () => __vitePreload(() => import("./truchet-BRKY3zWa.js").then((m) => m["default"]), [], import.meta.url),
-	"../hint.js": () => __vitePreload(() => import("./hint-Sn72Q7dE.js").then((m) => m["default"]), [], import.meta.url),
-	"../index.js": () => __vitePreload(() => import("./src-BXMJwuxq.js").then((m) => m["default"]), [], import.meta.url),
-	"../mines.js": () => __vitePreload(() => import("./mines-fdYoz0O3.js").then((m) => m["default"]), [], import.meta.url),
-	"../storage.js": () => __vitePreload(() => import("./storage-BFgRqbmn.js").then((m) => m["default"]), [], import.meta.url),
-	"../zoom.js": () => __vitePreload(() => import("./zoom-BEqOxbr8.js").then((m) => m["default"]), [], import.meta.url)
+	"../app.jsx": () => __vitePreload(() => import("./app-Bjox9kX8.js").then((m) => m["default"]), [], import.meta.url),
+	"./hill.js": () => __vitePreload(() => import("./hill-BeKOzOig.js").then((m) => m["default"]), [], import.meta.url),
+	"./index.js": () => __vitePreload(() => import("./backgrounds-DWHrOU0z.js").then((m) => m["default"]), [], import.meta.url),
+	"./matrix.js": () => __vitePreload(() => import("./matrix-Cs_X-Gm1.js").then((m) => m["default"]), [], import.meta.url),
+	"./substrate.js": () => __vitePreload(() => import("./substrate-DEEODJfR.js").then((m) => m["default"]), [], import.meta.url),
+	"./truchet.js": () => __vitePreload(() => import("./truchet-CPTm170L.js").then((m) => m["default"]), [], import.meta.url),
+	"../hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
+	"../index.js": () => __vitePreload(() => import("./src-C0eXu16q.js").then((m) => m["default"]), [], import.meta.url),
+	"../mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
+	"../storage.js": () => __vitePreload(() => import("./storage-CUVd8b8T.js").then((m) => m["default"]), [], import.meta.url),
+	"../themes.js": () => __vitePreload(() => import("./themes-Bv6WJCtV.js").then((m) => m["default"]), [], import.meta.url),
+	"../zoom.js": () => __vitePreload(() => import("./zoom-rkNmBMtQ.js").then((m) => m["default"]), [], import.meta.url)
 });
 var texts = null;
 var loadTexts = () => texts ??= Promise.all(Object.entries(sources).map(async ([path, load]) => ({
@@ -1823,7 +1821,11 @@ var backgrounds = {
 			const hill = new Image();
 			hill.src = hill_default$1;
 			let shape = null;
-			const sprites = [];
+			const sprites = {
+				cumulus: [],
+				cirrus: []
+			};
+			let made = 0;
 			let clouds = [];
 			const layers = [
 				{
@@ -1852,8 +1854,8 @@ var backgrounds = {
 				}
 			];
 			const spriteOf = (cloud) => {
-				const choices = sprites.filter((sprite, i) => sprite && kinds[i] === cloud.layer.kind);
-				return choices[cloud.sprite % Math.max(1, choices.length)];
+				const list = sprites[cloud.layer.kind];
+				return list[cloud.sprite % list.length];
 			};
 			const scatter = () => {
 				const count = Math.round(f.cover / 100 * 18);
@@ -1934,7 +1936,11 @@ var backgrounds = {
 					draw();
 				},
 				frame: (now) => {
-					if (sprites.length < kinds.length) sprites.push(makeCloud(sprites.length + 1, kinds[sprites.length]));
+					if (made < kinds.length) {
+						const kind = kinds[made++];
+						const sprite = makeCloud(made, kind);
+						if (sprite) sprites[kind].push(sprite);
+					}
 					const seconds = Math.min(.1, (now - last) / 1e3);
 					last = now;
 					for (const cloud of clouds) cloud.x += cloud.layer.speed * f.wind * seconds / 1e3;
@@ -2024,7 +2030,8 @@ var startBackgrounds = () => {
 	};
 	const update = (changed) => {
 		const id = backgroundFor(root.dataset.theme);
-		const next = !id ? null : settings[id].animated ? "animated" : backgrounds[id].wallpaper ? "wallpaper" : "still";
+		const still = backgrounds[id]?.wallpaper ? "wallpaper" : "still";
+		const next = id && (settings[id].animated ? "animated" : still);
 		if (next) root.dataset.background = next;
 		else delete root.dataset.background;
 		if (id === active && next === mode && changed !== id) return;
@@ -2045,6 +2052,16 @@ var startBackgrounds = () => {
 	watchPixels();
 	update();
 };
+//#endregion
+//#region src/themes.js
+var themes = [
+	["classic", "Classic"],
+	["synthwave", "Synthwave"],
+	["solarized", "Solarized Truchet"],
+	["solarized-phosphor", "Solarized Phosphor"],
+	["matrix", "Matrix"],
+	["nord", "Nord"]
+];
 //#endregion
 //#region src/Menu.jsx
 var SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => /* @__PURE__ */ h("li", {
@@ -2129,31 +2146,11 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	type: "theme",
 	active: state.menu,
 	onChange: actions.toggleMenu
-}, /* @__PURE__ */ h(SubMenuItem, {
-	name: "Classic",
-	checked: state.theme === "classic",
-	onClick: () => actions.setTheme("classic")
-}), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Synthwave",
-	checked: state.theme === "synthwave",
-	onClick: () => actions.setTheme("synthwave")
-}), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Solarized Truchet",
-	checked: state.theme === "solarized",
-	onClick: () => actions.setTheme("solarized")
-}), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Solarized Phosphor",
-	checked: state.theme === "solarized-phosphor",
-	onClick: () => actions.setTheme("solarized-phosphor")
-}), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Matrix",
-	checked: state.theme === "matrix",
-	onClick: () => actions.setTheme("matrix")
-}), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Nord",
-	checked: state.theme === "nord",
-	onClick: () => actions.setTheme("nord")
-}), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
+}, themes.map(([theme, name]) => /* @__PURE__ */ h(SubMenuItem, {
+	name,
+	checked: state.theme === theme,
+	onClick: () => actions.setTheme(theme)
+})), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
 	name: "Background Settings...",
 	onClick: actions.toggleBackgroundSettings
 })), /* @__PURE__ */ h(MenuItem, {
@@ -2943,6 +2940,7 @@ var placeMines = ({ width, height, mines, x, y, safe, noGuess, budget = 1500 }) 
 //#endregion
 //#region src/hint.js
 var count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
+var allMines = (n) => n === 1 ? "it is a mine" : "they are all mines";
 var where = (a, b, width, transposed) => {
 	const across = b % width - a % width;
 	const down = Math.floor(b / width) - Math.floor(a / width);
@@ -3016,8 +3014,7 @@ var findHint = ({ field, width, height, minesLeft, transposed = false }) => {
 		if (need === 0) return hint("clear", hidden, [i], `The highlighted ${num} already has ${count(flagged.length, "flag")} around it, so its other hidden neighbours are safe.`);
 		if (need === hidden.length) {
 			const needs = flagged.length ? `touches ${count(flagged.length, "flag")} and needs ${count(need, "more mine")}` : `needs ${count(need, "mine")}`;
-			const last = need === 1 ? "it is a mine" : "they are all mines";
-			return hint("mine", hidden, [i], `The highlighted ${num} ${needs}, and has exactly ${count(need, "hidden neighbour")} left, so ${last}.`);
+			return hint("mine", hidden, [i], `The highlighted ${num} ${needs}, and has exactly ${count(need, "hidden neighbour")} left, so ${allMines(need)}.`);
 		}
 	}
 	for (const a of numbered) {
@@ -3033,14 +3030,13 @@ var findHint = ({ field, width, height, minesLeft, transposed = false }) => {
 			if (extra !== 0 && extra !== rest.length) continue;
 			const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width, transposed)}. Those shared cells hold exactly ${count(A.need, "mine")}`;
 			if (extra === 0) return hint("clear", rest, [a, b], `${shared}, which is all the ${cells[b].num} needs, so its other hidden neighbours are safe.`);
-			const last = rest.length === 1 ? "it is a mine" : "they are all mines";
-			return hint("mine", rest, [a, b], `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, "other hidden neighbour")}, and ${last}.`);
+			return hint("mine", rest, [a, b], `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, "other hidden neighbour")}, and ${allMines(rest.length)}.`);
 		}
 	}
 	const left = [];
 	cells.forEach((c, i) => !c.opened && !c.flag && left.push(i));
 	if (left.length && minesLeft === 0) return hint("clear", left, [], "The mine counter is at 0, so every hidden cell without a flag is safe.");
-	if (left.length && minesLeft === left.length) return hint("mine", left, [], `The mine counter shows ${minesLeft} and exactly ${count(left.length, "hidden cell")} without a flag ${left.length === 1 ? "is" : "are"} left, so ${left.length === 1 ? "it is a mine" : "they are all mines"}.`);
+	if (left.length && minesLeft === left.length) return hint("mine", left, [], `The mine counter shows ${minesLeft} and exactly ${count(left.length, "hidden cell")} without a flag ${left.length === 1 ? "is" : "are"} left, so ${allMines(left.length)}.`);
 	return noHint("Nothing on the board can be worked out for certain right now, so this needs a guess.");
 };
 //#endregion
@@ -3072,14 +3068,6 @@ var levels = {
 	}
 };
 var levelNames = Object.keys(levels);
-var themes = [
-	"classic",
-	"synthwave",
-	"solarized",
-	"solarized-phosphor",
-	"matrix",
-	"nord"
-];
 var createGame = ({ level, width, height, mines }) => {
 	const field = new Array(height);
 	for (let y = 0; y < height; y++) {
@@ -3131,6 +3119,21 @@ var openable = (game, x, y) => {
 	}
 	return false;
 };
+var toggleFlag = (game, x, y, marks) => {
+	const cell = game.field[y][x];
+	const field = game.field.slice();
+	field[y] = field[y].slice();
+	field[y][x] = {
+		...cell,
+		flag: marks ? !cell.mark && !cell.flag : !cell.flag,
+		mark: marks && cell.flag
+	};
+	const change = cell.flag === field[y][x].flag ? 0 : field[y][x].flag ? -1 : 1;
+	return {
+		field,
+		flags: game.flags + change
+	};
+};
 var revealRange = (x, y, fn) => fn(x - 1, y - 1) + fn(x - 1, y + 1) + fn(x + 1, y - 1) + fn(x + 1, y + 1) + fn(x - 1, y) + fn(x + 1, y) + fn(x, y - 1) + fn(x, y + 1);
 var customLevel = (data, defaults) => {
 	const width = Math.max(9, Math.min(40, parseInt(data.width, 10) || defaults.width));
@@ -3156,7 +3159,7 @@ var loadLevel = () => {
 };
 var loadTheme = () => {
 	const theme = load("theme");
-	return themes.includes(theme) ? theme : "classic";
+	return themes.some(([id]) => id === theme) ? theme : "classic";
 };
 var timeKey = (level, hinted) => hinted ? `${level}Hints` : level;
 var bestTimes = (hinted) => levelNames.map((level) => {
@@ -3288,25 +3291,13 @@ var actions = {
 		} };
 	},
 	flag: () => ({ game, marks }) => {
-		const { pressedX, pressedY, field, flags } = game;
-		if (pressedX < 0 || pressedY < 0) return null;
-		const cell = field[pressedY][pressedX];
-		if (cell.opened) return null;
-		const nextField = game.field.slice();
-		nextField[pressedY] = nextField[pressedY].slice();
-		const nextCell = {
-			...cell,
-			flag: marks ? !cell.mark && !cell.flag : !cell.flag,
-			mark: marks && cell.flag
-		};
-		nextField[pressedY][pressedX] = nextCell;
-		const mines = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1);
+		const { pressedX, pressedY } = game;
+		if (pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null;
 		return {
 			hint: null,
 			game: {
 				...game,
-				field: nextField,
-				flags: mines,
+				...toggleFlag(game, pressedX, pressedY, marks),
 				pressedX: -1,
 				pressedY: -1
 			}
@@ -3315,19 +3306,7 @@ var actions = {
 	down: ({ event, x, y }) => ({ game, marks }, actions) => {
 		if (game.touch || event.button > 2 || game.win || game.lose) return null;
 		window.addEventListener("mouseup", actions.up);
-		let { field, flags } = game;
-		const cell = field[y][x];
-		if (!game.pressed && event.button === 2 && !field[y][x].opened) {
-			field = field.slice();
-			field[y] = field[y].slice();
-			const nextCell = {
-				...cell,
-				flag: marks ? !cell.mark && !cell.flag : !cell.flag,
-				mark: marks && cell.flag
-			};
-			field[y][x] = nextCell;
-			flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1);
-		}
+		const { field, flags } = !game.pressed && event.button === 2 && !game.field[y][x].opened ? toggleFlag(game, x, y, marks) : game;
 		return {
 			...field !== game.field && { hint: null },
 			game: {
