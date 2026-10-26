@@ -1,6 +1,6 @@
 const neighbourCache = new Map()
 
-//index lists of the up to 8 cells around each cell, built once per board size
+//each cell's neighbours, once per board size
 export const neighboursOf = (width, height) => {
   const key = `${width}x${height}`
   if (!neighbourCache.has(key)) {
@@ -137,8 +137,7 @@ export const solvable = (mined, width, height, start) => {
   return true
 }
 
-//mine layout for a board whose first click is at x, y
-//safe keeps that cell clear, noGuess also clears around it and retries until solvable
+//mines for a first click at x, y; noGuess clears around it and redeals until solvable
 export const placeMines = ({ width, height, mines, x, y, safe, noGuess, budget = 1500 }) => {
   const size = width * height
   const start = y * width + x

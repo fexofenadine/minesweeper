@@ -12,8 +12,7 @@
  * Written by Jamie Zawinski <jwz@jwz.org>
  */
 
-//canvas port of xscreensaver's phosphor.c with its built-in 6x10 font and fuzzy borders
-//it types out this game's own source code instead of running a program
+//canvas port of phosphor.c, typing this game's own source
 
 import { FONT_HEIGHT, FONT_WIDTH, pixel } from './font6x10'
 
@@ -60,7 +59,7 @@ export const loadTexts = () =>
     })),
   ))
 
-//lit pixel runs of a glyph per row, as [row, from, to], see capture_font_bits
+//a glyph's lit runs as [row, from, to], see capture_font_bits
 const runCache = new Map()
 const runsOf = (c, inverted) => {
   const key = c * 2 + (inverted ? 1 : 0)
@@ -121,7 +120,7 @@ export default {
       ],
       value: 'cyan',
     },
-    //not in the original, it keeps the text behind the game from competing with it
+    //not in the original, keeps the text behind the game
     {
       key: 'brightness',
       label: 'Brightness',
@@ -144,7 +143,7 @@ export default {
     let gridHeight = 0
     let ticks = 0
     let gcs = []
-    //what is drawn in each cell, and the tty underneath that the text is printed into
+    //what each cell shows, and the tty text is printed into
     let chars = new Uint8Array(0)
     let states = new Uint8Array(0)
     let changed = new Uint8Array(0)
@@ -158,7 +157,7 @@ export default {
     let queue = '$ '
     let last = 0
 
-    //a ramp of colours from the foreground to the background, as phosphor's gcs
+    //phosphor's gcs: a ramp from foreground to background
     const colour = () => {
       const bg = rgb(BACKGROUND)
       const dim = (hex) => rgb(hex).map((ch, i) => bg[i] + ((ch - bg[i]) * f.brightness) / 100)
@@ -194,7 +193,7 @@ export default {
       const runs = runsOf(c, inverted)
       if (!runs.length || (states[i] === BLANK && !cursor)) return
 
-      //a wide stroke two steps dimmer, then a narrower one in this state's colour
+      //a wide dim stroke, then a narrow one in this state's colour
       const strokeRuns = (lineWidth, style) => {
         //round caps like the original, which also turn single pixel runs into dots
         context.lineCap = 'round'
@@ -242,7 +241,7 @@ export default {
       }
     }
 
-    //a tiny tty: newlines, tabs, wrapping and scrolling are all the source code needs
+    //a tiny tty: newlines, tabs, wrapping and scrolling
     const newline = () => {
       x = 0
       if (++y < gridHeight) return
@@ -264,7 +263,7 @@ export default {
       tty[y * gridWidth + x++] = code > 255 ? 63 : code
     }
 
-    //print_char: compare the tty with what is shown, flare in new characters and fade out old ones
+    //print_char: show new characters, fade out old ones
     const printChar = (code) => {
       ttyPrint(code)
       for (let i = 0; i < tty.length; i++) {

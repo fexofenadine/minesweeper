@@ -95,7 +95,7 @@
   fill: var(--mine-shine);
 }
 
-/*hint highlights, drawn over the cell with a dark edge so they read on every theme*/
+/*hint outlines, dark edged to show on every theme*/
 .hintSource::after,
 .hintSafe::after,
 .hintMine::after,

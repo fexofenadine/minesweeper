@@ -1,9 +1,6 @@
-#makes hill.webp, the classic background's hill, from a cc0 photo:
-#clouds above cattle hill, roedean (february 2011) by hassocks5489, commons.wikimedia.org
-#file sha1 b79d79e2a1b557472f8c3ee7412e9e13f6c4a5c3
-#cut out along the ridge, fence and blemishes retouched, mirrored and colour matched to bliss
-#usage: py -3 src/backgrounds/hill.py <photo.jpg> src/backgrounds/hill.webp src/backgrounds/ridge.json [preview.jpg]
-#needs pillow and numpy
+#makes hill.webp and ridge.json from the cc0 commons photo
+#clouds above cattle hill, roedean (february 2011) by hassocks5489, sha1 b79d79e2a1b557472f8c3ee7412e9e13f6c4a5c3
+#usage: py -3 hill.py <photo.jpg> hill.webp ridge.json [preview.jpg], needs pillow and numpy
 import sys
 from PIL import Image
 import numpy as np
@@ -31,7 +28,7 @@ def ridge_of(img):
 
 ridge = ridge_of(a)
 
-#fence: replace the band under the ridge with the grass just below it, feathered at the bottom
+#fence: replace the band under the ridge with grass from below
 xs = np.arange(w)
 band = np.clip(95 - 0.05 * xs, 0, None)
 band[xs > 1550] = 0
@@ -46,7 +43,7 @@ for x in range(w):
         t = 1.0 if y < y0 + d else 1 - (y - y0 - d) / feather
         a[y, x] = a[sy, x] * t + a[y, x] * (1 - t)
 
-#the soft shadow in the bottom right: clone grass from further left on the same rows
+#shadow in the bottom right: clone grass from the left
 cy, cx, rad = 1650, 2250, 150
 yy, xx = np.mgrid[0:h, 0:w]
 dist = np.hypot(yy - cy, xx - cx)
@@ -54,7 +51,7 @@ blend = np.clip((rad - dist) / 60, 0, 1)[..., None]
 shifted = np.roll(a, 420, axis=1)
 a = shifted * blend + a * (1 - blend)
 
-#bare earth (molehills, worn patches): fill from grass a little to the side, feathered
+#bare earth: fill from grass to the side
 r, g, b = a[..., 0], a[..., 1], a[..., 2]
 lum = 0.3 * r + 0.59 * g + 0.11 * b
 earth = ((g - (r + b) / 2) < 8) & (lum < 95) & (np.arange(h)[:, None] > ridge[None, :] + 12)
@@ -101,19 +98,18 @@ far_blur = np.asarray(Image.fromarray(a.astype(np.uint8)).filter(ImageFilter.Gau
 depth = np.clip((np.arange(h)[:, None] - ridge[None, :]) / (h - ridge.min()), 0, 1)[..., None]
 a = far_blur * (1 - depth) + near_blur * depth
 
-#grass colour of bliss in lab, measured once from a reference copy so it is not needed here
-#most of bliss's spread is its lighting, so only the mean is matched and the lighting added after
+#bliss's mean grass colour in lab, measured once; its lighting is added below
 rmean = np.array([38.8, -21.8, 36.9])
 lab = to_lab(a)
 below = (np.arange(h)[:, None] > ridge[None, :] + 4)
 mean = lab[below].mean(0)
 lab = lab - mean + rmean
 
-#bliss's light: sunlit and yellower along the ridge and on the left, darker towards the front
+#bliss's light: bright along the ridge and left, darker in front
 across = np.linspace(1, -1, w)[None, :]
 down = depth[..., 0]
 lab[..., 0] += 9 * (1 - down) - 7 * down + 4 * across
-#softening greys the grass, so give back some colour, greener rather than yellower where it is sunlit
+#restore colour lost to softening, greener where sunlit
 lab[..., 1] = rmean[1] + (lab[..., 1] - rmean[1]) * 1.2 - 5 * (1 - down)
 lab[..., 2] = rmean[2] + (lab[..., 2] - rmean[2]) * 1.2 + 4 * (1 - down)
 a = from_lab(lab)
@@ -128,7 +124,7 @@ rgba = np.dstack([a, alpha]).astype(np.uint8)
 hill = Image.fromarray(rgba, 'RGBA').crop((0, top, w, h))
 hill.save(out, 'WEBP', quality=80, method=6)
 print('hill', hill.size, 'ridge rows', int(edge.min() - top), 'to', int(edge.max() - top))
-#the ridge as fractions of the hill image, for clipping cloud shadows to the grass
+#ridge outline for clipping cloud shadows
 import json
 points = [[round(x / (w - 1), 4), round((edge[x] - top) / hill.size[1], 4)] for x in range(0, w, w // 48)] + [[1, round((edge[-1] - top) / hill.size[1], 4)]]
 open(ridge_out, 'w').write(json.dumps(points) + '\n')

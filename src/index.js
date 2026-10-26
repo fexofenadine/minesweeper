@@ -6,6 +6,6 @@ app(state, actions, view, document.getElementById('app'))
 startBackgrounds()
 
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  //browsers that block site storage refuse to register, the game works without it
+  //refused when storage is blocked, which is fine
   navigator.serviceWorker.register('service-worker.js').catch(() => {})
 }

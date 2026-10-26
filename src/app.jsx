@@ -9,6 +9,7 @@ import About from './About'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
+import { themes } from './themes'
 import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
 import { applyZoom, fitZoom, loadZoom, measureFit, sameSize, saveZoom, stepZoom } from './zoom'
 
@@ -41,8 +42,6 @@ const levels = {
 }
 
 const levelNames = Object.keys(levels)
-
-const themes = ['classic', 'synthwave', 'solarized', 'solarized-phosphor', 'matrix', 'nord']
 
 const createGame = ({ level, width, height, mines }) => {
   const field = new Array(height)
@@ -99,6 +98,20 @@ const openable = (game, x, y) => {
   return false
 }
 
+//flag, question mark (with marks on) or clear, and the new mine count
+const toggleFlag = (game, x, y, marks) => {
+  const cell = game.field[y][x]
+  const field = game.field.slice()
+  field[y] = field[y].slice()
+  field[y][x] = {
+    ...cell,
+    flag: marks ? !cell.mark && !cell.flag : !cell.flag,
+    mark: marks && cell.flag,
+  }
+  const change = cell.flag === field[y][x].flag ? 0 : field[y][x].flag ? -1 : 1
+  return { field, flags: game.flags + change }
+}
+
 const revealRange = (x, y, fn) =>
   fn(x - 1, y - 1) +
   fn(x - 1, y + 1) +
@@ -131,7 +144,7 @@ const loadLevel = () => {
 
 const loadTheme = () => {
   const theme = load('theme')
-  return themes.includes(theme) ? theme : 'classic'
+  return themes.some(([id]) => id === theme) ? theme : 'classic'
 }
 
 //best times are kept apart for games played with and without hints
@@ -275,25 +288,13 @@ export const actions = {
   flag:
     () =>
     ({ game, marks }) => {
-      const { pressedX, pressedY, field, flags } = game
-      if (pressedX < 0 || pressedY < 0) return null
-      const cell = field[pressedY][pressedX]
-      if (cell.opened) return null
-      const nextField = game.field.slice()
-      nextField[pressedY] = nextField[pressedY].slice()
-      const nextCell = {
-        ...cell,
-        flag: marks ? !cell.mark && !cell.flag : !cell.flag,
-        mark: marks && cell.flag,
-      }
-      nextField[pressedY][pressedX] = nextCell
-      const mines = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1)
+      const { pressedX, pressedY } = game
+      if (pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null
       return {
         hint: null,
         game: {
           ...game,
-          field: nextField,
-          flags: mines,
+          ...toggleFlag(game, pressedX, pressedY, marks),
           pressedX: -1,
           pressedY: -1,
         },
@@ -304,21 +305,10 @@ export const actions = {
     ({ game, marks }, actions) => {
       if (game.touch || event.button > 2 || game.win || game.lose) return null
       window.addEventListener('mouseup', actions.up)
-      let { field, flags } = game
-      const cell = field[y][x]
-      if (!game.pressed && event.button === 2 && !field[y][x].opened) {
-        field = field.slice()
-        field[y] = field[y].slice()
-        const nextCell = {
-          ...cell,
-          flag: marks ? !cell.mark && !cell.flag : !cell.flag,
-          mark: marks && cell.flag,
-        }
-        field[y][x] = nextCell
-        flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1)
-      }
+      const flagging = !game.pressed && event.button === 2 && !game.field[y][x].opened
+      const { field, flags } = flagging ? toggleFlag(game, x, y, marks) : game
       return {
-        //a new flag changes the board, so an explanation of the old one goes
+        //a flag changes the board
         ...(field !== game.field && { hint: null }),
         game: {
           ...game,
@@ -336,7 +326,7 @@ export const actions = {
     ({ game }, actions) => {
       if (game.win || game.lose) return null
       if (!openable(game, x, y)) {
-        //the first click of a double click on a hidden cell just opened it, that is no failed chord
+        //a double click that just opened this cell is no failed chord
         const { openedAt } = game
         const fresh =
           openedAt.x === x && openedAt.y === y && performance.now() - openedAt.time < 500
@@ -398,8 +388,7 @@ export const actions = {
         return revealRange(x, y, reveal) + 1
       }
 
-      //mines are only placed once a cell is actually opened
-      //a flag or chord first must not pick the start cell for safe start or no guessing
+      //mines are placed on the first open, never on a flag or chord
       const begin = game.start < 0 && game.pressed && !game.group && !field[pressedY][pressedX].flag
       if (begin) {
         const { mined } = placeMines({
@@ -442,8 +431,7 @@ export const actions = {
         if (!lose) actions.win()
       }
 
-      //an explanation stays until the board changes, so a click that does nothing never moves the board
-      //otherwise the second click of a double click could land on another cell
+      //keep explanations until the board changes, so it never moves mid double click
       const changed = left !== game.left || lose || begin
       return {
         ...((chordHint || changed) && { hint: chordHint }),
@@ -564,7 +552,7 @@ export const actions = {
       marks,
     }
   },
-  //the dialog edits a draft that previews live, cancel puts the saved settings back
+  //a live draft, cancel restores the saved settings
   toggleBackgroundSettings:
     () =>
     ({ theme, backgrounds, backgroundSettings }) => {
@@ -592,8 +580,7 @@ export const actions = {
       saveSettings(next)
       return { backgrounds: next, backgroundSettings: null }
     },
-  //the zoom picked with the title bar buttons, shrunk when the window would not fit
-  //only a new level, theme or browser size refits, so zooming in past the fit can scroll
+  //shrink the chosen zoom to fit, only for a new level, theme or browser size
   fit:
     () =>
     ({ zoom }) => {
@@ -603,7 +590,7 @@ export const actions = {
       applyZoom(scale)
       return { zoom: { ...zoom, scale, seen: size } }
     },
-  //step in or out from the size shown, or back to 100% (which still fits the window)
+  //step from the shown size, or back to 100%
   zoom:
     (direction) =>
     ({ zoom }) => {

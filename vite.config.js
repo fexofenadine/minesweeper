@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto'
 import { basename } from 'node:path'
 import { defineConfig } from 'vite'
 
-//adds ?v=<content hash> to asset links so browsers never mix old and new files
+//?v=<hash> on asset links so old and new files never mix
 const versionAssets = () => ({
   name: 'version-assets',
   transformIndexHtml: {

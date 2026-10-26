@@ -123,7 +123,7 @@ it('runs more cycles on a finer canvas, in proportion to its scale', () => {
     for (let n = 0; n < 40; n++) instance.frame((now += 20))
     return context.counts.fillRect
   }
-  //twice the pixels each way runs twice the cycles in the same time, not four times
+  //twice the pixels runs twice the cycles, not four times
   const ratio = count(2) / count(1)
   expect(ratio).toBeGreaterThan(1.7)
   expect(ratio).toBeLessThan(2.4)
@@ -218,7 +218,7 @@ it('grows a whole substrate picture for the still background, then stops', () =>
   let calls = 0
   while (!done && calls++ < 1000) done = instance.still(performance.now())
   expect(done).toBe(true)
-  //the picture is blended in memory and put on the canvas, not drawn a grain at a time
+  //blended in memory, not drawn grain by grain
   expect(context.counts.putImageData).toBeGreaterThan(0)
   expect(context.counts.fillRect).toBe(1)
   //finished pictures stay put

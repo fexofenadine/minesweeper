@@ -1,4 +1,4 @@
-//saved settings that fall back to defaults when a browser blocks site storage
+//settings that survive blocked storage
 export const load = (key) => {
   try {
     return localStorage.getItem(key)

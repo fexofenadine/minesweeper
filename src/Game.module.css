@@ -154,7 +154,7 @@
   }
 }
 
-/*explanation under the field, as wide as the field so it never stretches the window*/
+/*explanation under the field, never wider than it*/
 .hint {
   box-sizing: border-box;
   width: 0;

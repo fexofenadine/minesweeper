@@ -21,11 +21,10 @@
  * implied warranty.
  */
 
-//canvas port of xscreensaver's substrate.c, function for function
-//canvas source-over with globalAlpha is the same blend as trans_point, so no offscreen copy is kept
+//canvas port of substrate.c, function for function; source-over blends like trans_point
 
 const STEP = 0.42
-//crack grid value for an empty pixel, anything below 10000 is a crack angle
+//an empty pixel, below 10000 is a crack angle
 const EMPTY = 10001
 
 //nord frost and aurora in place of the original pollock colour map
@@ -48,14 +47,14 @@ const BACKGROUND = '#2e3440'
 const FOREGROUND = '#d8dee9'
 
 const rgbCache = new Map()
-const rgbOf = (hex) => {
-  if (!rgbCache.has(hex))
-    rgbCache.set(
+const rgbOf = (hex) =>
+  rgbCache.get(hex) ??
+  rgbCache
+    .set(
       hex,
       [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)),
     )
-  return rgbCache.get(hex)
-}
+    .get(hex)
 
 const frand = (n) => Math.random() * n
 const random = (n) => Math.floor(Math.random() * n)
@@ -64,9 +63,7 @@ const radians = (degrees) => (degrees * Math.PI) / 180
 export default {
   name: 'Substrate',
   credit: 'Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver',
-  //like xscreensaver it draws in real screen pixels
-  //how finely to draw: original is one canvas pixel per css pixel like before, sharp is every screen
-  //pixel, balanced goes up to 1.5 times, which looks crisp at a fraction of sharp's cost
+  //original is 1x, sharp the screen's pixels, balanced up to 1.5x
   ratio: (pixels, { detail }) =>
     detail === 'sharp' ? pixels : detail === 'balanced' ? Math.min(pixels, 1.5) : 1,
   options: [
@@ -161,15 +158,13 @@ export default {
     let cracks = []
     let cycles = 0
     let last = 0
-    //a finer canvas has more to fill, so it runs proportionally more cycles per growth delay
-    //and restarts that much later; linear rather than by area, which kept big screens too busy
+    //finer canvases run more cycles per delay, linearly as by area was too slow
     let pace = 1
     let owed = 0
-    //the sand colour last set, so grains of one crack do not set it again each time
+    //the last fill colour, to skip setting it again
     let style = null
 
-    //while a still picture grows, points blend straight into its pixels like trans_point,
-    //which is far quicker than a canvas call per grain of sand
+    //a still picture blends into these pixels, far quicker than canvas calls
     let pixelsOf = null
 
     const plot = (x, y, colour, alpha) => {
@@ -252,7 +247,7 @@ export default {
       //synthesis of Crack::regionColor() and SandPainter::render()
       let rx = cr.x
       let ry = cr.y
-      //move perpendicular to crack, the step worked out once rather than at every pixel
+      //move perpendicular to the crack
       const sx = 0.81 * Math.sin(radians(cr.t))
       const sy = 0.81 * Math.cos(radians(cr.t))
       //seamless lines can wrap forever, so stop after a few screens
@@ -337,7 +332,7 @@ export default {
       }
     }
 
-    //build_substrate and build_img: clear the picture and seed the first cracks
+    //build_substrate and build_img
     const build = () => {
       pixelsOf = null
       context.globalAlpha = 1
@@ -364,7 +359,7 @@ export default {
         build()
       },
       frame: (now) => {
-        //substrate_draw once per growth delay (pace times on dense displays), a few at most per frame
+        //substrate_draw per growth delay, a few at most per frame
         const delay = Math.max(1, f.growthDelay)
         const due = Math.min(8, Math.floor((now - last) / delay))
         if (!due) return
@@ -377,8 +372,7 @@ export default {
           if (++cycles >= f.maxCycles * pace && f.maxCycles) build()
         }
       },
-      //grow a well filled picture as fast as the page allows, a slice per frame, then stop
-      //3000 cycles looks finished without fast forwarding for long, and stops short of a restart
+      //fast forward to a filled picture, 3000 cycles in slices, then stop
       still: (now) => {
         const target = Math.min(3000, (f.maxCycles || Infinity) * 0.95) * pace
         if (cycles >= target) return true

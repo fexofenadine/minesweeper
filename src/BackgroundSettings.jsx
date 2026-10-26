@@ -5,7 +5,7 @@ import Dialog from './Dialog'
 import Button from './Button'
 import { backgrounds, optionsOf } from './backgrounds'
 
-//one control per option type, so new backgrounds only need to declare their options
+//a control per option type, built from each background's options
 const Control = ({ option, value, onChange }) => {
   if (option.type === 'toggle') {
     return (

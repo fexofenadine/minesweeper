@@ -2,7 +2,7 @@ const CACHE = 'minesweeper'
 
 self.addEventListener('install', () => self.skipWaiting())
 
-//drop caches left by older workers, and reload open tabs they were serving stale files to
+//drop older caches and reload tabs they served
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then(async (keys) => {
@@ -16,7 +16,7 @@ self.addEventListener('activate', (event) => {
   )
 })
 
-//network first so updates show straight away, cache only as an offline fallback
+//network first, cache only for offline
 self.addEventListener('fetch', (event) => {
   const { request } = event
   if (request.method !== 'GET' || !request.url.startsWith(self.location.origin)) return

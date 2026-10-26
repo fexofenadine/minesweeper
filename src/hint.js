@@ -1,9 +1,9 @@
 import { neighboursOf } from './mines'
 
 const count = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`
+const allMines = (n) => (n === 1 ? 'it is a mine' : 'they are all mines')
 
-//where cell b sits seen from cell a, so two equal numbers can be told apart
-//a board shown transposed swaps across and down
+//where b sits from a, as shown on screen
 const where = (a, b, width, transposed) => {
   const across = (b % width) - (a % width)
   const down = Math.floor(b / width) - Math.floor(a / width)
@@ -65,8 +65,7 @@ export const explainChord = ({ field, width, height }, x, y) => {
   return null
 }
 
-//a certain move from what is on the board, with the reasoning behind it
-//only the numbers and the player's flags are used, never the real mines
+//a certain move and its reasoning, from the numbers and flags only
 export const findHint = ({ field, width, height, minesLeft, transposed = false }) => {
   const around = neighboursOf(width, height)
   const cells = field.flat()
@@ -98,7 +97,7 @@ export const findHint = ({ field, width, height, minesLeft, transposed = false }
     }
   }
 
-  //a number that already has its flags, or whose hidden cells must all be mines
+  //numbers with all their flags, or only mines left
   for (const i of numbered) {
     const { hidden, flagged, need } = seen.get(i)
     if (!hidden.length) continue
@@ -115,17 +114,16 @@ export const findHint = ({ field, width, height, minesLeft, transposed = false }
       const needs = flagged.length
         ? `touches ${count(flagged.length, 'flag')} and needs ${count(need, 'more mine')}`
         : `needs ${count(need, 'mine')}`
-      const last = need === 1 ? 'it is a mine' : 'they are all mines'
       return hint(
         'mine',
         hidden,
         [i],
-        `The highlighted ${num} ${needs}, and has exactly ${count(need, 'hidden neighbour')} left, so ${last}.`,
+        `The highlighted ${num} ${needs}, and has exactly ${count(need, 'hidden neighbour')} left, so ${allMines(need)}.`,
       )
     }
   }
 
-  //one number whose hidden cells all sit inside another number's hidden cells
+  //a number whose hidden cells lie within another's
   for (const a of numbered) {
     const A = seen.get(a)
     if (!A.hidden.length) continue
@@ -146,12 +144,11 @@ export const findHint = ({ field, width, height, minesLeft, transposed = false }
           `${shared}, which is all the ${cells[b].num} needs, so its other hidden neighbours are safe.`,
         )
       }
-      const last = rest.length === 1 ? 'it is a mine' : 'they are all mines'
       return hint(
         'mine',
         rest,
         [a, b],
-        `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, 'other hidden neighbour')}, and ${last}.`,
+        `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, 'other hidden neighbour')}, and ${allMines(rest.length)}.`,
       )
     }
   }
@@ -172,7 +169,7 @@ export const findHint = ({ field, width, height, minesLeft, transposed = false }
       'mine',
       left,
       [],
-      `The mine counter shows ${minesLeft} and exactly ${count(left.length, 'hidden cell')} without a flag ${left.length === 1 ? 'is' : 'are'} left, so ${left.length === 1 ? 'it is a mine' : 'they are all mines'}.`,
+      `The mine counter shows ${minesLeft} and exactly ${count(left.length, 'hidden cell')} without a flag ${left.length === 1 ? 'is' : 'are'} left, so ${allMines(left.length)}.`,
     )
   }
 

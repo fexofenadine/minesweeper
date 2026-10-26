@@ -32,7 +32,7 @@
       //apply the saved theme and window size before first paint
       try {
         document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
-        //animated backgrounds are the default except on classic, the script corrects this once it knows the settings
+        //assume animated off classic, the script corrects it
         if (document.documentElement.dataset.theme !== 'classic') {
           document.documentElement.dataset.background = 'animated'
         }

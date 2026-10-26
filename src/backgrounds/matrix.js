@@ -9,8 +9,7 @@
  * implied warranty.
  */
 
-//canvas port of the strip, wave and fog logic from xscreensaver's glmatrix.c
-//the camera stays level so the rain always falls straight down
+//canvas port of glmatrix.c's strips, waves and fog, with a level camera
 
 const GRID_SIZE = 70
 const GRID_DEPTH = 35
@@ -36,7 +35,7 @@ const ramp = Array.from({ length: WAVE_SIZE }, (_, i) => {
   return 0.2 + j * 0.8
 })
 
-//glyph cells hold 0 for blank, n for glyph n, and -n for a glyph that keeps changing
+//0 is blank, n is glyph n, -n a changing glyph
 const resetStrip = (s, count) => {
   s.x = frand(GRID_SIZE) - GRID_SIZE / 2
   s.y = GRID_SIZE / 2 + bellrand(0.5)
@@ -96,7 +95,7 @@ const newStrip = (count) => {
 //each sprite is padded to hold a glyph plus the glow around it
 const PAD = 1.6
 
-//mirrored glyphs pre-drawn with a glow, one row plain and one row bright for changing glyphs
+//mirrored glowing glyphs, a plain row and a bright row
 const buildAtlas = (glyphs, cell) => {
   const atlas = document.createElement('canvas')
   atlas.width = cell * glyphs.length
@@ -130,9 +129,9 @@ export default {
   credit: 'Ported from GLMatrix by Jamie Zawinski, part of xscreensaver',
   //turned off, the theme shows its digital rain photo
   wallpaper: true,
-  //a soft phosphor blur of 0.6 screen pixels, whatever the display's pixel ratio
+  //0.6 screen pixels of blur at any pixel ratio
   filter: (pixels) => `blur(${0.6 / pixels}px)`,
-  //up to twice the css resolution keeps the glyphs crisp without drawing far more than it shows
+  //up to 2x keeps glyphs crisp without overdrawing
   ratio: (pixels) => Math.min(pixels, 2),
   options: [
     { key: 'density', label: 'Density', type: 'range', min: 10, max: 100, step: 1, value: 44 },

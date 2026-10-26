@@ -22,8 +22,7 @@ const Zoom = ({ scale, onZoom }) => [
   </Button>,
 ]
 
-//a wide board on a portrait screen is shown transposed, columns as rows, so it suits the screen
-//neighbours stay neighbours, so only the view changes and cells keep their own x and y
+//wide boards on portrait screens are shown transposed, cells keep their own x and y
 export const transposed = ({ portrait, game }) => portrait && game.width > game.height
 
 const rowsOf = (state) => {

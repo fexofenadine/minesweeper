@@ -1,5 +1,4 @@
-//classic's opt-in animated background: a bliss style sky with drifting clouds over a green hill
-//the hill is a cc0 photo cut out and colour matched to bliss by hill.py, the sky and clouds are drawn here
+//classic's optional bliss style scene: a live sky over a hill made by hill.py
 import hillUrl from './hill.webp'
 import ridge from './ridge.json'
 
@@ -8,7 +7,7 @@ const HILL_HEIGHT = 851
 //bliss's ridge sits a little over halfway down the picture
 const RIDGE = 0.53
 
-//bliss's clear sky from the top down to the horizon, measured from the photo
+//bliss's sky, top to horizon
 const sky = [
   [0, '#4279ee'],
   [0.2, '#3d76ee'],
@@ -46,8 +45,7 @@ const fbm = (x, y, seed) => {
   return sum
 }
 
-//cumulus: a lumpy top over a flat base, bright above and blue grey underneath
-//cirrus: thin streaks stretched along the wind
+//cumulus have flat grey bases, cirrus are thin streaks
 const SPRITE_WIDTH = 384
 const SPRITE_HEIGHT = 128
 const makeCloud = (seed, kind) => {
@@ -86,7 +84,7 @@ const makeCloud = (seed, kind) => {
 }
 const kinds = ['cumulus', 'cumulus', 'cumulus', 'cumulus', 'cirrus', 'cirrus']
 
-//where the hill goes: as wide as the screen and reaching the bottom, ridge near bliss's height
+//cover the screen width and bottom, ridge at bliss's height
 export const hillLayout = (width, height) => {
   const scale = Math.max(width / HILL_WIDTH, (height * (1 - RIDGE)) / HILL_HEIGHT)
   const w = HILL_WIDTH * scale
@@ -133,20 +131,21 @@ export default {
     const hill = new Image()
     hill.src = hillUrl
     let shape = null
-    //cloud sprites are made a few per frame so starting the theme never stalls
-    const sprites = []
+    //sprites are made one per frame so starting never stalls
+    const sprites = { cumulus: [], cirrus: [] }
+    let made = 0
     let clouds = []
 
-    //three layers: small cumulus low on the horizon, bigger ones above, cirrus wisps highest
+    //small cumulus low, bigger above, cirrus highest
     const layers = [
       { top: 0.38, bottom: 0.47, size: 0.35, alpha: 0.95, speed: 3, kind: 'cumulus' },
       { top: 0.15, bottom: 0.32, size: 0.7, alpha: 0.95, speed: 7, kind: 'cumulus' },
       { top: 0, bottom: 0.14, size: 1.6, alpha: 0.6, speed: 10, kind: 'cirrus' },
     ]
-    //the sprite for a cloud, once its kind has been made
+    //undefined until a sprite of its kind exists
     const spriteOf = (cloud) => {
-      const choices = sprites.filter((sprite, i) => sprite && kinds[i] === cloud.layer.kind)
-      return choices[cloud.sprite % Math.max(1, choices.length)]
+      const list = sprites[cloud.layer.kind]
+      return list[cloud.sprite % list.length]
     }
 
     const scatter = () => {
@@ -178,7 +177,7 @@ export default {
       const base = (width / 3) * cloud.layer.size
       const w = base * cloud.stretch
       const h = (w * SPRITE_HEIGHT) / SPRITE_WIDTH
-      //clouds wrap round, leaving the screen on the right and coming back on the left
+      //clouds wrap round from right to left
       const span = width + w
       const x = ((cloud.x * span) % span) - w
       return { x, y: cloud.y * height, w, h }
@@ -204,7 +203,7 @@ export default {
       const { x, y, w, h } = hillLayout(width, height)
       context.drawImage(hill, x, y, w, h)
 
-      //the bigger cumulus' shadows slide over the grass, further down and stretched by perspective
+      //the bigger clouds' shadows, stretched over the grass
       if (f.shadows && shape) {
         context.save()
         context.clip(shape)
@@ -235,11 +234,14 @@ export default {
         draw()
       },
       frame: (now) => {
-        if (sprites.length < kinds.length)
-          sprites.push(makeCloud(sprites.length + 1, kinds[sprites.length]))
+        if (made < kinds.length) {
+          const kind = kinds[made++]
+          const sprite = makeCloud(made, kind)
+          if (sprite) sprites[kind].push(sprite)
+        }
         const seconds = Math.min(0.1, (now - last) / 1000)
         last = now
-        //drift as a share of the screen width per second, so every screen size moves alike
+        //drift in screen widths per second
         for (const cloud of clouds) cloud.x += (cloud.layer.speed * f.wind * seconds) / 1000
         draw()
       },

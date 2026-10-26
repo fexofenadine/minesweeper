@@ -5,13 +5,9 @@ import truchet from './truchet'
 import phosphor from './phosphor'
 import hill from './hill'
 
-//animated xscreensaver ports drawn on a canvas behind the game
-//a background declares its options, ratio(devicePixelRatio, settings) for its canvas resolution,
-//an optional filter(devicePixelRatio) for css effects, wallpaper: true if its theme has a
-//static wallpaper to fall back to, and a create(context, settings) that returns
-//{ configure(settings), resize(width, height, scale), frame(now), still?(now) }, then gets listed here
-//still draws a finished picture for themes without a wallpaper, returning true once done
-//animated: false starts a background switched off, so its theme shows its wallpaper until opted in
+//canvas backgrounds behind the game, each one
+//{ name, credit, options, ratio(dpr, settings), filter?(dpr), wallpaper?, animated?, create(context, settings) }
+//where create returns { configure, resize(w, h, scale), frame(now), still?(now) }
 export const backgrounds = { matrix, substrate, truchet, phosphor, hill }
 
 //which theme shows which background
@@ -25,7 +21,7 @@ const themeBackgrounds = {
 
 export const backgroundFor = (theme) => themeBackgrounds[theme] || null
 
-//every background can be turned off, showing its theme's wallpaper or a still picture instead
+//every background can be switched off
 export const optionsOf = (id) => [
   { key: 'animated', label: 'Animated', type: 'toggle', value: backgrounds[id].animated ?? true },
   ...backgrounds[id].options,
@@ -34,7 +30,7 @@ export const optionsOf = (id) => [
 export const defaults = (id) =>
   Object.fromEntries(optionsOf(id).map((option) => [option.key, option.value]))
 
-//keeps a stored value only if it still fits the option, so old or edited settings cannot break a background
+//keep a stored value only if it still fits its option
 const clean = (option, value) => {
   if (option.type === 'toggle') return typeof value === 'boolean' ? value : option.value
   if (option.type === 'select') {
@@ -69,7 +65,7 @@ let settings = loadSettings()
 const instances = {}
 let refresh = () => {}
 
-//apply settings to a background straight away, for live previews and after saving
+//apply settings now, for previews and after saving
 export const configure = (id, values) => {
   settings = { ...settings, [id]: values }
   instances[id]?.configure(values)
@@ -85,7 +81,7 @@ export const startBackgrounds = () => {
   const context = canvas.getContext('2d')
 
   let active = null
-  //animated, still (a finished picture) or wallpaper (the theme's css background)
+  //animated, still or wallpaper
   let mode = null
   let frame = null
 
@@ -98,7 +94,7 @@ export const startBackgrounds = () => {
     if (!instances[active].still(now)) frame = requestAnimationFrame(settle)
   }
 
-  //draw at the display's own pixels, as far as the background allows, so it stays sharp
+  //draw at the display's pixels, as far as the background allows
   const resize = () => {
     const { ratio, filter } = backgrounds[active]
     const pixels = window.devicePixelRatio || 1
@@ -116,7 +112,7 @@ export const startBackgrounds = () => {
     frame = requestAnimationFrame(mode === 'animated' ? loop : settle)
   }
 
-  //browser zoom and moving to another screen change the pixel ratio, sometimes without a resize
+  //zoom or a new screen can change the pixel ratio without a resize
   const watchPixels = () => {
     matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`).addEventListener(
       'change',
@@ -130,13 +126,8 @@ export const startBackgrounds = () => {
 
   const update = (changed) => {
     const id = backgroundFor(root.dataset.theme)
-    const next = !id
-      ? null
-      : settings[id].animated
-        ? 'animated'
-        : backgrounds[id].wallpaper
-          ? 'wallpaper'
-          : 'still'
+    const still = backgrounds[id]?.wallpaper ? 'wallpaper' : 'still'
+    const next = id && (settings[id].animated ? 'animated' : still)
     //the css shows a theme's wallpaper unless the canvas covers it
     if (next) root.dataset.background = next
     else delete root.dataset.background

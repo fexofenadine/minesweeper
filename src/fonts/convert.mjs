@@ -1,7 +1,5 @@
-//turns the 13px bitmap strike of wine's ms_sans_serif.sfd into pixel-square truetype fonts
-//source: github.com/wine-mirror/wine/blob/9ecca23a32a14976641e44e88f79ffa81050f4f9/fonts/ms_sans_serif.sfd
-//usage: npm i --no-save opentype.js@1 && node src/fonts/convert.mjs src/fonts/ms_sans_serif.sfd <out dir>
-//then compress the .ttf files to .woff2, e.g. with npx wawoff2 or woff2_compress
+//turns wine's ms_sans_serif.sfd 13px bitmaps into truetype fonts, from wine 9ecca23
+//usage: npm i --no-save opentype.js@1 && node src/fonts/convert.mjs <sfd> <out dir>, then make woff2
 import fs from 'node:fs'
 import opentype from 'opentype.js'
 

@@ -10,9 +10,7 @@
  * implied warranty.
  */
 
-//canvas port of xscreensaver's truchet.c
-//the pattern is kept as tile choices and redrawn at the scroll offset each frame,
-//in place of the original's oversized offscreen pixmap
+//canvas port of truchet.c, redrawing tiles at the scroll offset instead of a big pixmap
 
 const MAXRATIO = 2
 
@@ -27,7 +25,7 @@ const BACKGROUND = '#002b36'
 
 const random = (n) => Math.floor(Math.random() * n)
 
-//XDrawArc: a box, a start angle and an extent, in 64ths of a degree counterclockwise
+//XDrawArc angles are 64ths of a degree, counterclockwise
 const xarc = (context, x, y, w, h, a1, a2) => {
   const rad = Math.PI / (180 * 64)
   context.moveTo(x + w / 2 + (w / 2) * Math.cos(a1 * rad), y + h / 2 - (h / 2) * Math.sin(a1 * rad))
@@ -66,7 +64,7 @@ export default {
   credit: 'Ported from Truchet by Adrian Likins, part of xscreensaver',
   wallpaper: true,
   ratio: (pixels) => pixels,
-  //xscreensaver's options, with calm defaults: the slow scroll instead of a new pattern every 0.4 s
+  //xscreensaver's options with calmer defaults
   options: [
     {
       key: 'minWidth',
@@ -176,7 +174,7 @@ export default {
     let width = 0
     let height = 0
     let pixels = 1
-    //scroll-overlap, the extra pattern beyond the screen that the scroll pans across
+    //scroll-overlap, the extra pattern the scroll pans over
     let overlap = 0
     let layers = []
     let count = 0
@@ -184,7 +182,7 @@ export default {
     let last = 0
     let wait = 0
 
-    //one truchet_draw: a new layer of random tiles, size, line width and colour
+    //truchet_draw: a new layer of random tiles
     const pattern = () => {
       let linewidth = random(f.maxLineWidth)
       if (linewidth < f.minLineWidth) linewidth = f.minLineWidth
@@ -206,14 +204,8 @@ export default {
         count = 0
       }
       overlap = f.scroll ? 400 * pixels : 0
-      const kind =
-        f.curves && f.angles
-          ? random(2)
-            ? 'curve'
-            : 'angle'
-          : f.curves || !f.angles
-            ? 'curve'
-            : 'angle'
+      //both on picks at random, neither falls back to curves
+      const kind = f.angles && (!f.curves || random(2)) ? 'angle' : 'curve'
       const colours = palettes[f.palette]
       const cols = Math.ceil((width + overlap) / (w * pixels)) + 1
       const rows = Math.ceil((height + overlap) / (h * pixels)) + 1

@@ -1,6 +1,7 @@
 import { h } from 'hyperapp'
 import s from './Menu.module.css'
 import { backgroundFor } from './backgrounds'
+import { themes } from './themes'
 
 const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
   <li key={key} class={s.item}>
@@ -86,36 +87,13 @@ const Menu = ({ state, actions }) => (
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
     </MenuItem>
     <MenuItem name="Theme" type="theme" active={state.menu} onChange={actions.toggleMenu}>
-      <SubMenuItem
-        name="Classic"
-        checked={state.theme === 'classic'}
-        onClick={() => actions.setTheme('classic')}
-      />
-      <SubMenuItem
-        name="Synthwave"
-        checked={state.theme === 'synthwave'}
-        onClick={() => actions.setTheme('synthwave')}
-      />
-      <SubMenuItem
-        name="Solarized Truchet"
-        checked={state.theme === 'solarized'}
-        onClick={() => actions.setTheme('solarized')}
-      />
-      <SubMenuItem
-        name="Solarized Phosphor"
-        checked={state.theme === 'solarized-phosphor'}
-        onClick={() => actions.setTheme('solarized-phosphor')}
-      />
-      <SubMenuItem
-        name="Matrix"
-        checked={state.theme === 'matrix'}
-        onClick={() => actions.setTheme('matrix')}
-      />
-      <SubMenuItem
-        name="Nord"
-        checked={state.theme === 'nord'}
-        onClick={() => actions.setTheme('nord')}
-      />
+      {themes.map(([theme, name]) => (
+        <SubMenuItem
+          name={name}
+          checked={state.theme === theme}
+          onClick={() => actions.setTheme(theme)}
+        />
+      ))}
       {backgroundFor(state.theme) && <Separator />}
       {backgroundFor(state.theme) && (
         <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
