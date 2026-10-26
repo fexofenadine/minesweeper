@@ -35,7 +35,7 @@ const rowsOf = (state) => {
 const Game = ({ key, state, actions }) => (
   <Dialog
     key={key}
-    title="Minesweeper"
+    title={state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus'}
     titleHint="Double-click for 100% zoom"
     onTitleDoubleClick={() => actions.zoom(0)}
     controls={<Zoom scale={state.zoom.scale} onZoom={actions.zoom} />}

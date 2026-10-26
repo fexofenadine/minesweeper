@@ -332,3 +332,30 @@ it('keeps an explanation through clicks that change nothing, and clears it when 
   wired.peek()
   expect(current.hint).toBe(null)
 })
+
+it('calls the window Minesweeper on classic and Minesweeper Plus on the other themes', async () => {
+  const titleOf = (theme) =>
+    new Promise((resolve) => {
+      const container = document.createElement('div')
+      const testView = () => (
+        <div oncreate={(el) => resolve(el.querySelector('h1').textContent)}>
+          {view({ ...state, theme }, actions)}
+        </div>
+      )
+      app({ ...state, theme }, actions, testView, container)
+    })
+  expect(await titleOf('classic')).toBe('Minesweeper')
+  for (const theme of ['synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']) {
+    expect(await titleOf(theme)).toBe('Minesweeper Plus')
+  }
+})
+
+it('opens and closes the about box', () => {
+  start({})
+  wired.toggleAbout()
+  wired.peek()
+  expect(current.about).toBe(true)
+  wired.toggleAbout()
+  wired.peek()
+  expect(current.about).toBe(false)
+})

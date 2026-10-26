@@ -1,0 +1,29 @@
+.root {
+  max-width: 340px;
+  padding: 10px 14px 12px;
+}
+
+.root p {
+  margin: 0 0 8px;
+  line-height: 1.35;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.link {
+  color: var(--highlight);
+}
+
+.footer {
+  display: flex;
+  justify-content: center;
+  padding: 6px 0 0;
+}
+
+.button {
+  display: block;
+  min-width: 60px;
+  padding: 4px 5px 3px;
+}

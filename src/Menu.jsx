@@ -121,6 +121,9 @@ const Menu = ({ state, actions }) => (
         <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
       )}
     </MenuItem>
+    <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
+      <SubMenuItem name="About Minesweeper Plus..." onClick={actions.toggleAbout} />
+    </MenuItem>
   </ul>
 )
 

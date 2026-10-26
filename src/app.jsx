@@ -5,6 +5,7 @@ import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
 import BackgroundSettings from './BackgroundSettings'
+import About from './About'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
@@ -170,6 +171,7 @@ export const state = {
   theme: loadTheme(),
   winner: null,
   bestTime: null,
+  about: false,
   customField: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
@@ -502,6 +504,9 @@ export const actions = {
       actions.setBestTimeTab(winner.hinted ? 'hinted' : 'clean')
       return { winner: null }
     },
+  toggleAbout:
+    () =>
+    ({ about }) => ({ menu: null, about: !about }),
   toggleBestTime:
     () =>
     ({ bestTime }) => ({
@@ -643,5 +648,6 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.about && <About key="f" actions={actions} />}
   </main>
 )

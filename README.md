@@ -44,6 +44,7 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 
 ### Window and display
 
+- **Title and About**: the window is titled Minesweeper Plus on every theme except Classic, which keeps the original's title. Help → About Minesweeper Plus describes the game, credits the original author and links to this repository and its licences.
 - **Zoom**: the − and + buttons in the title bar scale the whole window in steps from 50% to 400%, and double-clicking the title bar goes back to 100%. The zoom is remembered.
 - **Fits the screen**: when a level, custom grid, theme or browser size would make the window too big, it shrinks to fit, but never below 62.5% (about 10 pixel cells), where the page scrolls instead. Zooming in past the fitted size is allowed and scrolls too. On small screens the margin around the window shrinks as well.
 - **Portrait screens**: on a screen taller than it is wide, a board that is wider than tall (Expert, Extreme or a wide custom grid) is shown turned on its side, columns as rows, so it fills the screen instead of shrinking. Numbers stay upright, and it switches back when the screen turns to landscape.
