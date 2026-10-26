@@ -97,9 +97,14 @@ const Menu = ({ state, actions }) => (
         onClick={() => actions.setTheme('synthwave')}
       />
       <SubMenuItem
-        name="Solarized Dark"
+        name="Solarized Truchet"
         checked={state.theme === 'solarized'}
         onClick={() => actions.setTheme('solarized')}
+      />
+      <SubMenuItem
+        name="Solarized Phosphor"
+        checked={state.theme === 'solarized-phosphor'}
+        onClick={() => actions.setTheme('solarized-phosphor')}
       />
       <SubMenuItem
         name="Matrix"

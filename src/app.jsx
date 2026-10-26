@@ -41,7 +41,7 @@ const levels = {
 
 const levelNames = Object.keys(levels)
 
-const themes = ['classic', 'synthwave', 'solarized', 'matrix', 'nord']
+const themes = ['classic', 'synthwave', 'solarized', 'solarized-phosphor', 'matrix', 'nord']
 
 const createGame = ({ level, width, height, mines }) => {
   const field = new Array(height)

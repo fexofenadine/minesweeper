@@ -258,6 +258,12 @@ export default {
         atlas ??= buildAtlas(glyphs, cell)
         draw()
       },
+      //one frame of rain, frozen
+      still: () => {
+        atlas ??= buildAtlas(glyphs, cell)
+        draw()
+        return true
+      },
     }
   },
 }

@@ -268,7 +268,7 @@ it('previews background settings live and only saves them on OK', () => {
 })
 
 it('has no background settings for themes without one', () => {
-  start({ theme: 'classic' })
+  start({ theme: 'synthwave' })
   wired.toggleBackgroundSettings()
   wired.peek()
   expect(current.backgroundSettings).toBe(null)

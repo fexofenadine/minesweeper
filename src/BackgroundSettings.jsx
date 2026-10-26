@@ -3,7 +3,7 @@ import s from './BackgroundSettings.module.css'
 import Overlay from './Overlay'
 import Dialog from './Dialog'
 import Button from './Button'
-import { backgrounds } from './backgrounds'
+import { backgrounds, optionsOf } from './backgrounds'
 
 //one control per option type, so new backgrounds only need to declare their options
 const Control = ({ option, value, onChange }) => {
@@ -55,7 +55,7 @@ const BackgroundSettings = ({ key, state, actions }) => {
     >
       <Dialog title={`${background.name} Settings`} onClose={actions.toggleBackgroundSettings}>
         <form class={s.root} autocomplete="off" onsubmit={actions.submitBackgroundSettings}>
-          {background.options.map((option) => (
+          {optionsOf(state.id).map((option) => (
             <label class={s.row}>
               <span class={s.name}>{option.label}:</span>
               <Control

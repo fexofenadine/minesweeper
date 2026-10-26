@@ -47,6 +47,16 @@ const palettes = {
 const BACKGROUND = '#2e3440'
 const FOREGROUND = '#d8dee9'
 
+const rgbCache = new Map()
+const rgbOf = (hex) => {
+  if (!rgbCache.has(hex))
+    rgbCache.set(
+      hex,
+      [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16)),
+    )
+  return rgbCache.get(hex)
+}
+
 const frand = (n) => Math.random() * n
 const random = (n) => Math.floor(Math.random() * n)
 const radians = (degrees) => (degrees * Math.PI) / 180
@@ -141,9 +151,23 @@ export default {
     //so it runs that many cycles per growth delay and restarts that much later
     let pace = 1
 
+    //while a still picture grows, points blend straight into its pixels like trans_point,
+    //which is far quicker than a canvas call per grain of sand
+    let pixelsOf = null
+
     const plot = (x, y, colour, alpha) => {
       if (x < 0 || x >= width || y < 0 || y >= height) return
-      context.globalAlpha = Math.min(1, alpha)
+      const a = Math.min(1, alpha)
+      if (pixelsOf) {
+        const data = pixelsOf.data
+        const i = (y * width + x) * 4
+        const [r, g, b] = rgbOf(colour)
+        data[i] += (r - data[i]) * a
+        data[i + 1] += (g - data[i + 1]) * a
+        data[i + 2] += (b - data[i + 2]) * a
+        return
+      }
+      context.globalAlpha = a
       context.fillStyle = colour
       context.fillRect(x, y, 1, 1)
     }
@@ -296,6 +320,7 @@ export default {
 
     //build_substrate and build_img: clear the picture and seed the first cracks
     const build = () => {
+      pixelsOf = null
       context.globalAlpha = 1
       context.fillStyle = BACKGROUND
       context.fillRect(0, 0, width, height)
@@ -329,6 +354,22 @@ export default {
           for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i])
           if (++cycles >= f.maxCycles * pace && f.maxCycles) build()
         }
+      },
+      //grow a well filled picture as fast as the page allows, a slice per frame, then stop
+      //3000 cycles looks finished without fast forwarding for long, and stops short of a restart
+      still: (now) => {
+        const target = Math.min(3000, (f.maxCycles || Infinity) * 0.95) * pace
+        if (cycles >= target) return true
+        pixelsOf ??= context.getImageData(0, 0, width, height)
+        while (cycles < target && performance.now() - now < 40) {
+          for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i])
+          cycles++
+        }
+        //show it growing, then hand the finished picture back to the canvas
+        context.putImageData(pixelsOf, 0, 0)
+        if (cycles < target) return false
+        pixelsOf = null
+        return true
       },
     }
   },
