@@ -1323,7 +1323,7 @@ var sources = /* #__PURE__ */ Object.assign({
 	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-BtrJ3RPa.js").then((m) => m["default"]), [], import.meta.url),
 	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"../app.jsx": () => __vitePreload(() => import("./app-CX1TIamD.js").then((m) => m["default"]), [], import.meta.url),
+	"../app.jsx": () => __vitePreload(() => import("./app-nchCqb_E.js").then((m) => m["default"]), [], import.meta.url),
 	"./hill.js": () => __vitePreload(() => import("./hill-z0PhJZqK.js").then((m) => m["default"]), [], import.meta.url),
 	"./index.js": () => __vitePreload(() => import("./backgrounds-y8fCa31h.js").then((m) => m["default"]), [], import.meta.url),
 	"./matrix.js": () => __vitePreload(() => import("./matrix-D_vYPxu0.js").then((m) => m["default"]), [], import.meta.url),
@@ -3242,17 +3242,14 @@ var actions = {
 		window.addEventListener("touchmove", move);
 		window.addEventListener("touchend", stop);
 		window.addEventListener("touchcancel", stop);
-		return {
-			hint: null,
-			game: {
-				...game,
-				pressed: true,
-				pressedX: x,
-				pressedY: y,
-				group: event.shiftKey || openable(game, x, y),
-				touch: true
-			}
-		};
+		return { game: {
+			...game,
+			pressed: true,
+			pressedX: x,
+			pressedY: y,
+			group: event.shiftKey || openable(game, x, y),
+			touch: true
+		} };
 	},
 	flag: () => ({ game, marks }) => {
 		const { pressedX, pressedY, field, flags } = game;
@@ -3268,13 +3265,16 @@ var actions = {
 		};
 		nextField[pressedY][pressedX] = nextCell;
 		const mines = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1);
-		return { game: {
-			...game,
-			field: nextField,
-			flags: mines,
-			pressedX: -1,
-			pressedY: -1
-		} };
+		return {
+			hint: null,
+			game: {
+				...game,
+				field: nextField,
+				flags: mines,
+				pressedX: -1,
+				pressedY: -1
+			}
+		};
 	},
 	down: ({ event, x, y }) => ({ game, marks }, actions) => {
 		if (game.touch || event.button > 2 || game.win || game.lose) return null;
@@ -3293,7 +3293,7 @@ var actions = {
 			flags = cell.flag === nextCell.flag ? flags : flags + (nextCell.flag ? -1 : 1);
 		}
 		return {
-			hint: null,
+			...field !== game.field && { hint: null },
 			game: {
 				...game,
 				field,
@@ -3401,8 +3401,9 @@ var actions = {
 			cancelAnimationFrame(game.raf);
 			if (!lose) actions.win();
 		}
+		const changed = left !== game.left || lose || begin;
 		return {
-			hint: chordHint,
+			...(chordHint || changed) && { hint: chordHint },
 			game: {
 				...game,
 				left,
