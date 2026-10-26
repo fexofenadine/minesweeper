@@ -159,7 +159,7 @@
     0 0 0 1px #36f9f6, 0 0 16px 5px rgba(54, 249, 246, 0.9), 0 0 48px 16px rgba(54, 249, 246, 0.5);
 }
 
-:root[data-theme='solarized'] {
+:root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) {
   color-scheme: dark;
   --ui-font: 'JetBrains Mono', monospace;
   --title-font: 'JetBrains Mono', monospace;
@@ -362,6 +362,11 @@ main::before {
   background: url(./background.jpg) 50% 50% / cover;
 }
 
+/*classic's optional animated sky and hill replace the photo when turned on*/
+:root[data-theme='classic'][data-background='animated'] main::before {
+  background: none;
+}
+
 /*background by neeqolah creative works on unsplash, with film grain and tape wobble*/
 :root[data-theme='synthwave'] main::before {
   top: -12px;
@@ -485,10 +490,16 @@ main::before {
 }
 
 /*code photo by chris ried on unsplash, muted under the solarized base*/
-:root[data-theme='solarized'] main::before {
+/*it is the static wallpaper for both solarized themes, shown when their background is not animated*/
+:root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) main::before {
   background:
     linear-gradient(rgba(0, 43, 54, 0.72), rgba(0, 43, 54, 0.72)),
     url(./solarized.jpg) 50% 50% / cover var(--desktop);
+}
+
+:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])[data-background='animated']
+  main::before {
+  background: none;
 }
 .Game_root {
   padding: 6px 5px 5px 6px;

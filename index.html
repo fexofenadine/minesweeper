@@ -32,6 +32,10 @@
       //apply the saved theme and window size before first paint
       try {
         document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
+        //animated backgrounds are the default except on classic, the script corrects this once it knows the settings
+        if (document.documentElement.dataset.theme !== 'classic') {
+          document.documentElement.dataset.background = 'animated'
+        }
         document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
       } catch {}
       //if the game fails to start, show why instead of an empty desktop
@@ -44,8 +48,8 @@
         document.body.append(note)
       })
     </script>
-    <script type="module" crossorigin src="./assets/app.js?v=817b6d54"></script>
-    <link rel="stylesheet" crossorigin href="./assets/app.css?v=cf652fcc">
+    <script type="module" crossorigin src="./assets/app.js?v=200b39be"></script>
+    <link rel="stylesheet" crossorigin href="./assets/app.css?v=2b4f9078">
   </head>
   <body>
     <div id="app">

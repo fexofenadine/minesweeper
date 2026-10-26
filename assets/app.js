@@ -515,6 +515,11 @@ var matrix_default = {
 				for (let n = 0; n < ticks; n++) strips.forEach((s) => tickStrip(s, glyphs.length));
 				atlas ??= buildAtlas(glyphs, cell);
 				draw();
+			},
+			still: () => {
+				atlas ??= buildAtlas(glyphs, cell);
+				draw();
+				return true;
 			}
 		};
 	}
@@ -523,7 +528,7 @@ var matrix_default = {
 //#region src/backgrounds/substrate.js
 var STEP = .42;
 var EMPTY = 10001;
-var palettes = {
+var palettes$1 = {
 	nord: [
 		"#8fbcbb",
 		"#88c0d0",
@@ -549,275 +554,1397 @@ var palettes = {
 		"#b48ead"
 	]
 };
-var BACKGROUND = "#2e3440";
+var BACKGROUND$2 = "#2e3440";
 var FOREGROUND = "#d8dee9";
+var rgbCache = /* @__PURE__ */ new Map();
+var rgbOf = (hex) => {
+	if (!rgbCache.has(hex)) rgbCache.set(hex, [
+		1,
+		3,
+		5
+	].map((i) => parseInt(hex.slice(i, i + 2), 16)));
+	return rgbCache.get(hex);
+};
 var frand = (n) => Math.random() * n;
-var random = (n) => Math.floor(Math.random() * n);
+var random$1 = (n) => Math.floor(Math.random() * n);
 var radians = (degrees) => degrees * Math.PI / 180;
+var substrate_default = {
+	name: "Substrate",
+	credit: "Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver",
+	ratio: (pixels) => pixels,
+	options: [
+		{
+			key: "growthDelay",
+			label: "Growth delay",
+			type: "range",
+			min: 0,
+			max: 50,
+			step: 1,
+			value: 18,
+			format: (v) => `${v} ms`
+		},
+		{
+			key: "initialCracks",
+			label: "Initial cracks",
+			type: "range",
+			min: 3,
+			max: 20,
+			step: 1,
+			value: 3
+		},
+		{
+			key: "maxCracks",
+			label: "Max cracks",
+			type: "range",
+			min: 11,
+			max: 300,
+			step: 1,
+			value: 100
+		},
+		{
+			key: "sandGrains",
+			label: "Sand grains",
+			type: "range",
+			min: 2,
+			max: 256,
+			step: 1,
+			value: 64
+		},
+		{
+			key: "circlePercent",
+			label: "Circular cracks",
+			type: "range",
+			min: 0,
+			max: 100,
+			step: 1,
+			value: 33,
+			format: (v) => `${v}%`
+		},
+		{
+			key: "maxCycles",
+			label: "Restart after",
+			type: "range",
+			min: 0,
+			max: 5e4,
+			step: 1e3,
+			value: 1e4,
+			format: (v) => v ? `${v} cycles` : "never"
+		},
+		{
+			key: "palette",
+			label: "Colours",
+			type: "select",
+			choices: [
+				["nord", "Frost and aurora"],
+				["frost", "Frost"],
+				["aurora", "Aurora"]
+			],
+			value: "nord"
+		},
+		{
+			key: "wireframe",
+			label: "Wireframe",
+			type: "toggle",
+			value: false
+		},
+		{
+			key: "seamless",
+			label: "Seamless",
+			type: "toggle",
+			value: false
+		}
+	],
+	create: (context, settings) => {
+		let f = settings;
+		let width = 0;
+		let height = 0;
+		let cgrid = /* @__PURE__ */ new Int32Array(0);
+		let cracks = [];
+		let cycles = 0;
+		let last = 0;
+		let pace = 1;
+		let pixelsOf = null;
+		const plot = (x, y, colour, alpha) => {
+			if (x < 0 || x >= width || y < 0 || y >= height) return;
+			const a = Math.min(1, alpha);
+			if (pixelsOf) {
+				const data = pixelsOf.data;
+				const i = (y * width + x) * 4;
+				const [r, g, b] = rgbOf(colour);
+				data[i] += (r - data[i]) * a;
+				data[i + 1] += (g - data[i + 1]) * a;
+				data[i + 2] += (b - data[i + 2]) * a;
+				return;
+			}
+			context.globalAlpha = a;
+			context.fillStyle = colour;
+			context.fillRect(x, y, 1, 1);
+		};
+		const startCrack = (cr) => {
+			let px = 0;
+			let py = 0;
+			let found = false;
+			let timeout = 0;
+			while (!found && timeout++ < 1e4) {
+				px = random$1(width);
+				py = random$1(height);
+				if (cgrid[py * width + px] < 1e4) found = true;
+			}
+			if (!found) {
+				px = Math.min(width - 1, Math.max(0, Math.trunc(cr.x)));
+				py = Math.min(height - 1, Math.max(0, Math.trunc(cr.y)));
+				cgrid[py * width + px] = cr.t;
+			}
+			let a = cgrid[py * width + px];
+			if (random$1(100) < 50) a -= 90 + (frand(4.1) - 2);
+			else a += 90 + (frand(4.1) - 2);
+			if (random$1(100) < f.circlePercent) {
+				cr.curved = true;
+				cr.degreesDrawn = 0;
+				let r = 10 + random$1(Math.floor((width + height) / 2));
+				if (random$1(100) < 50) r *= -1;
+				const radianInc = STEP / r;
+				cr.tInc = radianInc * 360 / 2 / Math.PI;
+				cr.ys = r * Math.sin(radianInc);
+				cr.xs = r * (1 - Math.cos(radianInc));
+			} else cr.curved = false;
+			cr.x = px + .61 * Math.cos(radians(a));
+			cr.y = py + .61 * Math.sin(radians(a));
+			cr.t = a;
+		};
+		const makeCrack = () => {
+			if (cracks.length >= f.maxCracks) return;
+			const colours = palettes$1[f.palette];
+			const cr = {
+				sandp: 0,
+				sandg: frand(.2) - .01,
+				sandcolor: colours[random$1(colours.length)],
+				curved: false,
+				degreesDrawn: 0,
+				x: random$1(width),
+				y: random$1(height),
+				t: random$1(360)
+			};
+			startCrack(cr);
+			cracks.push(cr);
+		};
+		const regionColor = (cr) => {
+			let rx = cr.x;
+			let ry = cr.y;
+			for (let steps = (width + height) * 4; steps > 0; steps--) {
+				rx += .81 * Math.sin(radians(cr.t));
+				ry -= .81 * Math.cos(radians(cr.t));
+				let cx = Math.trunc(rx);
+				let cy = Math.trunc(ry);
+				if (f.seamless) {
+					cx %= width;
+					cy %= height;
+				}
+				if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
+				if (cgrid[cy * width + cx] <= 1e4) break;
+			}
+			cr.sandg = Math.min(1, Math.max(0, cr.sandg + frand(.1) - .05));
+			const grains = f.sandGrains;
+			const w = cr.sandg / (grains - 1);
+			for (let i = 0; i < grains; i++) {
+				const s = Math.sin(cr.sandp + Math.sin(i * w));
+				let drawx = cr.x + (rx - cr.x) * s;
+				let drawy = cr.y + (ry - cr.y) * s;
+				if (f.seamless) {
+					drawx = (drawx + width) % width;
+					drawy = (drawy + height) % height;
+				}
+				plot(Math.trunc(drawx), Math.trunc(drawy), cr.sandcolor, .1 - i / (grains * 10));
+			}
+		};
+		const restartCrack = (cr) => {
+			startCrack(cr);
+			makeCrack();
+		};
+		const moveDrawCrack = (cr) => {
+			if (!cr.curved) {
+				cr.x += STEP * Math.cos(radians(cr.t));
+				cr.y += STEP * Math.sin(radians(cr.t));
+			} else {
+				cr.x += cr.ys * Math.cos(radians(cr.t));
+				cr.y += cr.ys * Math.sin(radians(cr.t));
+				cr.x += cr.xs * Math.cos(radians(cr.t) - Math.PI / 2);
+				cr.y += cr.xs * Math.sin(radians(cr.t) - Math.PI / 2);
+				cr.t += cr.tInc;
+				cr.degreesDrawn += Math.abs(cr.tInc);
+			}
+			if (f.seamless) {
+				cr.x = (cr.x + width) % width;
+				cr.y = (cr.y + height) % height;
+			}
+			let cx = Math.trunc(cr.x + frand(.66) - .33);
+			let cy = Math.trunc(cr.y + frand(.66) - .33);
+			if (f.seamless) {
+				cx %= width;
+				cy %= height;
+			}
+			if (cx < 0 || cx >= width || cy < 0 || cy >= height) {
+				cr.x = random$1(width);
+				cr.y = random$1(height);
+				cr.t = random$1(360);
+				restartCrack(cr);
+				return;
+			}
+			if (!f.wireframe) regionColor(cr);
+			plot(cx, cy, FOREGROUND, 1);
+			const here = cy * width + cx;
+			if (cr.curved && cr.degreesDrawn > 360) restartCrack(cr);
+			else if (cgrid[here] > 1e4 || Math.abs(cgrid[here] - cr.t) < 5) cgrid[here] = Math.trunc(cr.t);
+			else if (Math.abs(cgrid[here] - cr.t) > 2) restartCrack(cr);
+		};
+		const build = () => {
+			pixelsOf = null;
+			context.globalAlpha = 1;
+			context.fillStyle = BACKGROUND$2;
+			context.fillRect(0, 0, width, height);
+			cgrid.fill(EMPTY);
+			cracks = [];
+			cycles = 0;
+			for (let n = 0; n < f.initialCracks; n++) makeCrack();
+		};
+		return {
+			configure: (next) => {
+				f = next;
+				if (width) build();
+			},
+			resize: (w, h, pixels = 1) => {
+				width = w;
+				height = h;
+				pace = Math.max(1, Math.round(pixels * pixels));
+				cgrid = new Int32Array(w * h);
+				last = performance.now();
+				build();
+			},
+			frame: (now) => {
+				const delay = Math.max(1, f.growthDelay);
+				const due = Math.min(8, Math.floor((now - last) / delay));
+				if (!due) return;
+				last = now - delay > last + due * delay ? now : last + due * delay;
+				for (let n = 0; n < due * pace; n++) {
+					for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
+					if (++cycles >= f.maxCycles * pace && f.maxCycles) build();
+				}
+			},
+			still: (now) => {
+				const target = Math.min(3e3, (f.maxCycles || Infinity) * .95) * pace;
+				if (cycles >= target) return true;
+				pixelsOf ??= context.getImageData(0, 0, width, height);
+				while (cycles < target && performance.now() - now < 40) {
+					for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
+					cycles++;
+				}
+				context.putImageData(pixelsOf, 0, 0);
+				if (cycles < target) return false;
+				pixelsOf = null;
+				return true;
+			}
+		};
+	}
+};
+//#endregion
+//#region src/backgrounds/truchet.js
+var MAXRATIO = 2;
+var palettes = {
+	accents: [
+		"#b58900",
+		"#cb4b16",
+		"#dc322f",
+		"#d33682",
+		"#6c71c4",
+		"#268bd2",
+		"#2aa198",
+		"#859900"
+	],
+	cool: [
+		"#6c71c4",
+		"#268bd2",
+		"#2aa198",
+		"#859900"
+	],
+	warm: [
+		"#b58900",
+		"#cb4b16",
+		"#dc322f",
+		"#d33682"
+	],
+	base: [
+		"#586e75",
+		"#657b83",
+		"#839496",
+		"#93a1a1"
+	]
+};
+var BACKGROUND$1 = "#002b36";
+var random = (n) => Math.floor(Math.random() * n);
+var xarc = (context, x, y, w, h, a1, a2) => {
+	const rad = Math.PI / 11520;
+	context.moveTo(x + w / 2 + w / 2 * Math.cos(a1 * rad), y + h / 2 - h / 2 * Math.sin(a1 * rad));
+	context.ellipse(x + w / 2, y + h / 2, w / 2, h / 2, 0, -a1 * rad, -(a1 + a2) * rad, a2 > 0);
+};
+var line = (context, x1, y1, x2, y2) => {
+	context.moveTo(x1, y1);
+	context.lineTo(x2, y2);
+};
+var curve = (context, x, y, w, h, flip) => {
+	if (!flip) {
+		xarc(context, x - w / 2, y - h / 2, w, h, 0, -5760);
+		xarc(context, x + w / 2, y + h / 2, w, h, 11520, -5760);
+	} else {
+		xarc(context, x + w / 2, y - h / 2, w, h, 17280, -5760);
+		xarc(context, x - w / 2, y + h / 2, w, h, 0, 5760);
+	}
+};
+var angle = (context, x, y, w, h, flip) => {
+	if (!flip) {
+		line(context, x + w / 2, y, x + w, y + h / 2);
+		line(context, x, y + h / 2, x + w / 2, y + h);
+	} else {
+		line(context, x + w / 2, y, x, y + h / 2);
+		line(context, x + w, y + h / 2, x + w / 2, y + h);
+	}
+};
+var truchet_default = {
+	name: "Truchet",
+	credit: "Ported from Truchet by Adrian Likins, part of xscreensaver",
+	wallpaper: true,
+	ratio: (pixels) => pixels,
+	options: [
+		{
+			key: "minWidth",
+			label: "Smallest tile",
+			type: "range",
+			min: 12,
+			max: 256,
+			step: 4,
+			value: 40
+		},
+		{
+			key: "maxWidth",
+			label: "Largest tile",
+			type: "range",
+			min: 12,
+			max: 512,
+			step: 4,
+			value: 150
+		},
+		{
+			key: "minLineWidth",
+			label: "Thinnest line",
+			type: "range",
+			min: 1,
+			max: 48,
+			step: 1,
+			value: 2
+		},
+		{
+			key: "maxLineWidth",
+			label: "Thickest line",
+			type: "range",
+			min: 2,
+			max: 96,
+			step: 1,
+			value: 25
+		},
+		{
+			key: "curves",
+			label: "Curves",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "angles",
+			label: "Angles",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "square",
+			label: "Square tiles",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "erase",
+			label: "Erase each pattern",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "eraseCount",
+			label: "Layers before erasing",
+			type: "range",
+			min: 2,
+			max: 50,
+			step: 1,
+			value: 25
+		},
+		{
+			key: "scroll",
+			label: "Scroll",
+			type: "toggle",
+			value: true
+		},
+		{
+			key: "delay",
+			label: "Pattern delay",
+			type: "range",
+			min: .2,
+			max: 20,
+			step: .2,
+			value: 6,
+			format: (v) => `${v} s`
+		},
+		{
+			key: "animDelay",
+			label: "Scroll step delay",
+			type: "range",
+			min: 10,
+			max: 200,
+			step: 5,
+			value: 30,
+			format: (v) => `${v} ms`
+		},
+		{
+			key: "animStep",
+			label: "Scroll step size",
+			type: "range",
+			min: 1,
+			max: 9,
+			step: 1,
+			value: 1
+		},
+		{
+			key: "palette",
+			label: "Colours",
+			type: "select",
+			choices: [
+				["accents", "All accents"],
+				["cool", "Violet to green"],
+				["warm", "Yellow to magenta"],
+				["base", "Base tones"]
+			],
+			value: "accents"
+		},
+		{
+			key: "opacity",
+			label: "Line strength",
+			type: "range",
+			min: 10,
+			max: 100,
+			step: 5,
+			value: 45,
+			format: (v) => `${v}%`
+		}
+	],
+	create: (context, settings) => {
+		let f = settings;
+		let width = 0;
+		let height = 0;
+		let pixels = 1;
+		let overlap = 0;
+		let layers = [];
+		let count = 0;
+		let scrolling = 0;
+		let last = 0;
+		let wait = 0;
+		const pattern = () => {
+			let linewidth = random(f.maxLineWidth);
+			if (linewidth < f.minLineWidth) linewidth = f.minLineWidth;
+			if (linewidth % 2) linewidth++;
+			let w = random(f.maxWidth);
+			let h = random(f.maxWidth);
+			if (w === 0 || h === 0) w = h = f.maxWidth;
+			if (h < f.minWidth) h = f.minWidth;
+			if (w < f.minWidth) w = f.minWidth;
+			if (f.square) h = w;
+			if (Math.floor(w / h) > MAXRATIO) h = w;
+			if (Math.floor(h / w) > MAXRATIO) w = h;
+			if (linewidth >= h / 5) linewidth = Math.floor(h / 5);
+			linewidth = Math.max(1, linewidth);
+			if (f.erase || count >= f.eraseCount) {
+				layers = [];
+				count = 0;
+			}
+			overlap = f.scroll ? 400 * pixels : 0;
+			const kind = f.curves && f.angles ? random(2) ? "curve" : "angle" : f.curves || !f.angles ? "curve" : "angle";
+			const colours = palettes[f.palette];
+			const cols = Math.ceil((width + overlap) / (w * pixels)) + 1;
+			const rows = Math.ceil((height + overlap) / (h * pixels)) + 1;
+			layers.push({
+				kind,
+				w: w * pixels,
+				h: h * pixels,
+				linewidth: linewidth * pixels,
+				colour: colours[random(colours.length)],
+				cols,
+				tiles: Uint8Array.from({ length: cols * rows }, () => random(2))
+			});
+			count++;
+			if (f.scroll) scrolling = Math.floor(overlap / pixels / 4 / f.animStep) * 4;
+		};
+		const offsetOf = () => {
+			if (!f.scroll) return [0, 0];
+			const offset = overlap / 2;
+			const scroll = overlap / pixels / 4;
+			const legs = Math.max(1, Math.floor(scroll / f.animStep));
+			const direction = Math.floor(scrolling / legs);
+			const progress = scrolling % legs * f.animStep;
+			let x = direction & 1 ? progress - scroll : -progress;
+			let y = direction & 1 ? progress : progress - scroll;
+			if (direction & 2) {
+				x = -x;
+				y = -y;
+			}
+			return [x * pixels + offset, y * pixels + offset];
+		};
+		const draw = () => {
+			const [ox, oy] = offsetOf();
+			context.globalAlpha = 1;
+			context.fillStyle = BACKGROUND$1;
+			context.fillRect(0, 0, width, height);
+			context.globalAlpha = f.opacity / 100;
+			context.lineCap = "round";
+			context.lineJoin = "round";
+			for (const layer of layers) {
+				const { w, h, cols, tiles } = layer;
+				const tile = layer.kind === "curve" ? curve : angle;
+				context.strokeStyle = layer.colour;
+				context.lineWidth = layer.linewidth;
+				context.beginPath();
+				const x0 = Math.max(0, Math.floor(ox / w) - 1);
+				const y0 = Math.max(0, Math.floor(oy / h) - 1);
+				const x1 = Math.min(cols, Math.ceil((ox + width) / w) + 1);
+				const y1 = Math.min(tiles.length / cols, Math.ceil((oy + height) / h) + 1);
+				for (let cy = y0; cy < y1; cy++) for (let cx = x0; cx < x1; cx++) tile(context, cx * w - ox, cy * h - oy, w, h, tiles[cy * cols + cx]);
+				context.stroke();
+			}
+			context.globalAlpha = 1;
+		};
+		const restart = () => {
+			layers = [];
+			count = 0;
+			scrolling = 0;
+			pattern();
+			wait = f.scroll ? f.animDelay : f.delay * 1e3;
+			draw();
+		};
+		return {
+			configure: (next) => {
+				f = next;
+				if (width) restart();
+			},
+			resize: (w, h, scale = 1) => {
+				width = w;
+				height = h;
+				pixels = scale;
+				last = performance.now();
+				restart();
+			},
+			frame: (now) => {
+				if (now - last < wait) return;
+				last = now;
+				if (scrolling) {
+					scrolling--;
+					wait = f.animDelay;
+				} else {
+					pattern();
+					wait = f.scroll ? f.animDelay : f.delay * 1e3;
+				}
+				draw();
+			},
+			still: () => {
+				scrolling = 0;
+				draw();
+				return true;
+			}
+		};
+	}
+};
+//#endregion
+//#region src/backgrounds/font6x10.js
+var bytes = Uint8Array.from(atob("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"), (c) => c.charCodeAt(0));
+var pixel = (c, x, y) => {
+	const bit = c * 7 + x;
+	return bytes[y * 224 + (bit >> 3)] >> 7 - (bit & 7) & 1;
+};
+//#endregion
+//#region \0vite/preload-helper.js
+var scriptRel = /* @__PURE__ */ (function detectScriptRel() {
+	const relList = typeof document !== "undefined" && document.createElement("link").relList;
+	return relList && relList.supports && relList.supports("modulepreload") ? "modulepreload" : "preload";
+})();
+var assetsURL = function(dep, importerUrl) {
+	return new URL(dep, importerUrl).href;
+};
+var seen = {};
+var isCssPreloadUrl = function isCssPreloadUrl(url) {
+	return url.pathname.endsWith(".css");
+};
+var preloadOnce = function preloadOnce(seen, href, preload) {
+	if (href in seen) return seen[href];
+	const promise = preload();
+	if (!promise) {
+		seen[href] = void 0;
+		return;
+	}
+	const preloadPromise = promise.then(() => {
+		seen[href] = void 0;
+	}, (err) => {
+		seen[href] = void 0;
+		throw err;
+	});
+	seen[href] = preloadPromise;
+	return preloadPromise;
+};
+var __vitePreload = function preload(baseModule, deps, importerUrl) {
+	let promise = Promise.resolve();
+	if (deps && deps.length > 0) {
+		let preloadedHrefs;
+		const cspNonceMeta = document.querySelector("meta[property=csp-nonce]");
+		const cspNonce = cspNonceMeta?.nonce || cspNonceMeta?.getAttribute("nonce");
+		function allSettled(promises) {
+			return Promise.all(promises.map((p) => Promise.resolve(p).then((value) => ({
+				status: "fulfilled",
+				value
+			}), (reason) => ({
+				status: "rejected",
+				reason
+			}))));
+		}
+		function importMetaResolve(specifier) {
+			if (import.meta.resolve) return new URL(import.meta.resolve(specifier));
+			return new URL(
+				specifier,
+				/** #__KEEP__ */
+				import.meta.url
+			);
+		}
+		promise = allSettled(deps.map((depString) => {
+			depString = assetsURL(depString, importerUrl);
+			const dep = importMetaResolve(depString);
+			const isCss = isCssPreloadUrl(dep);
+			return preloadOnce(seen, dep.href, () => {
+				if (preloadedHrefs === void 0) {
+					preloadedHrefs = {
+						all: /* @__PURE__ */ new Set(),
+						styles: /* @__PURE__ */ new Set()
+					};
+					const links = document.getElementsByTagName("link");
+					for (let i = links.length - 1; i >= 0; i--) {
+						const link = links[i];
+						preloadedHrefs.all.add(link.href);
+						if (link.rel === "stylesheet") preloadedHrefs.styles.add(link.href);
+					}
+				}
+				if ((isCss ? preloadedHrefs.styles : preloadedHrefs.all).has(dep.href)) return;
+				const link = document.createElement("link");
+				link.rel = isCss ? "stylesheet" : scriptRel;
+				if (!isCss) link.as = "script";
+				link.crossOrigin = "";
+				link.href = dep.href;
+				if (cspNonce) link.setAttribute("nonce", cspNonce);
+				document.head.appendChild(link);
+				if (isCss) return new Promise((res, rej) => {
+					link.addEventListener("load", res);
+					link.addEventListener("error", () => rej(/* @__PURE__ */ new Error(`Unable to preload CSS for ${dep}`)));
+				});
+			});
+		}).filter((p) => p !== void 0));
+	}
+	function handlePreloadError(err) {
+		const e = new Event("vite:preloadError", { cancelable: true });
+		e.payload = err;
+		window.dispatchEvent(e);
+		if (!e.defaultPrevented) throw err;
+	}
+	return promise.then((res) => {
+		for (const item of res || []) {
+			if (item.status !== "rejected") continue;
+			handlePreloadError(item.reason);
+		}
+		return baseModule().catch(handlePreloadError);
+	});
+};
+//#endregion
+//#region src/backgrounds/phosphor.js
+var BLANK = 0;
+var FLARE = 1;
+var NORMAL = 2;
+var FADE = 3;
+var STATE_MAX = FADE;
+var CHAR_WIDTH = 6;
+var CHAR_HEIGHT = 10;
+var BACKGROUND = "#002b36";
+var WHITE = "#fdf6e3";
+var colours = {
+	base1: "#93a1a1",
+	cyan: "#2aa198",
+	green: "#859900",
+	yellow: "#b58900",
+	blue: "#268bd2",
+	violet: "#6c71c4"
+};
+var rgb = (hex) => [
+	1,
+	3,
+	5
+].map((i) => parseInt(hex.slice(i, i + 2), 16));
+var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+var brightness = ([r, g, b]) => Math.max(r, g, b);
+var sources = /* #__PURE__ */ Object.assign({
+	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-D3giHqNw.js").then((m) => m["default"]), [], import.meta.url),
+	"../BestTime.jsx": () => __vitePreload(() => import("./BestTime-Ce22rTOt.js").then((m) => m["default"]), [], import.meta.url),
+	"../Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
+	"../Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
+	"../CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
+	"../Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
+	"../Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
+	"../Game.jsx": () => __vitePreload(() => import("./Game-TTccPjEd.js").then((m) => m["default"]), [], import.meta.url),
+	"../Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
+	"../Menu.jsx": () => __vitePreload(() => import("./Menu-CSkFSVlA.js").then((m) => m["default"]), [], import.meta.url),
+	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-BtrJ3RPa.js").then((m) => m["default"]), [], import.meta.url),
+	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
+	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
+	"../app.jsx": () => __vitePreload(() => import("./app-CX1TIamD.js").then((m) => m["default"]), [], import.meta.url),
+	"./hill.js": () => __vitePreload(() => import("./hill-z0PhJZqK.js").then((m) => m["default"]), [], import.meta.url),
+	"./index.js": () => __vitePreload(() => import("./backgrounds-Bpjqmyq2.js").then((m) => m["default"]), [], import.meta.url),
+	"./matrix.js": () => __vitePreload(() => import("./matrix-QNhpOqfS.js").then((m) => m["default"]), [], import.meta.url),
+	"./substrate.js": () => __vitePreload(() => import("./substrate-Yi5Qozwe.js").then((m) => m["default"]), [], import.meta.url),
+	"./truchet.js": () => __vitePreload(() => import("./truchet-BRKY3zWa.js").then((m) => m["default"]), [], import.meta.url),
+	"../hint.js": () => __vitePreload(() => import("./hint-Sn72Q7dE.js").then((m) => m["default"]), [], import.meta.url),
+	"../index.js": () => __vitePreload(() => import("./src-BXMJwuxq.js").then((m) => m["default"]), [], import.meta.url),
+	"../mines.js": () => __vitePreload(() => import("./mines-fdYoz0O3.js").then((m) => m["default"]), [], import.meta.url),
+	"../storage.js": () => __vitePreload(() => import("./storage-BFgRqbmn.js").then((m) => m["default"]), [], import.meta.url),
+	"../zoom.js": () => __vitePreload(() => import("./zoom-BEqOxbr8.js").then((m) => m["default"]), [], import.meta.url)
+});
+var texts = null;
+var loadTexts = () => texts ??= Promise.all(Object.entries(sources).map(async ([path, load]) => ({
+	name: `src/${path.replace(/^\.\.\//, "").replace(/^\.\//, "backgrounds/")}`,
+	text: await load()
+})));
+var runCache = /* @__PURE__ */ new Map();
+var runsOf = (c, inverted) => {
+	const key = c * 2 + (inverted ? 1 : 0);
+	if (runCache.has(key)) return runCache.get(key);
+	const runs = [];
+	for (let y = 0; y < 10; y++) for (let x1 = 0; x1 < 7; x1++) {
+		if (!(pixel(c, x1, y) ^ inverted)) continue;
+		let x2 = x1;
+		while (x2 + 1 < 7 && pixel(c, x2 + 1, y) ^ inverted) x2++;
+		runs.push([
+			y,
+			x1,
+			x2
+		]);
+		x1 = x2;
+	}
+	runCache.set(key, runs);
+	return runs;
+};
+var phosphor_default = {
+	name: "Phosphor",
+	credit: "Ported from Phosphor by Jamie Zawinski, part of xscreensaver",
+	wallpaper: true,
+	ratio: (pixels) => pixels,
+	options: [
+		{
+			key: "scale",
+			label: "Scale",
+			type: "range",
+			min: 2,
+			max: 12,
+			step: 1,
+			value: 6
+		},
+		{
+			key: "ticks",
+			label: "Fade",
+			type: "range",
+			min: 4,
+			max: 40,
+			step: 1,
+			value: 20
+		},
+		{
+			key: "delay",
+			label: "Typing delay",
+			type: "range",
+			min: 10,
+			max: 200,
+			step: 5,
+			value: 50,
+			format: (v) => `${v} ms`
+		},
+		{
+			key: "cursor",
+			label: "Cursor blink",
+			type: "range",
+			min: 100,
+			max: 1e3,
+			step: 1,
+			value: 333,
+			format: (v) => `${v} ms`
+		},
+		{
+			key: "colour",
+			label: "Colour",
+			type: "select",
+			choices: [
+				["cyan", "Cyan"],
+				["base1", "Grey"],
+				["green", "Green"],
+				["yellow", "Yellow"],
+				["blue", "Blue"],
+				["violet", "Violet"]
+			],
+			value: "cyan"
+		},
+		{
+			key: "brightness",
+			label: "Brightness",
+			type: "range",
+			min: 10,
+			max: 100,
+			step: 5,
+			value: 55,
+			format: (v) => `${v}%`
+		}
+	],
+	create: (context, settings) => {
+		let f = settings;
+		let width = 0;
+		let height = 0;
+		let pixels = 1;
+		let scale = 6;
+		let gridWidth = 0;
+		let gridHeight = 0;
+		let ticks = 0;
+		let gcs = [];
+		let chars = /* @__PURE__ */ new Uint8Array(0);
+		let states = /* @__PURE__ */ new Uint8Array(0);
+		let changed = /* @__PURE__ */ new Uint8Array(0);
+		let tty = /* @__PURE__ */ new Uint8Array(0);
+		let x = 0;
+		let y = 0;
+		let cursorX = 0;
+		let cursorY = 0;
+		let cursorOn = true;
+		let cursorAt = 0;
+		let queue = "$ ";
+		let last = 0;
+		const colour = () => {
+			const bg = rgb(BACKGROUND);
+			const dim = (hex) => rgb(hex).map((ch, i) => bg[i] + (ch - bg[i]) * f.brightness / 100);
+			const fg = dim(colours[f.colour]);
+			ticks = STATE_MAX + f.ticks;
+			const ncolors = Math.max(1, ticks - 3);
+			const start = fg.map((ch, i) => (ch * 100 + bg[i] * 156) / 256);
+			const ramp = Array.from({ length: ncolors }, (_, i) => css(start.map((ch, j) => ch + (bg[j] - ch) * i / ncolors)));
+			ticks = ncolors + STATE_MAX;
+			gcs = [
+				BACKGROUND,
+				css(brightness(bg) <= brightness(fg) ? dim(WHITE) : fg),
+				css(fg),
+				...ramp
+			];
+		};
+		const drawCell = (cx, cy) => {
+			const i = cy * gridWidth + cx;
+			let st = states[i];
+			let c = chars[i];
+			let inverted = false;
+			const cursor = cx === cursorX && cy === cursorY;
+			if (cursor) {
+				if (cursorOn) inverted = true;
+				if (st >= FADE) c = 32;
+				if (st === BLANK || st >= FADE) st = NORMAL;
+			}
+			const w = CHAR_WIDTH * scale;
+			const h = CHAR_HEIGHT * scale;
+			const tx = cx * w;
+			const ty = cy * h;
+			context.fillStyle = BACKGROUND;
+			context.fillRect(tx, ty, w, h);
+			const runs = runsOf(c, inverted);
+			if (!runs.length || states[i] === BLANK && !cursor) return;
+			const strokeRuns = (lineWidth, style) => {
+				context.lineCap = "round";
+				context.lineWidth = lineWidth;
+				context.strokeStyle = style;
+				context.beginPath();
+				for (const [row, x1, x2] of runs) {
+					context.moveTo(tx + x1 * scale + scale / 2, ty + row * scale);
+					context.lineTo(tx + x2 * scale + scale / 2, ty + row * scale);
+				}
+				context.stroke();
+			};
+			context.save();
+			context.beginPath();
+			context.rect(tx, ty, w, h);
+			context.clip();
+			const outer = Math.round(scale * 1.3) === scale ? scale + 1 : Math.round(scale * 1.3);
+			const dim = st + 2 < ticks ? gcs[st + 2] : null;
+			strokeRuns(outer, dim || gcs[st]);
+			if (dim) strokeRuns(Math.max(1, Math.min(scale - 1, Math.round(scale * .8))), gcs[st]);
+			context.restore();
+		};
+		const update = () => {
+			for (let i = 0; i < changed.length; i++) {
+				if (!changed[i]) continue;
+				drawCell(i % gridWidth, Math.floor(i / gridWidth));
+				changed[i] = 0;
+			}
+		};
+		const decay = () => {
+			for (let i = 0; i < states.length; i++) if (states[i] === FLARE) {
+				states[i] = NORMAL;
+				changed[i] = 1;
+			} else if (states[i] >= FADE) {
+				states[i]++;
+				if (states[i] >= ticks) {
+					states[i] = BLANK;
+					chars[i] = 32;
+				}
+				changed[i] = 1;
+			}
+		};
+		const newline = () => {
+			x = 0;
+			if (++y < gridHeight) return;
+			y = gridHeight - 1;
+			tty.copyWithin(0, gridWidth);
+			tty.fill(32, (gridHeight - 1) * gridWidth);
+		};
+		const ttyPrint = (code) => {
+			if (code === 10) return newline();
+			if (code === 13) return x = 0;
+			if (code === 9) {
+				do
+					ttyPrint(32);
+				while (x % 8 && x < gridWidth);
+				return;
+			}
+			if (code < 32) return;
+			if (x >= gridWidth) newline();
+			tty[y * gridWidth + x++] = code > 255 ? 63 : code;
+		};
+		const printChar = (code) => {
+			ttyPrint(code);
+			for (let i = 0; i < tty.length; i++) if (!!runsOf(chars[i], false).length && tty[i] === 32) {
+				if (states[i] === FLARE || states[i] === NORMAL) states[i] = FADE;
+				changed[i] = 1;
+			} else if (chars[i] !== tty[i] || states[i] >= FADE) {
+				states[i] = NORMAL;
+				changed[i] = 1;
+				chars[i] = tty[i];
+			}
+			const cx = Math.min(x, gridWidth - 1);
+			if (cursorX !== cx || cursorY !== y) {
+				changed[cursorY * gridWidth + cursorX] = 1;
+				const next = y * gridWidth + cx;
+				if (states[next] >= FADE) chars[next] = 32;
+				states[next] = FLARE;
+				changed[next] = 1;
+				cursorX = cx;
+				cursorY = y;
+				cursorOn = true;
+				cursorAt = performance.now() + 2 * f.cursor;
+			}
+		};
+		const refill = () => {
+			loadTexts().then((files) => {
+				if (queue.length > 2) return;
+				const { name, text } = files[Math.floor(Math.random() * files.length)];
+				queue += `cat ${name}\n${text.replace(/\r\n/g, "\n")}\n$ `;
+			});
+		};
+		const build = () => {
+			scale = f.scale * pixels;
+			gridWidth = Math.max(1, Math.floor(width / (CHAR_WIDTH * scale)));
+			gridHeight = Math.max(1, Math.floor(height / (CHAR_HEIGHT * scale)));
+			const size = gridWidth * gridHeight;
+			chars = new Uint8Array(size).fill(32);
+			states = new Uint8Array(size);
+			changed = new Uint8Array(size);
+			tty = new Uint8Array(size).fill(32);
+			x = y = cursorX = cursorY = 0;
+			colour();
+			context.globalAlpha = 1;
+			context.fillStyle = BACKGROUND;
+			context.fillRect(0, 0, width, height);
+			changed[0] = 1;
+		};
+		return {
+			configure: (next) => {
+				f = next;
+				if (width) build();
+			},
+			resize: (w, h, scale = 1) => {
+				width = w;
+				height = h;
+				pixels = scale;
+				last = performance.now();
+				build();
+			},
+			frame: (now) => {
+				if (now >= cursorAt) {
+					cursorOn = !cursorOn;
+					cursorAt = now + (cursorOn ? 2 : 1) * f.cursor;
+					changed[cursorY * gridWidth + cursorX] = 1;
+				}
+				const due = Math.min(8, Math.floor((now - last) / f.delay));
+				for (let n = 0; n < due; n++) {
+					update();
+					decay();
+					if (queue.length < 2) refill();
+					if (queue) {
+						printChar(queue.charCodeAt(0));
+						queue = queue.slice(1);
+					}
+				}
+				if (due) last = now - (now - last) % f.delay;
+				update();
+			}
+		};
+	}
+};
+//#endregion
+//#region src/backgrounds/hill.webp
+var hill_default$1 = new URL("hill.webp", import.meta.url).href;
+//#endregion
+//#region src/backgrounds/ridge.json
+var ridge_default = [
+	[0, .0057],
+	[.0208, .0069],
+	[.0417, .0082],
+	[.0625, .0095],
+	[.0834, .0108],
+	[.1042, .0121],
+	[.1251, .0133],
+	[.1459, .0144],
+	[.1667, .0155],
+	[.1876, .0164],
+	[.2084, .0172],
+	[.2293, .0179],
+	[.2501, .0185],
+	[.2709, .019],
+	[.2918, .0194],
+	[.3126, .0197],
+	[.3335, .02],
+	[.3543, .0202],
+	[.3752, .0205],
+	[.396, .0207],
+	[.4168, .021],
+	[.4377, .0213],
+	[.4585, .0217],
+	[.4794, .0222],
+	[.5002, .0229],
+	[.5211, .0237],
+	[.5419, .0247],
+	[.5627, .0259],
+	[.5836, .0272],
+	[.6044, .0288],
+	[.6253, .0307],
+	[.6461, .0327],
+	[.6669, .035],
+	[.6878, .0375],
+	[.7086, .0403],
+	[.7295, .0432],
+	[.7503, .0464],
+	[.7712, .0497],
+	[.792, .0531],
+	[.8128, .0566],
+	[.8337, .0601],
+	[.8545, .0636],
+	[.8754, .067],
+	[.8962, .0703],
+	[.917, .0733],
+	[.9379, .0759],
+	[.9587, .0781],
+	[.9796, .0797],
+	[1, .0806]
+];
+//#endregion
+//#region src/backgrounds/hill.js
+var HILL_WIDTH = 2400;
+var HILL_HEIGHT = 851;
+var RIDGE = .53;
+var sky = [
+	[0, "#4279ee"],
+	[.2, "#3d76ee"],
+	[.3, "#4e84f1"],
+	[.42, "#84a8f2"],
+	[.56, "#96b2f2"]
+];
+var hash = (x, y, seed) => {
+	const n = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453;
+	return n - Math.floor(n);
+};
+var smooth = (t) => t * t * (3 - 2 * t);
+var noise = (x, y, seed) => {
+	const xi = Math.floor(x);
+	const yi = Math.floor(y);
+	const u = smooth(x - xi);
+	const v = smooth(y - yi);
+	const a = hash(xi, yi, seed);
+	const b = hash(xi + 1, yi, seed);
+	const c = hash(xi, yi + 1, seed);
+	const d = hash(xi + 1, yi + 1, seed);
+	return a + (b - a) * u + (c - a) * v + (a - b - c + d) * u * v;
+};
+var fbm = (x, y, seed) => {
+	let sum = 0;
+	let amp = .5;
+	for (let octave = 0; octave < 5; octave++) {
+		sum += amp * noise(x, y, seed + octave * 13);
+		x *= 2.03;
+		y *= 2.03;
+		amp /= 2;
+	}
+	return sum;
+};
+var SPRITE_WIDTH = 384;
+var SPRITE_HEIGHT = 128;
+var makeCloud = (seed, kind) => {
+	const canvas = document.createElement("canvas");
+	canvas.width = SPRITE_WIDTH;
+	canvas.height = SPRITE_HEIGHT;
+	const context = canvas.getContext("2d");
+	if (!context) return null;
+	const image = context.createImageData(SPRITE_WIDTH, SPRITE_HEIGHT);
+	for (let y = 0; y < SPRITE_HEIGHT; y++) for (let x = 0; x < SPRITE_WIDTH; x++) {
+		const dx = x / SPRITE_WIDTH * 2 - 1;
+		const dy = y / SPRITE_HEIGHT * 2 - 1;
+		const i = (y * SPRITE_WIDTH + x) * 4;
+		let alpha;
+		let shade;
+		if (kind === "cirrus") {
+			const falloff = Math.max(0, 1 - dx * dx - dy * dy * 2);
+			const n = fbm(x / SPRITE_WIDTH * 2.5, y / SPRITE_HEIGHT * 9, seed);
+			alpha = Math.min(1, Math.max(0, (n - .42) * 3)) * falloff;
+			shade = 252;
+		} else {
+			const falloff = Math.max(0, 1 - dx * dx - dy * dy * (dy > 0 ? 4 : 1.1));
+			const n = fbm(x / SPRITE_WIDTH * 4, y / SPRITE_HEIGHT * 2.6, seed);
+			alpha = Math.min(1, Math.max(0, (n * falloff - .14) * 5));
+			shade = 255 - 55 * Math.max(0, dy + .15) * Math.min(1, alpha * 1.5);
+		}
+		image.data[i] = shade - 10;
+		image.data[i + 1] = shade - 5;
+		image.data[i + 2] = shade;
+		image.data[i + 3] = alpha * 255;
+	}
+	context.putImageData(image, 0, 0);
+	return canvas;
+};
+var kinds = [
+	"cumulus",
+	"cumulus",
+	"cumulus",
+	"cumulus",
+	"cirrus",
+	"cirrus"
+];
+var hillLayout = (width, height) => {
+	const scale = Math.max(width / HILL_WIDTH, height * .47 / HILL_HEIGHT);
+	const w = HILL_WIDTH * scale;
+	return {
+		x: (width - w) / 2,
+		y: height * RIDGE,
+		w,
+		h: HILL_HEIGHT * scale
+	};
+};
 //#endregion
 //#region src/backgrounds/index.js
 var backgrounds = {
 	matrix: matrix_default,
-	substrate: {
-		name: "Substrate",
-		credit: "Ported from Substrate by J. Tarbell and Mike Kershaw, part of xscreensaver",
+	substrate: substrate_default,
+	truchet: truchet_default,
+	phosphor: phosphor_default,
+	hill: {
+		name: "Hill",
+		credit: "Hill from a CC0 photo of Cattle Hill, Roedean by Hassocks5489, colour matched to Bliss, under a sky drawn live",
+		wallpaper: true,
+		animated: false,
 		ratio: (pixels) => pixels,
 		options: [
 			{
-				key: "growthDelay",
-				label: "Growth delay",
+				key: "wind",
+				label: "Wind speed",
 				type: "range",
-				min: 0,
-				max: 50,
-				step: 1,
-				value: 18,
-				format: (v) => `${v} ms`
+				min: .25,
+				max: 4,
+				step: .25,
+				value: 1,
+				format: (v) => `${v}×`
 			},
 			{
-				key: "initialCracks",
-				label: "Initial cracks",
-				type: "range",
-				min: 3,
-				max: 20,
-				step: 1,
-				value: 3
-			},
-			{
-				key: "maxCracks",
-				label: "Max cracks",
-				type: "range",
-				min: 11,
-				max: 300,
-				step: 1,
-				value: 100
-			},
-			{
-				key: "sandGrains",
-				label: "Sand grains",
-				type: "range",
-				min: 2,
-				max: 256,
-				step: 1,
-				value: 64
-			},
-			{
-				key: "circlePercent",
-				label: "Circular cracks",
+				key: "cover",
+				label: "Cloud cover",
 				type: "range",
 				min: 0,
 				max: 100,
-				step: 1,
-				value: 33,
+				step: 5,
+				value: 35,
 				format: (v) => `${v}%`
 			},
 			{
-				key: "maxCycles",
-				label: "Restart after",
-				type: "range",
-				min: 0,
-				max: 5e4,
-				step: 1e3,
-				value: 1e4,
-				format: (v) => v ? `${v} cycles` : "never"
-			},
-			{
-				key: "palette",
-				label: "Colours",
-				type: "select",
-				choices: [
-					["nord", "Frost and aurora"],
-					["frost", "Frost"],
-					["aurora", "Aurora"]
-				],
-				value: "nord"
-			},
-			{
-				key: "wireframe",
-				label: "Wireframe",
+				key: "shadows",
+				label: "Cloud shadows",
 				type: "toggle",
-				value: false
-			},
-			{
-				key: "seamless",
-				label: "Seamless",
-				type: "toggle",
-				value: false
+				value: true
 			}
 		],
 		create: (context, settings) => {
 			let f = settings;
 			let width = 0;
 			let height = 0;
-			let cgrid = /* @__PURE__ */ new Int32Array(0);
-			let cracks = [];
-			let cycles = 0;
 			let last = 0;
-			let pace = 1;
-			const plot = (x, y, colour, alpha) => {
-				if (x < 0 || x >= width || y < 0 || y >= height) return;
-				context.globalAlpha = Math.min(1, alpha);
-				context.fillStyle = colour;
-				context.fillRect(x, y, 1, 1);
-			};
-			const startCrack = (cr) => {
-				let px = 0;
-				let py = 0;
-				let found = false;
-				let timeout = 0;
-				while (!found && timeout++ < 1e4) {
-					px = random(width);
-					py = random(height);
-					if (cgrid[py * width + px] < 1e4) found = true;
+			const hill = new Image();
+			hill.src = hill_default$1;
+			let shape = null;
+			const sprites = [];
+			let clouds = [];
+			const layers = [
+				{
+					top: .38,
+					bottom: .47,
+					size: .35,
+					alpha: .95,
+					speed: 3,
+					kind: "cumulus"
+				},
+				{
+					top: .15,
+					bottom: .32,
+					size: .7,
+					alpha: .95,
+					speed: 7,
+					kind: "cumulus"
+				},
+				{
+					top: 0,
+					bottom: .14,
+					size: 1.6,
+					alpha: .6,
+					speed: 10,
+					kind: "cirrus"
 				}
-				if (!found) {
-					px = Math.min(width - 1, Math.max(0, Math.trunc(cr.x)));
-					py = Math.min(height - 1, Math.max(0, Math.trunc(cr.y)));
-					cgrid[py * width + px] = cr.t;
-				}
-				let a = cgrid[py * width + px];
-				if (random(100) < 50) a -= 90 + (frand(4.1) - 2);
-				else a += 90 + (frand(4.1) - 2);
-				if (random(100) < f.circlePercent) {
-					cr.curved = true;
-					cr.degreesDrawn = 0;
-					let r = 10 + random(Math.floor((width + height) / 2));
-					if (random(100) < 50) r *= -1;
-					const radianInc = STEP / r;
-					cr.tInc = radianInc * 360 / 2 / Math.PI;
-					cr.ys = r * Math.sin(radianInc);
-					cr.xs = r * (1 - Math.cos(radianInc));
-				} else cr.curved = false;
-				cr.x = px + .61 * Math.cos(radians(a));
-				cr.y = py + .61 * Math.sin(radians(a));
-				cr.t = a;
+			];
+			const spriteOf = (cloud) => {
+				const choices = sprites.filter((sprite, i) => sprite && kinds[i] === cloud.layer.kind);
+				return choices[cloud.sprite % Math.max(1, choices.length)];
 			};
-			const makeCrack = () => {
-				if (cracks.length >= f.maxCracks) return;
-				const colours = palettes[f.palette];
-				const cr = {
-					sandp: 0,
-					sandg: frand(.2) - .01,
-					sandcolor: colours[random(colours.length)],
-					curved: false,
-					degreesDrawn: 0,
-					x: random(width),
-					y: random(height),
-					t: random(360)
+			const scatter = () => {
+				const count = Math.round(f.cover / 100 * 18);
+				clouds = Array.from({ length: count }, (_, i) => {
+					const layer = layers[i % layers.length];
+					return {
+						layer,
+						sprite: i,
+						x: Math.random(),
+						y: layer.top + Math.random() * (layer.bottom - layer.top),
+						stretch: .7 + Math.random() * .8
+					};
+				});
+			};
+			const outline = () => {
+				const { x, y, w, h } = hillLayout(width, height);
+				const path = new Path2D();
+				path.moveTo(x, height);
+				for (const [px, py] of ridge_default) path.lineTo(x + px * w, y + py * h);
+				path.lineTo(x + w, height);
+				path.closePath();
+				return path;
+			};
+			const cloudBox = (cloud) => {
+				const w = width / 3 * cloud.layer.size * cloud.stretch;
+				const h = w * SPRITE_HEIGHT / SPRITE_WIDTH;
+				const span = width + w;
+				return {
+					x: cloud.x * span % span - w,
+					y: cloud.y * height,
+					w,
+					h
 				};
-				startCrack(cr);
-				cracks.push(cr);
 			};
-			const regionColor = (cr) => {
-				let rx = cr.x;
-				let ry = cr.y;
-				for (let steps = (width + height) * 4; steps > 0; steps--) {
-					rx += .81 * Math.sin(radians(cr.t));
-					ry -= .81 * Math.cos(radians(cr.t));
-					let cx = Math.trunc(rx);
-					let cy = Math.trunc(ry);
-					if (f.seamless) {
-						cx %= width;
-						cy %= height;
-					}
-					if (cx < 0 || cx >= width || cy < 0 || cy >= height) break;
-					if (cgrid[cy * width + cx] <= 1e4) break;
-				}
-				cr.sandg = Math.min(1, Math.max(0, cr.sandg + frand(.1) - .05));
-				const grains = f.sandGrains;
-				const w = cr.sandg / (grains - 1);
-				for (let i = 0; i < grains; i++) {
-					const s = Math.sin(cr.sandp + Math.sin(i * w));
-					let drawx = cr.x + (rx - cr.x) * s;
-					let drawy = cr.y + (ry - cr.y) * s;
-					if (f.seamless) {
-						drawx = (drawx + width) % width;
-						drawy = (drawy + height) % height;
-					}
-					plot(Math.trunc(drawx), Math.trunc(drawy), cr.sandcolor, .1 - i / (grains * 10));
-				}
-			};
-			const restartCrack = (cr) => {
-				startCrack(cr);
-				makeCrack();
-			};
-			const moveDrawCrack = (cr) => {
-				if (!cr.curved) {
-					cr.x += STEP * Math.cos(radians(cr.t));
-					cr.y += STEP * Math.sin(radians(cr.t));
-				} else {
-					cr.x += cr.ys * Math.cos(radians(cr.t));
-					cr.y += cr.ys * Math.sin(radians(cr.t));
-					cr.x += cr.xs * Math.cos(radians(cr.t) - Math.PI / 2);
-					cr.y += cr.xs * Math.sin(radians(cr.t) - Math.PI / 2);
-					cr.t += cr.tInc;
-					cr.degreesDrawn += Math.abs(cr.tInc);
-				}
-				if (f.seamless) {
-					cr.x = (cr.x + width) % width;
-					cr.y = (cr.y + height) % height;
-				}
-				let cx = Math.trunc(cr.x + frand(.66) - .33);
-				let cy = Math.trunc(cr.y + frand(.66) - .33);
-				if (f.seamless) {
-					cx %= width;
-					cy %= height;
-				}
-				if (cx < 0 || cx >= width || cy < 0 || cy >= height) {
-					cr.x = random(width);
-					cr.y = random(height);
-					cr.t = random(360);
-					restartCrack(cr);
-					return;
-				}
-				if (!f.wireframe) regionColor(cr);
-				plot(cx, cy, FOREGROUND, 1);
-				const here = cy * width + cx;
-				if (cr.curved && cr.degreesDrawn > 360) restartCrack(cr);
-				else if (cgrid[here] > 1e4 || Math.abs(cgrid[here] - cr.t) < 5) cgrid[here] = Math.trunc(cr.t);
-				else if (Math.abs(cgrid[here] - cr.t) > 2) restartCrack(cr);
-			};
-			const build = () => {
+			const draw = () => {
+				const gradient = context.createLinearGradient(0, 0, 0, height * RIDGE);
+				for (const [stop, colour] of sky) gradient.addColorStop(stop / sky[sky.length - 1][0], colour);
 				context.globalAlpha = 1;
-				context.fillStyle = BACKGROUND;
+				context.fillStyle = gradient;
 				context.fillRect(0, 0, width, height);
-				cgrid.fill(EMPTY);
-				cracks = [];
-				cycles = 0;
-				for (let n = 0; n < f.initialCracks; n++) makeCrack();
+				for (const cloud of clouds) {
+					const sprite = spriteOf(cloud);
+					if (!sprite) continue;
+					const { x, y, w, h } = cloudBox(cloud);
+					context.globalAlpha = cloud.layer.alpha;
+					context.drawImage(sprite, x, y, w, h);
+				}
+				context.globalAlpha = 1;
+				if (!hill.complete || !hill.naturalWidth) return;
+				const { x, y, w, h } = hillLayout(width, height);
+				context.drawImage(hill, x, y, w, h);
+				if (f.shadows && shape) {
+					context.save();
+					context.clip(shape);
+					for (const cloud of clouds) {
+						if (cloud.layer !== layers[1]) continue;
+						const sprite = spriteOf(cloud);
+						if (!sprite) continue;
+						const box = cloudBox(cloud);
+						context.globalAlpha = .18;
+						context.globalCompositeOperation = "multiply";
+						context.drawImage(sprite, box.x, height * .62 + box.y * .6, box.w * 1.3, box.h * 1.8);
+					}
+					context.restore();
+				}
 			};
 			return {
 				configure: (next) => {
 					f = next;
-					if (width) build();
+					scatter();
 				},
-				resize: (w, h, pixels = 1) => {
+				resize: (w, h) => {
 					width = w;
 					height = h;
-					pace = Math.max(1, Math.round(pixels * pixels));
-					cgrid = new Int32Array(w * h);
 					last = performance.now();
-					build();
+					shape = typeof Path2D === "undefined" ? null : outline();
+					if (!clouds.length) scatter();
+					draw();
 				},
 				frame: (now) => {
-					const delay = Math.max(1, f.growthDelay);
-					const due = Math.min(8, Math.floor((now - last) / delay));
-					if (!due) return;
-					last = now - delay > last + due * delay ? now : last + due * delay;
-					for (let n = 0; n < due * pace; n++) {
-						for (let i = 0; i < cracks.length; i++) moveDrawCrack(cracks[i]);
-						if (++cycles >= f.maxCycles * pace && f.maxCycles) build();
-					}
+					if (sprites.length < kinds.length) sprites.push(makeCloud(sprites.length + 1, kinds[sprites.length]));
+					const seconds = Math.min(.1, (now - last) / 1e3);
+					last = now;
+					for (const cloud of clouds) cloud.x += cloud.layer.speed * f.wind * seconds / 1e3;
+					draw();
 				}
 			};
 		}
 	}
 };
 var themeBackgrounds = {
+	classic: "hill",
 	matrix: "matrix",
-	nord: "substrate"
+	nord: "substrate",
+	solarized: "truchet",
+	"solarized-phosphor": "phosphor"
 };
 var backgroundFor = (theme) => themeBackgrounds[theme] || null;
-var defaults = (id) => Object.fromEntries(backgrounds[id].options.map((option) => [option.key, option.value]));
+var optionsOf = (id) => [{
+	key: "animated",
+	label: "Animated",
+	type: "toggle",
+	value: backgrounds[id].animated ?? true
+}, ...backgrounds[id].options];
+var defaults = (id) => Object.fromEntries(optionsOf(id).map((option) => [option.key, option.value]));
 var clean = (option, value) => {
 	if (option.type === "toggle") return typeof value === "boolean" ? value : option.value;
 	if (option.type === "select") return option.choices.some(([choice]) => choice === value) ? value : option.value;
@@ -830,17 +1957,19 @@ var loadSettings = () => {
 	try {
 		stored = JSON.parse(load("backgrounds")) || {};
 	} catch {}
-	return Object.fromEntries(Object.entries(backgrounds).map(([id, { options }]) => [id, Object.fromEntries(options.map((option) => [option.key, clean(option, stored[id]?.[option.key])]))]));
+	return Object.fromEntries(Object.keys(backgrounds).map((id) => [id, Object.fromEntries(optionsOf(id).map((option) => [option.key, clean(option, stored[id]?.[option.key])]))]));
 };
 var saveSettings = (settings) => save("backgrounds", JSON.stringify(settings));
 var settings = loadSettings();
 var instances = {};
+var refresh = () => {};
 var configure = (id, values) => {
 	settings = {
 		...settings,
 		[id]: values
 	};
 	instances[id]?.configure(values);
+	refresh(id);
 };
 var startBackgrounds = () => {
 	const root = document.documentElement;
@@ -849,10 +1978,14 @@ var startBackgrounds = () => {
 	document.body.prepend(canvas);
 	const context = canvas.getContext("2d");
 	let active = null;
+	let mode = null;
 	let frame = null;
 	const loop = (now) => {
 		frame = requestAnimationFrame(loop);
 		instances[active].frame(now);
+	};
+	const settle = (now) => {
+		if (!instances[active].still(now)) frame = requestAnimationFrame(settle);
 	};
 	const resize = () => {
 		const { ratio, filter } = backgrounds[active];
@@ -863,28 +1996,38 @@ var startBackgrounds = () => {
 		canvas.style.filter = filter ? filter(pixels) : "none";
 		instances[active].resize(canvas.width, canvas.height, scale);
 	};
+	const start = () => {
+		cancelAnimationFrame(frame);
+		if (mode === "wallpaper") return;
+		resize();
+		frame = requestAnimationFrame(mode === "animated" ? loop : settle);
+	};
 	const watchPixels = () => {
 		matchMedia(`(resolution: ${window.devicePixelRatio || 1}dppx)`).addEventListener("change", () => {
-			if (active) resize();
+			if (active) start();
 			watchPixels();
 		}, { once: true });
 	};
-	const update = () => {
+	const update = (changed) => {
 		const id = backgroundFor(root.dataset.theme);
-		if (id === active) return;
+		const next = !id ? null : settings[id].animated ? "animated" : backgrounds[id].wallpaper ? "wallpaper" : "still";
+		if (next) root.dataset.background = next;
+		else delete root.dataset.background;
+		if (id === active && next === mode && changed !== id) return;
 		cancelAnimationFrame(frame);
 		active = id;
-		canvas.style.display = id ? "block" : "none";
+		mode = next;
+		canvas.style.display = id && mode !== "wallpaper" ? "block" : "none";
 		if (!id) return;
 		instances[id] ??= backgrounds[id].create(context, settings[id]);
-		resize();
-		frame = requestAnimationFrame(loop);
+		start();
 	};
-	new MutationObserver(update).observe(root, {
+	refresh = update;
+	new MutationObserver(() => update()).observe(root, {
 		attributes: true,
 		attributeFilter: ["data-theme"]
 	});
-	window.addEventListener("resize", () => active && resize());
+	window.addEventListener("resize", () => active && start());
 	watchPixels();
 	update();
 };
@@ -981,9 +2124,13 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	checked: state.theme === "synthwave",
 	onClick: () => actions.setTheme("synthwave")
 }), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Solarized Dark",
+	name: "Solarized Truchet",
 	checked: state.theme === "solarized",
 	onClick: () => actions.setTheme("solarized")
+}), /* @__PURE__ */ h(SubMenuItem, {
+	name: "Solarized Phosphor",
+	checked: state.theme === "solarized-phosphor",
+	onClick: () => actions.setTheme("solarized-phosphor")
 }), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Matrix",
 	checked: state.theme === "matrix",
@@ -1586,7 +2733,7 @@ var BackgroundSettings = ({ key, state, actions }) => {
 		class: BackgroundSettings_module_default.root,
 		autocomplete: "off",
 		onsubmit: actions.submitBackgroundSettings
-	}, background.options.map((option) => /* @__PURE__ */ h("label", { class: BackgroundSettings_module_default.row }, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.name }, option.label, ":"), /* @__PURE__ */ h(Control, {
+	}, optionsOf(state.id).map((option) => /* @__PURE__ */ h("label", { class: BackgroundSettings_module_default.row }, /* @__PURE__ */ h("span", { class: BackgroundSettings_module_default.name }, option.label, ":"), /* @__PURE__ */ h(Control, {
 		option,
 		value: state.draft[option.key],
 		onChange: (value) => actions.changeBackgroundSettings({ [option.key]: value })
@@ -1881,6 +3028,7 @@ var themes = [
 	"classic",
 	"synthwave",
 	"solarized",
+	"solarized-phosphor",
 	"matrix",
 	"nord"
 ];
