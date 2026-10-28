@@ -32,7 +32,7 @@ const BestTime = ({ key, state, actions }) => (
             {state[state.tab].map((row) => (
               <tr>
                 <td class={s.cell}>{row.level}:</td>
-                <td class={s.cell}>{row.time} seconds</td>
+                <td class={s.cell}>{row.time && `${row.time} seconds`}</td>
                 <td class={s.cell}>{row.name}</td>
               </tr>
             ))}
