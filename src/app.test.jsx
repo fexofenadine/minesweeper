@@ -359,3 +359,80 @@ it('opens and closes the about box', () => {
   wired.peek()
   expect(current.about).toBe(false)
 })
+
+it('pauses the clock and picks up from the same time', () => {
+  start({ game: { ...chordGame(), time: 5 } })
+  wired.pause()
+  const paused = game()
+  expect(paused.paused).toBe(true)
+  wired.pause()
+  const resumed = game()
+  expect(resumed.paused).toBe(false)
+  expect(resumed.start).toBeGreaterThan(paused.start)
+  expect(resumed.start - paused.start).toBeCloseTo(performance.now() - paused.pausedAt, -2)
+})
+
+it('ignores clicks, chords and hints while paused', () => {
+  wired.pause()
+  wired.down({ event: { button: 0, buttons: 1 }, x: 3, y: 2 })
+  wired.up()
+  wired.chord({ x: 1, y: 1 })
+  wired.hint()
+  const { field, hinted } = game()
+  expect(field.flat().filter((c) => c.opened)).toHaveLength(1)
+  expect(hinted).toBe(false)
+})
+
+it('only pauses a game that is running', () => {
+  start({ game: { ...chordGame(), start: -1 } })
+  wired.pause()
+  expect(game().paused).toBe(false)
+  start({ game: { ...chordGame(), win: true } })
+  wired.pause(true)
+  expect(game().paused).toBe(false)
+})
+
+it('pauses on p and leaves a paused game paused when told to pause', () => {
+  wired.press({ keyCode: 80, target: { tagName: 'BODY' } })
+  expect(game().paused).toBe(true)
+  wired.pause(true)
+  expect(game().paused).toBe(true)
+})
+
+it('esc shows the spreadsheet and pauses, and only esc takes it away', () => {
+  const key = (keyCode) => wired.press({ keyCode, target: { tagName: 'BODY' } })
+  key(27)
+  wired.peek()
+  expect(current.boss.rows).toHaveLength(10)
+  expect(current.game.paused).toBe(true)
+  key(78)
+  key(80)
+  wired.peek()
+  expect(current.boss).not.toBe(null)
+  expect(current.game.start).toBe(0)
+  key(27)
+  wired.peek()
+  expect(current.boss).toBe(null)
+  expect(current.game.paused).toBe(true)
+})
+
+it('hides the board while paused and covers the page with the spreadsheet', () =>
+  new Promise((resolve) => {
+    const container = document.createElement('div')
+    const shown = { ...state, game: { ...chordGame(), paused: true }, boss: { rows: [] } }
+    shown.game.field[0][0].flag = true
+    const testView = () => (
+      <div
+        oncreate={(el) => {
+          expect(el.querySelectorAll('[class*=flag]')).toHaveLength(0)
+          expect(el.querySelector('[title="Resume (P)"]')).not.toBe(null)
+          expect(document.title).toBe('Q3 budget')
+          expect(document.documentElement.dataset.boss).toBe('true')
+          resolve()
+        }}
+      >
+        {view(shown, actions)}
+      </div>
+    )
+    app(shown, actions, testView, container)
+  }))

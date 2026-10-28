@@ -6,6 +6,7 @@ import BestTime from './BestTime'
 import CustomField from './CustomField'
 import BackgroundSettings from './BackgroundSettings'
 import About from './About'
+import Boss, { BossButton, makeSheet } from './Boss'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './storage'
@@ -76,6 +77,8 @@ const createGame = ({ level, width, height, mines }) => {
     win: false,
     touch: false,
     hinted: false,
+    paused: false,
+    pausedAt: 0,
     openedAt: { x: -1, y: -1, time: 0 },
   }
 }
@@ -185,6 +188,7 @@ export const state = {
   winner: null,
   bestTime: null,
   about: false,
+  boss: null,
   customField: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
@@ -195,6 +199,9 @@ export const state = {
 export const actions = {
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
+    //leaving the page pauses, coming back waits for play
+    document.addEventListener('visibilitychange', () => document.hidden && actions.pause(true))
+    window.addEventListener('blur', () => actions.pause(true))
     if (window.matchMedia) {
       matchMedia('(orientation: portrait)').addEventListener('change', (event) =>
         actions.setPortrait(event.matches),
@@ -206,12 +213,53 @@ export const actions = {
     //leave typing in a dialog and browser shortcuts alone
     const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
     if (typing || event.ctrlKey || event.metaKey || event.altKey) return
-    if (event.keyCode === 113 || event.keyCode === 78) {
+    if (event.keyCode === 27) {
+      actions.boss()
+    } else if (state.boss) {
+      //the spreadsheet only answers to esc
+    } else if (event.keyCode === 113 || event.keyCode === 78) {
       actions.reset()
     } else if (event.keyCode === 72) {
       actions.hint()
+    } else if (event.keyCode === 80) {
+      actions.pause()
     }
   },
+  //stop the clock and hide the board, only while a game is running
+  pause:
+    (paused) =>
+    ({ game }, actions) => {
+      const next = paused === undefined ? !game.paused : paused
+      if (game.start < 0 || game.win || game.lose || next === game.paused) return null
+      if (!next) {
+        game.raf = requestAnimationFrame(actions.tick)
+        return {
+          game: { ...game, paused: false, start: game.start + performance.now() - game.pausedAt },
+        }
+      }
+      cancelAnimationFrame(game.raf)
+      window.removeEventListener('mouseup', actions.up)
+      return {
+        menu: null,
+        game: {
+          ...game,
+          paused: true,
+          pausedAt: performance.now(),
+          pressed: false,
+          group: false,
+          pressedX: -1,
+          pressedY: -1,
+        },
+      }
+    },
+  //esc covers everything with a spreadsheet and pauses the game
+  boss:
+    () =>
+    ({ boss }, actions) => {
+      if (boss) return { boss: null }
+      actions.pause(true)
+      return { menu: null, boss: makeSheet() }
+    },
   reset:
     (payload) =>
     ({ game }) => {
@@ -231,7 +279,7 @@ export const actions = {
     },
   hint: () => (state) => {
     const { game } = state
-    if (game.win || game.lose) return { menu: null }
+    if (game.win || game.lose || game.paused) return { menu: null }
     if (game.start < 0) {
       return { menu: null, hint: noHint('Open a cell first, then ask for a hint.') }
     }
@@ -245,7 +293,7 @@ export const actions = {
   touch:
     ({ event, x, y }) =>
     ({ game }, actions) => {
-      if (game.win || game.lose) return null
+      if (game.win || game.lose || game.paused) return null
       const rect = event.currentTarget.getBoundingClientRect()
       const timer = setTimeout(actions.flag, 600)
       const move = ({ touches }) => {
@@ -289,7 +337,9 @@ export const actions = {
     () =>
     ({ game, marks }) => {
       const { pressedX, pressedY } = game
-      if (pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null
+      if (game.paused || pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) {
+        return null
+      }
       return {
         hint: null,
         game: {
@@ -303,7 +353,7 @@ export const actions = {
   down:
     ({ event, x, y }) =>
     ({ game, marks }, actions) => {
-      if (game.touch || event.button > 2 || game.win || game.lose) return null
+      if (game.touch || event.button > 2 || game.win || game.lose || game.paused) return null
       window.addEventListener('mouseup', actions.up)
       const flagging = !game.pressed && event.button === 2 && !game.field[y][x].opened
       const { field, flags } = flagging ? toggleFlag(game, x, y, marks) : game
@@ -324,7 +374,7 @@ export const actions = {
   chord:
     ({ x, y }) =>
     ({ game }, actions) => {
-      if (game.win || game.lose) return null
+      if (game.win || game.lose || game.paused) return null
       if (!openable(game, x, y)) {
         //a double click that just opened this cell is no failed chord
         const { openedAt } = game
@@ -358,7 +408,7 @@ export const actions = {
     ({ game, safeStart, noGuess }, actions) => {
       window.removeEventListener('mouseup', actions.up)
       const { width, height, pressedX, pressedY } = game
-      if (game.win || game.lose || pressedX < 0 || pressedY < 0) {
+      if (game.win || game.lose || game.paused || pressedX < 0 || pressedY < 0) {
         if (!game.pressed && !game.group) return null
         return { game: { ...game, pressed: false, group: false } }
       }
@@ -629,6 +679,7 @@ export const actions = {
 export const view = (state, actions) => (
   <main oncontextmenu={prevent} ondragstart={prevent} oncreate={actions.init}>
     {state.game && <Game key="a" state={state} actions={actions} />}
+    <BossButton key="h" actions={actions} />
     {state.winner && <Winner key="b" state={state.winner} actions={actions} />}
     {state.bestTime && <BestTime key="c" state={state.bestTime} actions={actions} />}
     {state.customField && <CustomField key="d" state={state.customField} actions={actions} />}
@@ -636,5 +687,6 @@ export const view = (state, actions) => (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
     {state.about && <About key="f" actions={actions} />}
+    {state.boss && <Boss key="g" state={state.boss} actions={actions} />}
   </main>
 )

@@ -17,6 +17,7 @@
 }
 
 .field {
+  position: relative;
   white-space: nowrap;
   border-width: 2px 3px 3px 2px;
   border-style: solid;
@@ -31,6 +32,25 @@
 
 .inactive {
   cursor: default;
+}
+
+/*play button over the hidden board*/
+.paused {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.paused svg {
+  display: block;
+  margin: 2px;
+  fill: currentColor;
 }
 
 /*neon theme meltdown after hitting a mine*/

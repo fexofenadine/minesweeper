@@ -39,8 +39,10 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 - **No Guessing**: the first click opens an empty area and every board can be solved with logic alone. A solver checks each board and redeals until it finds one, within a few milliseconds even on Expert and Extreme.
 - **Hint** (Game menu or `H`): highlights a move that follows with certainty and explains the reasoning under the board. Blue marks the numbers it reasons from, green cells are safe, red cells are mines and amber marks flags that contradict a number. It only uses the visible numbers and your flags, and says so when only a guess is left.
 - **Double-click chording**: double-click (or tap) a revealed number whose mines are all flagged to open every unflagged neighbour. If the flags don't match the number, the reason is shown under the board: extra flags are outlined in amber, and the cells where the missing flags belong in dashed violet. Explanations stay until the board changes, so clicking never shifts the board under the pointer.
+- **Pause** (title bar button or `P`): stops the clock and hides the board behind plain tiles until you press play. The game also pauses when the tab is hidden or the window loses focus, and waits for play when you come back.
+- **Boss key** (`Esc` or the button in the bottom right corner): covers the screen with a spreadsheet of fresh made up figures, renames the tab and swaps its icon, and pauses the game. Press it again, or click the 100% in the status bar, to go back.
 - **Best times** are kept in two tabs, one for games played without hints and one for games where a hint was used.
-- **Shortcuts**: F2 or N starts a new game and H asks for a hint. They are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
+- **Shortcuts**: F2 or N starts a new game, H asks for a hint, P pauses and Esc is the boss key. They are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
 
 ### Window and display
 
@@ -60,6 +62,8 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 | ![Hint](docs/screenshots/hint.jpg)             | ![Chord explanation](docs/screenshots/chord.jpg)      |
 | **Best times with and without hints**          | **Background settings**                               |
 | ![Best times](docs/screenshots/best-times.jpg) | ![Background settings](docs/screenshots/settings.jpg) |
+| **Paused**                                     | **The boss key**                                      |
+| ![Paused](docs/screenshots/paused.jpg)         | ![Boss key spreadsheet](docs/screenshots/boss.jpg)    |
 
 **Expert turned on its side on a phone**
 

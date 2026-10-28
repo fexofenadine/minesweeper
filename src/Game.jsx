@@ -8,8 +8,20 @@ import Cell from './Cell'
 import Button from './Button'
 import { watchWindow } from './zoom'
 
-//title bar zoom buttons in place of a resize grip
-const Zoom = ({ scale, onZoom }) => [
+const running = ({ start, win, lose }) => start >= 0 && !win && !lose
+
+//title bar pause and zoom buttons in place of a resize grip
+const Zoom = ({ scale, onZoom, game, onPause }) => [
+  <Button
+    tabIndex={-1}
+    title={game.paused ? 'Resume (P)' : 'Pause (P)'}
+    disabled={!running(game)}
+    onClick={() => onPause()}
+  >
+    <svg width="13" height="11">
+      <path d={game.paused ? 'M4 1.5v8l6-4z' : 'M4 2h2v7H4zM8 2h2v7H8z'} />
+    </svg>
+  </Button>,
   <Button tabIndex={-1} title="Zoom out" disabled={scale <= 0.5} onClick={() => onZoom(-1)}>
     <svg width="13" height="11">
       <path d="M3 5h8v2H3z" />
@@ -37,7 +49,14 @@ const Game = ({ key, state, actions }) => (
     title={state.theme === 'classic' ? 'Minesweeper' : 'Minesweeper Plus'}
     titleHint="Double-click for 100% zoom"
     onTitleDoubleClick={() => actions.zoom(0)}
-    controls={<Zoom scale={state.zoom.scale} onZoom={actions.zoom} />}
+    controls={
+      <Zoom
+        scale={state.zoom.scale}
+        onZoom={actions.zoom}
+        game={state.game}
+        onPause={actions.pause}
+      />
+    }
     onCreate={(dialog) => {
       watchWindow(dialog, actions.fit)
       actions.fit()
@@ -57,7 +76,7 @@ const Game = ({ key, state, actions }) => (
       </div>
       <div class={state.game.lose ? s.fieldLost : s.field}>
         {rowsOf(state).map((row) => (
-          <div class={state.game.win || state.game.lose ? s.inactive : s.active}>
+          <div class={running(state.game) && !state.game.paused ? s.active : s.inactive}>
             {row.map(({ cell, x, y }) => (
               <Cell
                 x={x}
@@ -66,12 +85,14 @@ const Game = ({ key, state, actions }) => (
                 pressedX={state.game.pressedX}
                 pressedY={state.game.pressedY}
                 group={state.game.group}
-                opened={cell.opened}
+                opened={cell.opened && !state.game.paused}
                 mined={cell.mined}
-                flag={cell.flag}
-                mark={cell.mark}
+                flag={cell.flag && !state.game.paused}
+                mark={cell.mark && !state.game.paused}
                 num={cell.num}
-                hint={state.hint && state.hint.marks[y * state.game.width + x]}
+                hint={
+                  !state.game.paused && state.hint && state.hint.marks[y * state.game.width + x]
+                }
                 lose={state.game.lose}
                 onDown={actions.down}
                 onMove={actions.move}
@@ -81,8 +102,17 @@ const Game = ({ key, state, actions }) => (
             ))}
           </div>
         ))}
+        {state.game.paused && (
+          <div class={s.paused}>
+            <Button tabIndex={-1} title="Resume (P)" onClick={() => actions.pause(false)}>
+              <svg width="40" height="40">
+                <path d="M14 9v22l17-11z" />
+              </svg>
+            </Button>
+          </div>
+        )}
       </div>
-      {state.hint && (
+      {state.hint && !state.game.paused && (
         <p class={s.hint} role="status">
           {state.hint.text}
         </p>

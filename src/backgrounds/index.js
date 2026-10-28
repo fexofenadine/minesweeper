@@ -109,6 +109,13 @@ export const startBackgrounds = () => {
     cancelAnimationFrame(frame)
     if (mode === 'wallpaper') return
     resize()
+    if (!root.dataset.boss) frame = requestAnimationFrame(mode === 'animated' ? loop : settle)
+  }
+
+  //nothing is drawn under the boss screen
+  const cover = () => {
+    cancelAnimationFrame(frame)
+    if (root.dataset.boss || !active || mode === 'wallpaper') return
     frame = requestAnimationFrame(mode === 'animated' ? loop : settle)
   }
 
@@ -146,6 +153,7 @@ export const startBackgrounds = () => {
     attributes: true,
     attributeFilter: ['data-theme'],
   })
+  new MutationObserver(cover).observe(root, { attributes: true, attributeFilter: ['data-boss'] })
   window.addEventListener('resize', () => active && start())
   watchPixels()
   update()

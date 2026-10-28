@@ -1,0 +1,176 @@
+/*a plain office spreadsheet over everything, the same in every theme*/
+.root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  color: #202124;
+  font:
+    13px/1.4 'Segoe UI',
+    Arial,
+    sans-serif;
+  text-shadow: none;
+  background: #fff;
+  outline: 0;
+  cursor: default;
+  user-select: none;
+}
+
+.header {
+  padding: 8px 12px 4px;
+  background: #f8f9fa;
+}
+
+.title {
+  font-size: 18px;
+}
+
+.menus {
+  display: flex;
+  gap: 14px;
+  margin-top: 2px;
+  color: #444;
+}
+
+.formula {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 12px;
+  border-top: 1px solid #dadce0;
+  border-bottom: 1px solid #dadce0;
+}
+
+.ref {
+  width: 60px;
+  padding-right: 12px;
+  border-right: 1px solid #dadce0;
+}
+
+.fx {
+  color: #888;
+  font-style: italic;
+}
+
+.grid {
+  flex: 1;
+  overflow: hidden;
+}
+
+.table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.table th,
+.table td {
+  height: 21px;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 1px solid #e2e3e3;
+}
+
+.table th {
+  width: 90px;
+  color: #555;
+  font-weight: normal;
+  background: #f8f9fa;
+}
+
+.table td:first-of-type {
+  width: 150px;
+}
+
+.table th.corner,
+.table th.number {
+  width: 40px;
+  text-align: center;
+}
+
+.table tr:first-child td {
+  font-weight: 600;
+}
+
+.figure {
+  text-align: right;
+}
+
+.negative {
+  color: #c5221f;
+}
+
+.total td {
+  font-weight: 600;
+  border-top: 2px solid #999;
+}
+
+.table td.selected {
+  outline: 2px solid #2b6cb0;
+  outline-offset: -2px;
+}
+
+.footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dadce0;
+}
+
+.tabs {
+  display: flex;
+  padding: 0 12px;
+}
+
+.tab {
+  padding: 4px 14px;
+  color: #555;
+}
+
+.tabActive {
+  composes: tab;
+  color: #2b6cb0;
+  background: #fff;
+  border-bottom: 2px solid #2b6cb0;
+}
+
+.status {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+  padding: 2px 12px 3px;
+  color: #555;
+  font-size: 12px;
+  border-top: 1px solid #dadce0;
+}
+
+.status span:first-child {
+  margin-right: auto;
+}
+
+.exit {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/*floating boss key in the bottom right corner*/
+.button {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 3;
+  box-shadow: var(--glow-dim);
+}
+
+.label {
+  display: block;
+  padding: 3px 8px 2px;
+  font-family: var(--ui-font);
+  text-shadow: var(--text-glow);
+}
