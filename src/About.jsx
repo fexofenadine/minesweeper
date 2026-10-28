@@ -30,8 +30,8 @@ const About = ({ key, actions }) => (
           colour schemes. Released under the MIT licence; full credits are in the README.
         </p>
         <p>
-          <Link href="https://github.com/fexofenadine/minesweeperplus">
-            github.com/fexofenadine/minesweeperplus
+          <Link href="https://github.com/fexofenadine/puzzles">
+            github.com/fexofenadine/puzzles
           </Link>
         </p>
         <div class={s.footer}>

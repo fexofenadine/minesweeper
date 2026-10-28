@@ -2,9 +2,9 @@
 
 A Windows style minesweeper with classic, synthwave, solarized truchet, solarized phosphor, matrix and nord themes.
 
-[Play Minesweeper Plus](https://fexofenadine.github.io/minesweeperplus/)
+[Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)
 
-[![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/minesweeperplus/)
+[![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/)
 
 ## Themes
 
