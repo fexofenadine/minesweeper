@@ -1,0 +1,36 @@
+.table {
+  margin: 0 8px;
+  border-collapse: collapse;
+}
+
+.level,
+.size {
+  padding: 2px 8px;
+  font-weight: normal;
+}
+
+.size {
+  text-align: left;
+}
+
+.slot {
+  min-width: 64px;
+  height: 34px;
+  padding: 2px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.time,
+.name {
+  display: block;
+}
+
+/*names can be long, keep the grid even*/
+.name {
+  max-width: 80px;
+  overflow: hidden;
+  font-size: 0.85em;
+  text-overflow: ellipsis;
+  opacity: 0.75;
+}

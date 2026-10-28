@@ -1,0 +1,143 @@
+/*the two values in near complementary colours for each theme, the digit in a contrasting one*/
+:global(:root) {
+  --tz-zero: #1f5fbf;
+  --tz-zero-text: #fff;
+  --tz-one: #f08a24;
+  --tz-one-text: #1a1a1a;
+}
+
+:global(:root[data-theme='synthwave']) {
+  --tz-zero: #36f9f6;
+  --tz-zero-text: #241b2f;
+  --tz-one: #ff7edb;
+  --tz-one-text: #241b2f;
+}
+
+:global(:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])) {
+  --tz-zero: #268bd2;
+  --tz-zero-text: #fdf6e3;
+  --tz-one: #cb4b16;
+  --tz-one-text: #fdf6e3;
+}
+
+:global(:root[data-theme='nord']) {
+  --tz-zero: #81a1c1;
+  --tz-zero-text: #2e3440;
+  --tz-one: #d08770;
+  --tz-one-text: #2e3440;
+}
+
+/*matrix is all green, so one value is green on black and the other black on green*/
+:global(:root[data-theme='matrix']) {
+  --tz-zero: #020a04;
+  --tz-zero-text: #39d26b;
+  --tz-one: #39d26b;
+  --tz-one-text: #020a04;
+}
+
+.root {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  font: bold 15px/24px var(--text-font);
+  text-align: center;
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*an empty cell is a raised tile like an unopened one in minesweeper*/
+.empty {
+  composes: root;
+  background: var(--cell);
+}
+
+.empty::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+/*a filled cell lies flat in its colour*/
+.zero {
+  composes: root;
+  color: var(--tz-zero-text);
+  font-weight: normal;
+  background: var(--tz-zero);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+.one {
+  composes: root;
+  color: var(--tz-one-text);
+  font-weight: normal;
+  background: var(--tz-one);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*clues are bold with a frame in their own text colour, and can't be changed*/
+.given {
+  font-weight: bold;
+  box-shadow:
+    inset 1px 1px 0 var(--cell-shadow),
+    inset 0 0 0 3px color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.error::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 3px,
+    color-mix(in srgb, #ff2020 55%, transparent) 3px 5px
+  );
+  box-shadow: inset 0 0 0 2px #ff2020;
+  content: '';
+}
+
+.ghost {
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+.hintSource::after,
+.hintPlace::after,
+.hintWrong::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
+}
+
+.hintSource {
+  --hint-color: #2e8bff;
+}
+
+.hintPlace {
+  --hint-color: #12d12a;
+}
+
+.hintWrong {
+  --hint-color: #ff3b3b;
+}

@@ -96,6 +96,13 @@
   text-shadow: none;
 }
 
+.option:disabled,
+.option:disabled:hover {
+  color: var(--shadow);
+  background: none;
+  cursor: default;
+}
+
 .hotKey {
   position: absolute;
   top: 2px;

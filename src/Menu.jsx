@@ -2,9 +2,9 @@ import { h } from 'hyperapp'
 import s from './Menu.module.css'
 import ThemeMenu from './shell/ThemeMenu'
 
-export const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
+export const SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => (
   <li key={key} class={s.item}>
-    <button type="button" class={s.option} tabindex={-1} onclick={onClick}>
+    <button type="button" class={s.option} tabindex={-1} disabled={disabled} onclick={onClick}>
       {checked && (
         <svg class={s.check} width="7" height="7">
           <path d="M0 4.5L2.5 7 7 2.5V0L2.5 4.5 0 2v2.5z" />
