@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <title>Takuzu</title>
+    <meta
+      name="description"
+      content="Takuzu binary puzzles with hints, every board solvable by logic, free and open source"
+    />
+    <meta
+      name="keywords"
+      content="takuzu, binairo, binary puzzle, logic puzzle, online, free, open source"
+    />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#cbcbcb" />
+    <meta property="og:title" content="Takuzu: Binary Puzzles" />
+    <meta
+      property="og:description"
+      content="Takuzu binary puzzles with hints, every board solvable by logic, free and open source"
+    />
+    <meta property="og:url" content="https://fexofenadine.github.io/minesweeperplus/takuzu/" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="https://fexofenadine.github.io/minesweeperplus/takuzu/takuzu.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="675" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Takuzu" />
+    <link rel="manifest" href="/takuzu/site.webmanifest" />
+    <link rel="apple-touch-icon" href="/takuzu/icon.png" />
+    <link rel="shortcut icon" href="/takuzu/favicon.ico" />
+    <script>
+      //apply the saved theme and window size before first paint
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
+        //assume animated off classic, the script corrects it
+        if (document.documentElement.dataset.theme !== 'classic') {
+          document.documentElement.dataset.background = 'animated'
+        }
+        document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
+      } catch {}
+      //if the game fails to start, show why instead of an empty desktop
+      addEventListener('error', (event) => {
+        if (document.querySelector('main *')) return
+        const note = document.createElement('pre')
+        note.style.cssText =
+          'position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;padding:8px;background:#000;color:#fff;font:12px monospace;white-space:pre-wrap'
+        note.textContent = 'Takuzu could not start: ' + event.message
+        document.body.append(note)
+      })
+    </script>
+    <script type="module" src="/src/takuzu/index.js"></script>
+  </head>
+  <body>
+    <div id="app">
+      <main></main>
+    </div>
+  </body>
+</html>

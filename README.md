@@ -4,7 +4,7 @@ A Windows style minesweeper with classic, synthwave, solarized truchet, solarize
 
 [Play Minesweeper Plus](https://fexofenadine.github.io/minesweeperplus/)
 
-[![Play Minesweeper Plus](public/minesweeper.jpg)](https://fexofenadine.github.io/minesweeperplus/)
+[![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/minesweeperplus/)
 
 ## Themes
 
@@ -82,7 +82,7 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 
 ```sh
 yarn          #install dependencies
-yarn start    #dev server
+yarn start    #dev server, the games are at /minesweeper/ and /takuzu/
 yarn build    #static site in build/
 yarn test     #run tests
 yarn lint     #lint

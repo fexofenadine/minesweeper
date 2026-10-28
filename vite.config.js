@@ -8,14 +8,14 @@ const versionAssets = () => ({
   transformIndexHtml: {
     order: 'post',
     handler: (html, { bundle }) =>
-      html.replace(/\.\/(assets\/[^"?]+)"/g, (match, file) => {
+      html.replace(/((?:\.\.\/)+|\.\/)(assets\/[^"?]+)"/g, (match, path, file) => {
         const output = bundle?.[file]
         if (!output) return match
         const hash = createHash('sha256')
           .update(output.code ?? output.source)
           .digest('hex')
           .slice(0, 8)
-        return `./${file}?v=${hash}"`
+        return `${path}${file}?v=${hash}"`
       }),
   },
 })
@@ -37,7 +37,12 @@ export default defineConfig({
     cssMinify: false,
     modulePreload: { polyfill: false },
     rolldownOptions: {
-      input: { app: 'index.html' },
+      //the root page only redirects, each game is its own page
+      input: {
+        index: 'index.html',
+        minesweeper: 'minesweeper/index.html',
+        takuzu: 'takuzu/index.html',
+      },
       output: {
         entryFileNames: 'assets/[name].js',
         assetFileNames: 'assets/[name][extname]',

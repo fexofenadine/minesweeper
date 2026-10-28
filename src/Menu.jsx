@@ -84,6 +84,8 @@ const Menu = ({ state, actions }) => (
       <SubMenuItem name="No Guessing" checked={state.noGuess} onClick={actions.toggleNoGuess} />
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
+      <Separator />
+      <SubMenuItem name="Takuzu" onClick={() => location.assign('../takuzu/')} />
     </MenuItem>
     <ThemeMenu state={state} actions={actions} />
     <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
