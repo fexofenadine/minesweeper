@@ -95,32 +95,52 @@ const newStrip = (count) => {
 //each sprite is padded to hold a glyph plus the glow around it
 const PAD = 1.6
 
+export const GLYPH = '#2cff6e'
+export const BRIGHT = '#d4ffe0'
+
+//one mirrored glowing glyph centred at x, y in a cell sized sprite
+const drawGlyph = (context, glyph, x, y, cell, colour) => {
+  context.save()
+  context.font = `${Math.round((cell / PAD) * 0.8)}px monospace`
+  context.textAlign = 'center'
+  context.textBaseline = 'middle'
+  context.fillStyle = colour
+  context.shadowColor = colour
+  context.translate(x, y)
+  context.scale(-1, 1)
+  //a wide soft halo then a tighter one for a phosphor glow
+  context.shadowBlur = cell * 0.3
+  context.fillText(glyph, 0, 0)
+  context.fillText(glyph, 0, 0)
+  context.shadowBlur = cell * 0.07
+  context.fillText(glyph, 0, 0)
+  context.restore()
+}
+
 //mirrored glowing glyphs, a plain row and a bright row
 const buildAtlas = (glyphs, cell) => {
   const atlas = document.createElement('canvas')
   atlas.width = cell * glyphs.length
   atlas.height = cell * 2
   const context = atlas.getContext('2d')
-  context.font = `${Math.round((cell / PAD) * 0.8)}px monospace`
-  context.textAlign = 'center'
-  context.textBaseline = 'middle'
-  ;['#2cff6e', '#d4ffe0'].forEach((colour, row) => {
-    context.fillStyle = colour
-    context.shadowColor = colour
+  ;[GLYPH, BRIGHT].forEach((colour, row) => {
     glyphs.forEach((glyph, i) => {
-      context.save()
-      context.translate((i + 0.5) * cell, (row + 0.5) * cell)
-      context.scale(-1, 1)
-      //a wide soft halo then a tighter one for a phosphor glow
-      context.shadowBlur = cell * 0.3
-      context.fillText(glyph, 0, 0)
-      context.fillText(glyph, 0, 0)
-      context.shadowBlur = cell * 0.07
-      context.fillText(glyph, 0, 0)
-      context.restore()
+      drawGlyph(context, glyph, (i + 0.5) * cell, (row + 0.5) * cell, cell, colour)
     })
   })
   return atlas
+}
+
+export const rainGlyphs = encodings.matrix
+
+//a single rain glyph as an image url, for other pages to draw with, null without canvas
+export const glyphImage = (glyph, cell, colour = GLYPH) => {
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = cell
+  const context = canvas.getContext('2d')
+  if (!context) return null
+  drawGlyph(context, glyph, cell / 2, cell / 2, cell, colour)
+  return canvas.toDataURL()
 }
 
 //the defaults are the look the matrix theme was tuned with

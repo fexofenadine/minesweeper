@@ -41,7 +41,15 @@ const Menu = ({ state, actions }) => (
         />
       ))}
     </MenuItem>
-    <ThemeMenu state={state} actions={actions} />
+    <ThemeMenu state={state} actions={actions}>
+      {state.theme === 'matrix' && <Separator />}
+      {state.theme === 'matrix' && (
+        <SubMenuItem name="Rain Glyphs" checked={state.rain} onClick={actions.toggleRain} />
+      )}
+    </ThemeMenu>
+    <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
+      <SubMenuItem name="About Takuzu Plus..." onClick={actions.toggleAbout} />
+    </MenuItem>
   </ul>
 )
 

@@ -12,6 +12,8 @@ import { allowed, levelNames } from './Menu'
 import { EMPTY, emptyBoard, full, sizes, solved } from './rules'
 import { findHint } from './hint'
 import { deal } from './deal'
+import { showRain } from './rain'
+import About from './About'
 
 //the saved size and level, medium 8x8 when missing or out of range
 const loadChoice = () => {
@@ -98,6 +100,8 @@ export const state = {
   hint: null,
   prompt: false,
   errors: Boolean(load('takuzu.errors')),
+  rain: Boolean(load('takuzu.rain')),
+  about: false,
   game: createGame(loadChoice()),
   winner: null,
   bestTime: null,
@@ -108,6 +112,7 @@ export const actions = {
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
     listen(actions)
+    showRain(state.rain)
     actions.reset()
   },
   press: (event) => (state, actions) => {
@@ -196,6 +201,14 @@ export const actions = {
     save('takuzu.errors', state.errors ? '' : 'yes')
     return { menu: null, errors: !state.errors }
   },
+  toggleRain: () => (state) => {
+    save('takuzu.rain', state.rain ? '' : 'yes')
+    showRain(!state.rain)
+    return { menu: null, rain: !state.rain }
+  },
+  toggleAbout:
+    () =>
+    ({ about }) => ({ menu: null, about: !about }),
   //stop the clock and hide the board, only while a game is running
   pause:
     (paused) =>
@@ -279,6 +292,7 @@ export const view = (state, actions) => (
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
+    {state.about && <About key="f" actions={actions} />}
     {state.boss && <Boss key="g" state={state.boss} actions={actions} />}
   </main>
 )

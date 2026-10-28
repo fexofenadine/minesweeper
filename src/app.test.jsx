@@ -436,3 +436,15 @@ it('hides the board while paused and covers the page with the spreadsheet', () =
     )
     app(shown, actions, testView, container)
   }))
+
+it('esc closes an open menu before it shows the spreadsheet', () => {
+  start({ game: chordGame(), menu: { game: true } })
+  const esc = () => wired.press({ keyCode: 27, target: { tagName: 'BODY' } })
+  esc()
+  wired.peek()
+  expect(current.menu).toBe(null)
+  expect(current.boss).toBe(null)
+  esc()
+  wired.peek()
+  expect(current.boss).not.toBe(null)
+})

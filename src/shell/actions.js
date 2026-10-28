@@ -39,7 +39,9 @@ export const shortcut = (event, state, actions) => {
   const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
   if (typing || event.ctrlKey || event.metaKey || event.altKey) return null
   if (event.keyCode === 27) {
-    actions.boss()
+    //an open menu closes first, as in windows
+    if (state.menu) actions.closeMenu()
+    else actions.boss()
     return null
   }
   //the spreadsheet only answers to esc
@@ -47,6 +49,7 @@ export const shortcut = (event, state, actions) => {
 }
 
 export const shellActions = {
+  closeMenu: () => ({ menu: null }),
   setPortrait: (portrait) => ({ portrait }),
   //esc covers everything with a spreadsheet and pauses the game
   boss:

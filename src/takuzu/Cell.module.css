@@ -141,3 +141,28 @@
 .hintWrong {
   --hint-color: #ff3b3b;
 }
+
+/*rain glyphs on matrix: a green glyph on black for 0, a bright one on dark green for 1*/
+:global(:root[data-theme='matrix'][data-rain]) .zero,
+:global(:root[data-theme='matrix'][data-rain]) .one {
+  color: transparent;
+  background-position: center;
+  background-size: 140%;
+  background-repeat: no-repeat;
+}
+
+:global(:root[data-theme='matrix'][data-rain]) .zero {
+  background-color: #020a04;
+  background-image: var(--tz-rain-0);
+}
+
+:global(:root[data-theme='matrix'][data-rain]) .one {
+  background-color: #0b3d1a;
+  background-image: var(--tz-rain-1);
+}
+
+:global(:root[data-theme='matrix'][data-rain]) .given {
+  box-shadow:
+    inset 1px 1px 0 var(--cell-shadow),
+    inset 0 0 0 3px rgba(57, 210, 107, 0.45);
+}

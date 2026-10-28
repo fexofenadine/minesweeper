@@ -168,3 +168,13 @@ it('drops an answer from an older deal', async () => {
   expect(now().game).toMatchObject({ n: 10, dealing: false })
   expect(now().game.board).toHaveLength(100)
 })
+
+it('remembers the rain glyph choice and opens the about box', () => {
+  wired.toggleRain()
+  expect(now().rain).toBe(true)
+  expect(localStorage.getItem('takuzu.rain')).toBe('yes')
+  wired.toggleRain()
+  expect(now().rain).toBe(false)
+  wired.toggleAbout()
+  expect(now().about).toBe(true)
+})

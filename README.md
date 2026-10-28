@@ -1,10 +1,10 @@
-# Minesweeper Plus
+# Puzzles
 
-A Windows style minesweeper with classic, synthwave, solarized truchet, solarized phosphor, matrix and nord themes.
+Windows style puzzle games with hints that explain their reasoning, boards you can solve by logic alone, zoom and animated themes ported from xscreensaver. Both games share the window, the six themes and their backgrounds, pause and the boss key, and your theme and zoom carry over between them.
 
-[Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)
-
-[![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/)
+| [Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)                                        | [Play Takuzu Plus](https://fexofenadine.github.io/puzzles/takuzu/)                              |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| [![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/) | [![Play Takuzu Plus](public/takuzu/takuzu.jpg)](https://fexofenadine.github.io/puzzles/takuzu/) |
 
 ## Themes
 
@@ -18,7 +18,28 @@ Pick a theme from the **Theme** menu. Your choice is remembered.
 | **Solarized Truchet**                                | **Solarized Phosphor**                               |
 | ![Solarized Truchet](docs/screenshots/solarized.jpg) | ![Solarized Phosphor](docs/screenshots/phosphor.jpg) |
 
-## What this fork adds
+## Takuzu Plus
+
+Binary puzzles: fill the grid with 0s and 1s so that no row or column has three alike in a row, every row and column holds as many 0s as 1s, and no two rows or two columns are the same.
+
+| Classic, with a hint                                        | Synthwave, with Show Errors                                   |
+| ----------------------------------------------------------- | ------------------------------------------------------------- |
+| ![Takuzu on Classic](docs/screenshots/takuzu-classic.jpg)   | ![Takuzu on Synthwave](docs/screenshots/takuzu-synthwave.jpg) |
+| **Matrix, with rain glyphs**                                | **Nord, 14 × 14 expert**                                      |
+| ![Takuzu on Matrix](docs/screenshots/takuzu-matrix.jpg)     | ![Takuzu on Nord](docs/screenshots/takuzu-nord.jpg)           |
+| **A full board with a mistake**                             | **Best times**                                                |
+| ![Full board prompt](docs/screenshots/takuzu-solarized.jpg) | ![Takuzu best times](docs/screenshots/takuzu-phosphor.jpg)    |
+
+- **Every board has exactly one solution** and can be solved by logic alone. Boards are made fresh each game: a random full grid, then clues taken away for as long as the chosen level can still finish it.
+- **Four levels** (Game menu), each needing its own reasoning: **Easy** uses pairs (two alike side by side) and gaps (a cell between two alike); **Medium** adds full counts (a line with all its 0s or all its 1s); **Hard** adds balance (every way to finish a line agrees on a cell) and no repeated lines; **Expert** adds a short what-if (a value that soon breaks a rule must be the other one). A board is only dealt at a level if it needs that level's reasoning.
+- **Five sizes** (Size menu), 6 × 6 to 14 × 14. Small boards never need a what-if, so 6 × 6 has no Expert.
+- **Playing**: click a cell to step it through 0, 1 and empty, right-click to step back, or tap on a touch screen. Clues are bold and framed and can't be changed. **Undo** (Ctrl+Z, the Game menu or the arrow button) takes back one change at a time.
+- **Hint** (`H`, the Game menu or the ? button): points out a broken rule first, then a cell that can't fit the only solution, and otherwise the easiest next step with the cells it reasons from outlined in blue, the cell it fills in green and the reason under the board.
+- **Show Errors** (Game menu, off by default) stripes cells that break a rule as you go. When every cell is filled but the board isn't solved, the game asks whether you want a hint, or lets you find the mistake yourself.
+- **Colours**: the two values are tiles in near complementary colours from each theme, blue and orange on Classic and the Solarized themes, cyan and pink on Synthwave, frost and aurora on Nord, and green on black against black on green on Matrix. **Rain Glyphs** (Theme menu, on Matrix) draws them as two glyphs from the digital rain instead.
+- **Best times** for every size and level, with and without hints, the window title (Takuzu on Classic, Takuzu Plus elsewhere), zoom and fit, pause, the boss key and the shortcuts work as in Minesweeper Plus. Big expert boards are dealt in the background, so the window never stalls.
+
+## Minesweeper Plus
 
 On top of the [original game](https://github.com/frenzzy/minesweeper), which has the classic look, the beginner, intermediate, expert and custom levels, marks, best times and touch support, this fork adds:
 
@@ -42,7 +63,7 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 - **Pause** (title bar button or `P`): stops the clock and hides the board behind plain tiles until you press play. The game also pauses when the tab is hidden or the window loses focus, and waits for play when you come back.
 - **Boss key** (`Esc` or the button in the bottom right corner): covers the screen with a spreadsheet of fresh made up figures, renames the tab and swaps its icon, and pauses the game. Press it again, or click the 100% in the status bar, to go back.
 - **Best times** are kept in two tabs, one for games played without hints and one for games where a hint was used.
-- **Shortcuts**: F2 or N starts a new game, H asks for a hint, P pauses and Esc is the boss key. They are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
+- **Shortcuts**: F2 or N starts a new game, H asks for a hint, P pauses and Esc is the boss key (Esc closes an open menu first). They are ignored while typing in a dialog or with Ctrl, Alt or Cmd held.
 
 ### Window and display
 
@@ -74,9 +95,11 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 - Rebuilt on [Vite](https://vite.dev) with Vitest, ESLint and Prettier, replacing the abandoned hyperapp-tools webpack 4 setup.
 - A plain static build with readable asset names, versioned links so browsers never mix old and new files, and a simple offline-capable service worker.
 - Settings survive browsers that block site storage, falling back to the defaults.
-- Animated backgrounds are canvas ports in `src/backgrounds`, one file each. A port declares its options and the settings dialog builds itself from them, so adding another xscreensaver hack needs no other code. Phosphor's source code text is only downloaded when that theme is used.
+- Both games are pages of one build. Code they share (themes, backgrounds, zoom, pause, the boss key, settings storage) lives in `src/shell`, Minesweeper keeps the original's file layout in `src`, and Takuzu has `src/takuzu`.
+- Takuzu's rules, an exact line-by-line solver, the technique ladder behind hints and difficulty, and the generator are plain modules with no interface code, and boards are dealt in a web worker.
+- Animated backgrounds are canvas ports in `src/shell/backgrounds`, one file each. A port declares its options and the settings dialog builds itself from them, so adding another xscreensaver hack needs no other code. Phosphor's source code text is only downloaded when that theme is used.
 - Google Analytics removed.
-- Tests for mine placement and the no-guessing solver, chording and its explanations, hints, best times, zoom and fitting, portrait boards and every background and its settings.
+- Tests for mine placement and the no-guessing solver, chording and its explanations, hints, best times, zoom and fitting, portrait boards and every background and its settings, and for Takuzu's rules, solver (checked against a brute force search), every technique, difficulty rating, generation at every size and level, hints that always agree with the solution, and playing.
 
 ## Development
 
@@ -89,13 +112,14 @@ yarn lint     #lint
 yarn deploy   #build and publish to github pages
 ```
 
-Classic's hill (`src/backgrounds/hill.webp` and `ridge.json`) is made from the CC0 source photo by `src/backgrounds/hill.py`, which needs Python with Pillow and numpy. The theme fonts are converted by `src/fonts/convert.mjs`.
+Classic's hill (`src/shell/backgrounds/hill.webp` and `ridge.json`) is made from the CC0 source photo by `src/shell/backgrounds/hill.py`, which needs Python with Pillow and numpy. The theme fonts are converted by `src/fonts/convert.mjs`.
 
 ## Credits
 
+- Takuzu, also known as Binairo, was devised by Frank Coussement and Peter De Schepper. This version's puzzles, solver and hints are its own.
 - Forked from [frenzzy/minesweeper](https://github.com/frenzzy/minesweeper) by Vladimir Kutepov, bootstrapped with [Hyperapp Starter](https://github.com/kriasoft/hyperapp-starter).
 - Classic background by [Chris Barbalis](https://unsplash.com/photos/green-grass-field-under-blue-sky--nYBR0LFTvQ) on Unsplash, colour matched to resemble Bliss.
-- Classic's animated hill is cut from [Clouds above Cattle Hill, Roedean](<https://commons.wikimedia.org/wiki/File:Clouds_above_Cattle_Hill,_Roedean_(February_2011).JPG>) by Hassocks5489 (CC0), retouched, mirrored and colour matched to Bliss by `src/backgrounds/hill.py`. Its sky and clouds are drawn live.
+- Classic's animated hill is cut from [Clouds above Cattle Hill, Roedean](<https://commons.wikimedia.org/wiki/File:Clouds_above_Cattle_Hill,_Roedean_(February_2011).JPG>) by Hassocks5489 (CC0), retouched, mirrored and colour matched to Bliss by `src/shell/backgrounds/hill.py`. Its sky and clouds are drawn live.
 - Synthwave background by [Neeqolah Creative Works](https://unsplash.com/photos/a-computer-generated-image-of-a-sun-setting-in-the-distance-Tn5gnXGI3hI) on Unsplash.
 - Synthwave colours from [SynthWave '84](https://github.com/robb0wen/synthwave-vscode) by Robb Owen.
 - Matrix code rain is a canvas port of [GLMatrix](https://github.com/xscreensaver/xscreensaver/blob/master/hacks/glx/glmatrix.c) from xscreensaver by Jamie Zawinski.
