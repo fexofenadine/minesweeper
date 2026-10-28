@@ -1,5 +1,6 @@
 import { EMPTY, emptyBoard } from './rules'
 import { countSolutions, solve } from './solver'
+import { rate } from './techniques'
 
 //seeded so a board can be dealt again from its number
 export const random = (seed) => {
@@ -35,4 +36,20 @@ export const makePuzzle = (n, rng, keep = (board) => countSolutions(board, n, 2)
     if (!keep(givens)) givens[i] = solution[i]
   }
   return { givens, solution }
+}
+
+//a puzzle the techniques up to level can finish and that needs that level, within a time budget
+//finishing by sound steps also proves the solution is the only one
+//falls back to the hardest board found when time runs out
+export const makeGame = (n, level, rng, budget = 1500) => {
+  const start = performance.now()
+  const keep = (board) => rate(board, n, level) !== null
+  let best = null
+  do {
+    const puzzle = makePuzzle(n, rng, keep)
+    const rated = rate(puzzle.givens, n, level).level
+    if (rated === level) return { ...puzzle, level }
+    if (!best || rated > best.level) best = { ...puzzle, level: rated }
+  } while (performance.now() - start < budget)
+  return best
 }

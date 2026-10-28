@@ -1,7 +1,9 @@
 import { expect, it } from 'vitest'
 import { EMPTY, cellsOf, emptyBoard, linesOf, readLine, sizes, solved, violations } from './rules'
-import { countSolutions, solve } from './solver'
-import { makePuzzle, makeSolution, random } from './generate'
+import { countSolutions, propagate, solve, startCandidates } from './solver'
+import { levels, nextSteps, rate, repeats } from './techniques'
+import { makeGame, makePuzzle, makeSolution, random } from './generate'
+import { completeWithErrors, findHint } from './hint'
 
 const parse = (rows) =>
   Int8Array.from(rows.join('').split(''), (c) => (c === '.' ? EMPTY : Number(c)))
@@ -109,4 +111,118 @@ it('deals puzzles with exactly one solution, the one it made', () => {
       expect(countSolutions(fewer, n, 2)).toBe(2)
     }
   }
+})
+
+it('fills the same cells with every technique up to hard as line propagation does', () => {
+  const rng = random(3)
+  for (let run = 0; run < 40; run++) {
+    const n = sizes[run % 4]
+    const board = makeSolution(n, rng)
+    board.forEach((_, i) => rng() < 0.7 && (board[i] = EMPTY))
+    const ladder = board.slice()
+    let broken = false
+    for (;;) {
+      const { contradiction, steps } = nextSteps(ladder, n, 2)
+      if (contradiction) broken = true
+      if (contradiction || !steps.length) break
+      steps.forEach(({ place }) => place.forEach(([i, v]) => (ladder[i] = v)))
+    }
+    const lines = board.slice()
+    const narrowed = propagate(lines, n, startCandidates(n))
+    expect(broken).toBe(false)
+    expect(narrowed).not.toBe(null)
+    expect(ladder).toEqual(lines)
+  }
+})
+
+const hintFor = (rows, solution = null) => {
+  const board = parse(rows)
+  const n = rows.length
+  return findHint({ board, solution: solution ?? solve(board, n), n })
+}
+
+it('hints a pair, a gap and a full count with their reasoning cells', () => {
+  const pair = hintFor(['11....', '......', '......', '......', '......', '......'])
+  expect(pair).toMatchObject({
+    kind: 'pair',
+    place: [[2, 0]],
+    marks: { 0: 'source', 1: 'source', 2: 'zero' },
+  })
+  expect(pair.text).toMatch(/row 1/)
+  const gap = hintFor(['1.1...', '......', '......', '......', '......', '......'])
+  expect(gap).toMatchObject({ kind: 'gap', place: [[1, 0]] })
+  const count = hintFor(['1010.1', '......', '......', '......', '......', '......'])
+  expect(count).toMatchObject({ kind: 'count', place: [[4, 0]] })
+  expect(count.text).toMatch(/Row 1 already has all 3 of its 1s/)
+})
+
+it('rules out a line that would repeat a full one', () => {
+  const [step] = repeats(parse(['0101', '01..', '....', '....']), 4)
+  expect(step.place).toEqual([
+    [6, 1],
+    [7, 0],
+  ])
+  expect(step.text).toMatch(/Row 2 could otherwise end up the same as row 1/)
+})
+
+it('points out a broken rule before anything else', () => {
+  const rows = ['111...', '......', '......', '......', '......', '......']
+  const hint = findHint({ board: parse(rows), solution: makeSolution(6, random(1)), n: 6 })
+  expect(hint).toMatchObject({ kind: 'break', marks: { 0: 'wrong', 1: 'wrong', 2: 'wrong' } })
+  expect(hint.text).toMatch(/Row 1 has three 1s in a row/)
+  expect(completeWithErrors).toMatch(/complete but there are errors/)
+})
+
+it('marks a cell that breaks no rule yet but does not fit the solution', () => {
+  const { givens, solution } = makeGame(8, 1, random(9))
+  const board = givens.slice()
+  const i = board.indexOf(EMPTY)
+  board[i] = 1 - solution[i]
+  const hint = findHint({ board, solution, n: 8 })
+  //either it already breaks a rule or it is called out as not fitting
+  expect(['break', 'wrong']).toContain(hint.kind)
+  if (hint.kind === 'wrong') expect(hint.marks).toEqual({ [i]: 'wrong' })
+})
+
+it('deals every size at every level, needing exactly that level', () => {
+  for (const n of sizes) {
+    for (let level = 0; level < levels.length; level++) {
+      if (n === 6 && level === 3) continue
+      const { givens, solution, level: got } = makeGame(n, level, random(n * 10 + level))
+      expect(got).toBe(level)
+      expect(rate(givens, n).level).toBe(level)
+      if (level) expect(rate(givens, n, level - 1)).toBe(null)
+      expect(countSolutions(givens, n, 2)).toBe(1)
+      expect(rate(givens, n).solution).toEqual(solution)
+    }
+  }
+})
+
+it('finishes boards by following hints alone, every hint agreeing with the solution', () => {
+  const kinds = new Set()
+  for (const [n, level] of [
+    [6, 0],
+    [8, 1],
+    [8, 2],
+    [10, 3],
+    [12, 3],
+  ]) {
+    for (let seed = 0; seed < 3; seed++) {
+      const { givens, solution } = makeGame(n, level, random(seed + 100))
+      const board = givens.slice()
+      for (let guard = 0; guard < n * n; guard++) {
+        const hint = findHint({ board, solution, n })
+        if (hint.kind === 'solved') break
+        kinds.add(hint.kind)
+        expect(hint.place.length).toBeGreaterThan(0)
+        for (const [i, v] of hint.place) {
+          expect(v).toBe(solution[i])
+          board[i] = v
+        }
+      }
+      expect(solved(board, n)).toBe(true)
+    }
+  }
+  for (const kind of ['pair', 'gap', 'count', 'balance', 'what-if']) expect(kinds).toContain(kind)
+  expect(kinds).not.toContain('reveal')
 })

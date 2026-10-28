@@ -46,37 +46,53 @@ export const emptyBoard = (n) => new Int8Array(n * n).fill(EMPTY)
 
 export const full = (board) => !board.includes(EMPTY)
 
-//cells breaking a rule: three alike in a row, too many of one value, or a repeated full line
-export const violations = (board, n) => {
-  const bad = new Set()
+export const lineName = (line, n) => (line < n ? `row ${line + 1}` : `column ${line - n + 1}`)
+
+const capital = (text) => text[0].toUpperCase() + text.slice(1)
+
+//each broken rule with its cells and a sentence: three alike in a row, too many of one value,
+//or a full line repeated
+export const breaks = (board, n) => {
+  const found = []
   const lines = cellsOf(n)
   const done = new Map()
   lines.forEach((cells, line) => {
+    const name = lineName(line, n)
     for (let k = 2; k < n; k++) {
       const v = board[cells[k]]
       if (v !== EMPTY && v === board[cells[k - 1]] && v === board[cells[k - 2]]) {
-        bad
-          .add(cells[k])
-          .add(cells[k - 1])
-          .add(cells[k - 2])
+        found.push({
+          cells: [cells[k - 2], cells[k - 1], cells[k]],
+          text: `${capital(name)} has three ${v}s in a row.`,
+        })
       }
     }
     for (const v of [0, 1]) {
       const same = cells.filter((i) => board[i] === v)
-      if (same.length * 2 > n) same.forEach((i) => bad.add(i))
+      if (same.length * 2 > n) {
+        found.push({
+          cells: same,
+          text: `${capital(name)} has ${same.length} ${v}s, but only ${n / 2} fit in a line of ${n}.`,
+        })
+      }
     }
     const { known, value } = readLine(board, cells)
     if (known !== (1 << n) - 1) return
     //rows only repeat rows and columns only repeat columns
     const key = `${line < n ? 'r' : 'c'}${value}`
     if (done.has(key)) {
-      cells.forEach((i) => bad.add(i))
-      lines[done.get(key)].forEach((i) => bad.add(i))
+      const twin = done.get(key)
+      found.push({
+        cells: [...lines[twin], ...cells],
+        text: `${capital(lineName(twin, n))} and ${name} are the same, and no two ${line < n ? 'rows' : 'columns'} may match.`,
+      })
     } else {
       done.set(key, line)
     }
   })
-  return bad
+  return found
 }
+
+export const violations = (board, n) => new Set(breaks(board, n).flatMap((b) => b.cells))
 
 export const solved = (board, n) => full(board) && violations(board, n).size === 0
