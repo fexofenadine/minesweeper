@@ -6,33 +6,10 @@ import Digit from './Digit'
 import Play from './Play'
 import Cell from './Cell'
 import Button from './Button'
-import { watchWindow } from './zoom'
+import WindowControls from './shell/WindowControls'
+import { watchWindow } from './shell/zoom'
 
 const running = ({ start, win, lose }) => start >= 0 && !win && !lose
-
-//title bar pause and zoom buttons in place of a resize grip
-const Zoom = ({ scale, onZoom, game, onPause }) => [
-  <Button
-    tabIndex={-1}
-    title={game.paused ? 'Resume (P)' : 'Pause (P)'}
-    disabled={!running(game)}
-    onClick={() => onPause()}
-  >
-    <svg width="13" height="11">
-      <path d={game.paused ? 'M4 1.5v8l6-4z' : 'M4 2h2v7H4zM8 2h2v7H8z'} />
-    </svg>
-  </Button>,
-  <Button tabIndex={-1} title="Zoom out" disabled={scale <= 0.5} onClick={() => onZoom(-1)}>
-    <svg width="13" height="11">
-      <path d="M3 5h8v2H3z" />
-    </svg>
-  </Button>,
-  <Button tabIndex={-1} title="Zoom in" disabled={scale >= 4} onClick={() => onZoom(1)}>
-    <svg width="13" height="11">
-      <path d="M6 2h2v3h3v2H8v3H6V7H3V5h3z" />
-    </svg>
-  </Button>,
-]
 
 //wide boards on portrait screens are shown transposed, cells keep their own x and y
 export const transposed = ({ portrait, game }) => portrait && game.width > game.height
@@ -50,10 +27,11 @@ const Game = ({ key, state, actions }) => (
     titleHint="Double-click for 100% zoom"
     onTitleDoubleClick={() => actions.zoom(0)}
     controls={
-      <Zoom
+      <WindowControls
         scale={state.zoom.scale}
         onZoom={actions.zoom}
-        game={state.game}
+        paused={state.game.paused}
+        canPause={running(state.game)}
         onPause={actions.pause}
       />
     }

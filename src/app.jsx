@@ -4,15 +4,13 @@ import Game, { transposed } from './Game'
 import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
-import BackgroundSettings from './BackgroundSettings'
+import BackgroundSettings from './shell/BackgroundSettings'
 import About from './About'
-import Boss, { BossButton, makeSheet } from './Boss'
+import Boss, { BossButton } from './shell/Boss'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
-import { load, save, remove } from './storage'
-import { themes } from './themes'
-import { backgroundFor, configure, defaults, loadSettings, saveSettings } from './backgrounds'
-import { applyZoom, fitZoom, loadZoom, measureFit, sameSize, saveZoom, stepZoom } from './zoom'
+import { load, save, remove } from './shell/storage'
+import { listen, shellActions, shellState, shortcut } from './shell/actions'
 
 const levels = {
   beginner: {
@@ -145,11 +143,6 @@ const loadLevel = () => {
   return customLevel({ width: data[0], height: data[1], mines: data[2] }, levels.beginner)
 }
 
-const loadTheme = () => {
-  const theme = load('theme')
-  return themes.some(([id]) => id === theme) ? theme : 'classic'
-}
-
 //best times are kept apart for games played with and without hints
 const timeKey = (level, hinted) => (hinted ? `${level}Hints` : level)
 
@@ -178,50 +171,31 @@ const prevent = (event) => {
 }
 
 export const state = {
-  menu: null,
+  ...shellState(),
   hint: null,
   game: createGame(loadLevel()),
   marks: Boolean(load('marks')),
   safeStart: load('safeStart') !== 'off',
   noGuess: Boolean(load('noGuess')),
-  theme: loadTheme(),
   winner: null,
   bestTime: null,
   about: false,
-  boss: null,
   customField: null,
-  backgrounds: loadSettings(),
-  backgroundSettings: null,
-  zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null },
-  portrait: Boolean(window.matchMedia && matchMedia('(orientation: portrait)').matches),
 }
 
 export const actions = {
+  ...shellActions,
   init: () => (state, actions) => {
     window.addEventListener('keydown', actions.press)
-    //leaving the page pauses, coming back waits for play
-    document.addEventListener('visibilitychange', () => document.hidden && actions.pause(true))
-    window.addEventListener('blur', () => actions.pause(true))
-    if (window.matchMedia) {
-      matchMedia('(orientation: portrait)').addEventListener('change', (event) =>
-        actions.setPortrait(event.matches),
-      )
-    }
+    listen(actions)
   },
-  setPortrait: (portrait) => ({ portrait }),
   press: (event) => (state, actions) => {
-    //leave typing in a dialog and browser shortcuts alone
-    const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
-    if (typing || event.ctrlKey || event.metaKey || event.altKey) return
-    if (event.keyCode === 27) {
-      actions.boss()
-    } else if (state.boss) {
-      //the spreadsheet only answers to esc
-    } else if (event.keyCode === 113 || event.keyCode === 78) {
+    const key = shortcut(event, state, actions)
+    if (key === 113 || key === 78) {
       actions.reset()
-    } else if (event.keyCode === 72) {
+    } else if (key === 72) {
       actions.hint()
-    } else if (event.keyCode === 80) {
+    } else if (key === 80) {
       actions.pause()
     }
   },
@@ -251,14 +225,6 @@ export const actions = {
           pressedY: -1,
         },
       }
-    },
-  //esc covers everything with a spreadsheet and pauses the game
-  boss:
-    () =>
-    ({ boss }, actions) => {
-      if (boss) return { boss: null }
-      actions.pause(true)
-      return { menu: null, boss: makeSheet() }
     },
   reset:
     (payload) =>
@@ -602,78 +568,6 @@ export const actions = {
       marks,
     }
   },
-  //a live draft, cancel restores the saved settings
-  toggleBackgroundSettings:
-    () =>
-    ({ theme, backgrounds, backgroundSettings }) => {
-      if (backgroundSettings) {
-        configure(backgroundSettings.id, backgrounds[backgroundSettings.id])
-        return { backgroundSettings: null }
-      }
-      const id = backgroundFor(theme)
-      return { menu: null, backgroundSettings: id && { id, draft: { ...backgrounds[id] } } }
-    },
-  changeBackgroundSettings:
-    (values) =>
-    ({ backgroundSettings: { id, draft } }) => {
-      const next = { ...draft, ...values }
-      configure(id, next)
-      return { backgroundSettings: { id, draft: next } }
-    },
-  resetBackgroundSettings: () => (state, actions) =>
-    actions.changeBackgroundSettings(defaults(state.backgroundSettings.id)),
-  submitBackgroundSettings:
-    (event) =>
-    ({ backgrounds, backgroundSettings: { id, draft } }) => {
-      event.preventDefault()
-      const next = { ...backgrounds, [id]: draft }
-      saveSettings(next)
-      return { backgrounds: next, backgroundSettings: null }
-    },
-  //shrink the chosen zoom to fit, only for a new level, theme or browser size
-  fit:
-    () =>
-    ({ zoom }) => {
-      const { fit, size } = measureFit(zoom.scale)
-      if (sameSize(size, zoom.seen)) return null
-      const scale = fitZoom(zoom.chosen, fit)
-      applyZoom(scale)
-      return { zoom: { ...zoom, scale, seen: size } }
-    },
-  //step from the shown size, or back to 100%
-  zoom:
-    (direction) =>
-    ({ zoom }) => {
-      const { fit, size } = measureFit(zoom.scale)
-      const chosen = direction ? stepZoom(zoom.scale, direction) : 1
-      const scale = direction ? chosen : fitZoom(chosen, fit)
-      saveZoom(chosen)
-      applyZoom(scale)
-      return { zoom: { chosen, scale, seen: size } }
-    },
-  setTheme: (theme) => () => {
-    save('theme', theme)
-    document.documentElement.dataset.theme = theme
-    return {
-      menu: null,
-      theme,
-    }
-  },
-  toggleMenu:
-    (event) =>
-    ({ menu }) => {
-      const { name } = event.currentTarget.dataset
-      if (event.type === 'click') {
-        return { menu: menu && menu[name] ? null : { [name]: true } }
-      }
-      if (event.type === 'mouseenter') {
-        return menu ? { menu: { [name]: true } } : null
-      }
-      if (event.type === 'focusout' && !event.currentTarget.contains(event.relatedTarget)) {
-        return { menu: null }
-      }
-      return null
-    },
 }
 
 export const view = (state, actions) => (

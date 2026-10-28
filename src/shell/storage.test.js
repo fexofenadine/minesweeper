@@ -8,7 +8,7 @@ it('starts with default settings when the browser blocks site storage', async ()
   }
   vi.stubGlobal('localStorage', { getItem: blocked, setItem: blocked, removeItem: blocked })
   vi.resetModules()
-  const { state } = await import('./app')
+  const { state } = await import('../app')
   expect(state.theme).toBe('classic')
   expect(state.game.level).toBe('beginner')
   expect(state.safeStart).toBe(true)

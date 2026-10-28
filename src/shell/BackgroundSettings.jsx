@@ -1,8 +1,8 @@
 import { h } from 'hyperapp'
 import s from './BackgroundSettings.module.css'
-import Overlay from './Overlay'
-import Dialog from './Dialog'
-import Button from './Button'
+import Overlay from '../Overlay'
+import Dialog from '../Dialog'
+import Button from '../Button'
 import { backgrounds, optionsOf } from './backgrounds'
 
 //a control per option type, built from each background's options

@@ -1,9 +1,8 @@
 import { h } from 'hyperapp'
 import s from './Menu.module.css'
-import { backgroundFor } from './backgrounds'
-import { themes } from './themes'
+import ThemeMenu from './shell/ThemeMenu'
 
-const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
+export const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
   <li key={key} class={s.item}>
     <button type="button" class={s.option} tabindex={-1} onclick={onClick}>
       {checked && (
@@ -22,7 +21,7 @@ const SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => (
   </li>
 )
 
-const MenuItem = ({ key, name, type, active, onChange }, children) => (
+export const MenuItem = ({ key, name, type, active, onChange }, children) => (
   <li key={key} class={active && active[type] ? s.columnActive : s.column}>
     <button
       type="button"
@@ -42,7 +41,7 @@ const MenuItem = ({ key, name, type, active, onChange }, children) => (
   </li>
 )
 
-const Separator = () => <li class={s.separator} />
+export const Separator = () => <li class={s.separator} />
 
 const Menu = ({ state, actions }) => (
   <ul class={s.root} tabindex={-1} onfocusout={actions.toggleMenu}>
@@ -86,19 +85,7 @@ const Menu = ({ state, actions }) => (
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
     </MenuItem>
-    <MenuItem name="Theme" type="theme" active={state.menu} onChange={actions.toggleMenu}>
-      {themes.map(([theme, name]) => (
-        <SubMenuItem
-          name={name}
-          checked={state.theme === theme}
-          onClick={() => actions.setTheme(theme)}
-        />
-      ))}
-      {backgroundFor(state.theme) && <Separator />}
-      {backgroundFor(state.theme) && (
-        <SubMenuItem name="Background Settings..." onClick={actions.toggleBackgroundSettings} />
-      )}
-    </MenuItem>
+    <ThemeMenu state={state} actions={actions} />
     <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
       <SubMenuItem name="About Minesweeper Plus..." onClick={actions.toggleAbout} />
     </MenuItem>

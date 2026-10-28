@@ -43,7 +43,7 @@ const brightness = ([r, g, b]) => Math.max(r, g, b)
 
 //the source files, loaded only once phosphor first runs
 const sources = import.meta.glob(
-  ['../*.{js,jsx}', './*.js', '!../*.test.*', '!./*.test.*', '!./font6x10.js'],
+  ['/src/**/*.{js,jsx}', '!/src/**/*.test.*', '!/src/shell/backgrounds/font6x10.js'],
   {
     query: '?raw',
     import: 'default',
@@ -54,7 +54,7 @@ let texts = null
 export const loadTexts = () =>
   (texts ??= Promise.all(
     Object.entries(sources).map(async ([path, load]) => ({
-      name: `src/${path.replace(/^\.\.\//, '').replace(/^\.\//, 'backgrounds/')}`,
+      name: path.slice(1),
       text: await load(),
     })),
   ))

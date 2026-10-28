@@ -1,6 +1,6 @@
 import { h } from 'hyperapp'
 import s from './Boss.module.css'
-import Button from './Button'
+import Button from '../Button'
 
 const departments = [
   'Engineering',

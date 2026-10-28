@@ -1,6 +1,6 @@
 import { app } from 'hyperapp'
 import { state, actions, view } from './app'
-import { startBackgrounds } from './backgrounds'
+import { startBackgrounds } from './shell/backgrounds'
 
 app(state, actions, view, document.getElementById('app'))
 startBackgrounds()
