@@ -214,6 +214,7 @@ var Game_module_default = {
 	field: "Game_field",
 	active: "Game_active",
 	inactive: "Game_inactive",
+	paused: "Game_paused",
 	fieldLost: "Game_fieldLost Game_field",
 	jitter: "Game_jitter",
 	chroma: "Game_chroma",
@@ -1310,20 +1311,21 @@ var sources = /* #__PURE__ */ Object.assign({
 	"../About.jsx": () => __vitePreload(() => import("./About-D9CbMnRN.js").then((m) => m["default"]), [], import.meta.url),
 	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-Lz6_3lr6.js").then((m) => m["default"]), [], import.meta.url),
 	"../BestTime.jsx": () => __vitePreload(() => import("./BestTime-Ce22rTOt.js").then((m) => m["default"]), [], import.meta.url),
+	"../Boss.jsx": () => __vitePreload(() => import("./Boss-DVj8-Yu3.js").then((m) => m["default"]), [], import.meta.url),
 	"../Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
 	"../Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
 	"../CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"../Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
 	"../Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"../Game.jsx": () => __vitePreload(() => import("./Game-B4itl_AX.js").then((m) => m["default"]), [], import.meta.url),
+	"../Game.jsx": () => __vitePreload(() => import("./Game-EAJjAAj_.js").then((m) => m["default"]), [], import.meta.url),
 	"../Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
 	"../Menu.jsx": () => __vitePreload(() => import("./Menu-B4hKNzU8.js").then((m) => m["default"]), [], import.meta.url),
-	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-BtrJ3RPa.js").then((m) => m["default"]), [], import.meta.url),
+	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
 	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"../app.jsx": () => __vitePreload(() => import("./app-Bjox9kX8.js").then((m) => m["default"]), [], import.meta.url),
+	"../app.jsx": () => __vitePreload(() => import("./app-ByHpwi04.js").then((m) => m["default"]), [], import.meta.url),
 	"./hill.js": () => __vitePreload(() => import("./hill-BeKOzOig.js").then((m) => m["default"]), [], import.meta.url),
-	"./index.js": () => __vitePreload(() => import("./backgrounds-DWHrOU0z.js").then((m) => m["default"]), [], import.meta.url),
+	"./index.js": () => __vitePreload(() => import("./backgrounds-yzT2ejc9.js").then((m) => m["default"]), [], import.meta.url),
 	"./matrix.js": () => __vitePreload(() => import("./matrix-Cs_X-Gm1.js").then((m) => m["default"]), [], import.meta.url),
 	"./substrate.js": () => __vitePreload(() => import("./substrate-DEEODJfR.js").then((m) => m["default"]), [], import.meta.url),
 	"./truchet.js": () => __vitePreload(() => import("./truchet-CPTm170L.js").then((m) => m["default"]), [], import.meta.url),
@@ -2020,6 +2022,11 @@ var startBackgrounds = () => {
 		cancelAnimationFrame(frame);
 		if (mode === "wallpaper") return;
 		resize();
+		if (!root.dataset.boss) frame = requestAnimationFrame(mode === "animated" ? loop : settle);
+	};
+	const cover = () => {
+		cancelAnimationFrame(frame);
+		if (root.dataset.boss || !active || mode === "wallpaper") return;
 		frame = requestAnimationFrame(mode === "animated" ? loop : settle);
 	};
 	const watchPixels = () => {
@@ -2047,6 +2054,10 @@ var startBackgrounds = () => {
 	new MutationObserver(() => update()).observe(root, {
 		attributes: true,
 		attributeFilter: ["data-theme"]
+	});
+	new MutationObserver(cover).observe(root, {
+		attributes: true,
+		attributeFilter: ["data-boss"]
 	});
 	window.addEventListener("resize", () => active && start());
 	watchPixels();
@@ -2431,7 +2442,7 @@ var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mar
 })));
 //#endregion
 //#region src/zoom.js
-var root$7 = document.documentElement;
+var root$8 = document.documentElement;
 var steps = [
 	.5,
 	.625,
@@ -2453,7 +2464,7 @@ var loadZoom = () => {
 };
 var stepZoom = (scale, direction) => direction > 0 ? steps.find((step) => step > scale + .001) ?? steps[steps.length - 1] : steps.findLast((step) => step < scale - .001) ?? steps[0];
 var fitZoom = (chosen, fit) => fit >= chosen ? chosen : Math.min(chosen, Math.max(MIN_FIT, Math.floor(fit * 50) / 50));
-var applyZoom = (scale) => root$7.style.setProperty("--scale", scale);
+var applyZoom = (scale) => root$8.style.setProperty("--scale", scale);
 var saveZoom = (scale) => save("scale", scale);
 var gameWindow = null;
 var measureFit = (scale) => {
@@ -2483,23 +2494,36 @@ var watchWindow = (dialog, refit) => {
 };
 //#endregion
 //#region src/Game.jsx
-var Zoom = ({ scale, onZoom }) => [/* @__PURE__ */ h(Button, {
-	tabIndex: -1,
-	title: "Zoom out",
-	disabled: scale <= .5,
-	onClick: () => onZoom(-1)
-}, /* @__PURE__ */ h("svg", {
-	width: "13",
-	height: "11"
-}, /* @__PURE__ */ h("path", { d: "M3 5h8v2H3z" }))), /* @__PURE__ */ h(Button, {
-	tabIndex: -1,
-	title: "Zoom in",
-	disabled: scale >= 4,
-	onClick: () => onZoom(1)
-}, /* @__PURE__ */ h("svg", {
-	width: "13",
-	height: "11"
-}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))];
+var running = ({ start, win, lose }) => start >= 0 && !win && !lose;
+var Zoom = ({ scale, onZoom, game, onPause }) => [
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: game.paused ? "Resume (P)" : "Pause (P)",
+		disabled: !running(game),
+		onClick: () => onPause()
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: game.paused ? "M4 1.5v8l6-4z" : "M4 2h2v7H4zM8 2h2v7H8z" }))),
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: "Zoom out",
+		disabled: scale <= .5,
+		onClick: () => onZoom(-1)
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: "M3 5h8v2H3z" }))),
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: "Zoom in",
+		disabled: scale >= 4,
+		onClick: () => onZoom(1)
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))
+];
 var transposed = ({ portrait, game }) => portrait && game.width > game.height;
 var rowsOf = (state) => {
 	const { field } = state.game;
@@ -2521,7 +2545,9 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	onTitleDoubleClick: () => actions.zoom(0),
 	controls: /* @__PURE__ */ h(Zoom, {
 		scale: state.zoom.scale,
-		onZoom: actions.zoom
+		onZoom: actions.zoom,
+		game: state.game,
+		onPause: actions.pause
 	}),
 	onCreate: (dialog) => {
 		watchWindow(dialog, actions.fit);
@@ -2535,25 +2561,32 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	lose: state.game.lose,
 	win: state.game.win,
 	onReset: actions.reset
-}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: state.game.win || state.game.lose ? Game_module_default.inactive : Game_module_default.active }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
+}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
 	x,
 	y,
 	pressed: state.game.pressed,
 	pressedX: state.game.pressedX,
 	pressedY: state.game.pressedY,
 	group: state.game.group,
-	opened: cell.opened,
+	opened: cell.opened && !state.game.paused,
 	mined: cell.mined,
-	flag: cell.flag,
-	mark: cell.mark,
+	flag: cell.flag && !state.game.paused,
+	mark: cell.mark && !state.game.paused,
 	num: cell.num,
-	hint: state.hint && state.hint.marks[y * state.game.width + x],
+	hint: !state.game.paused && state.hint && state.hint.marks[y * state.game.width + x],
 	lose: state.game.lose,
 	onDown: actions.down,
 	onMove: actions.move,
 	onTouch: actions.touch,
 	onChord: actions.chord
-}))))), state.hint && /* @__PURE__ */ h("p", {
+})))), state.game.paused && /* @__PURE__ */ h("div", { class: Game_module_default.paused }, /* @__PURE__ */ h(Button, {
+	tabIndex: -1,
+	title: "Resume (P)",
+	onClick: () => actions.pause(false)
+}, /* @__PURE__ */ h("svg", {
+	width: "40",
+	height: "40"
+}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), state.hint && !state.game.paused && /* @__PURE__ */ h("p", {
 	class: Game_module_default.hint,
 	role: "status"
 }, state.hint.text)));
@@ -2570,11 +2603,15 @@ var Overlay_module_default = {
 };
 //#endregion
 //#region src/Overlay.jsx
+var keyDown = (onKeyDown) => (event) => {
+	if (event.keyCode === 27 && onKeyDown) event.stopPropagation();
+	if (onKeyDown) onKeyDown(event);
+};
 var Overlay = ({ key, onKeyDown }, children) => /* @__PURE__ */ h("section", {
 	key,
 	class: Overlay_module_default.root,
 	tabindex: -1,
-	onkeydown: onKeyDown
+	onkeydown: keyDown(onKeyDown)
 }, /* @__PURE__ */ h("div", { class: Overlay_module_default.table }, /* @__PURE__ */ h("div", { class: Overlay_module_default.cell }, children)));
 var Input_module_default = {
 	root: "Input_root",
@@ -2630,7 +2667,7 @@ var BestTime_module_default = {
 };
 //#endregion
 //#region src/BestTime.jsx
-var tabs = [{
+var tabs$1 = [{
 	id: "clean",
 	name: "No hints"
 }, {
@@ -2646,7 +2683,7 @@ var BestTime = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("div", {
 	class: BestTime_module_default.tabs,
 	role: "tablist"
-}, tabs.map((tab) => /* @__PURE__ */ h("button", {
+}, tabs$1.map((tab) => /* @__PURE__ */ h("button", {
 	type: "button",
 	role: "tab",
 	tabindex: -1,
@@ -2790,6 +2827,154 @@ var About = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
 	onClick: actions.toggleAbout,
 	onCreate: (el) => el.focus()
 }, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
+var Boss_module_default = {
+	root: "Boss_root",
+	header: "Boss_header",
+	title: "Boss_title",
+	menus: "Boss_menus",
+	formula: "Boss_formula",
+	ref: "Boss_ref",
+	fx: "Boss_fx",
+	grid: "Boss_grid",
+	table: "Boss_table",
+	corner: "Boss_corner",
+	number: "Boss_number",
+	figure: "Boss_figure",
+	negative: "Boss_negative",
+	total: "Boss_total",
+	selected: "Boss_selected",
+	footer: "Boss_footer",
+	tabs: "Boss_tabs",
+	tab: "Boss_tab",
+	tabActive: "Boss_tabActive Boss_tab",
+	status: "Boss_status",
+	exit: "Boss_exit",
+	button: "Boss_button",
+	label: "Boss_label"
+};
+//#endregion
+//#region src/Boss.jsx
+var departments = [
+	"Engineering",
+	"Sales",
+	"Marketing",
+	"Customer support",
+	"Operations",
+	"Finance",
+	"People",
+	"Facilities",
+	"IT",
+	"Legal"
+];
+var headings = [
+	"Department",
+	"Jul",
+	"Aug",
+	"Sep",
+	"Q3 total",
+	"Budget",
+	"Variance",
+	"% of budget"
+];
+var columns = "ABCDEFGHIJKLMN".split("");
+var icon = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='2' fill='%232b6cb0'/%3E%3Cpath d='M3 5.5h10M3 8.5h10M3 11.5h10M6.5 3v10M10 3v10' stroke='%23fff'/%3E%3C/svg%3E";
+var makeSheet = () => ({ rows: departments.map((name) => {
+	const base = 2e4 + Math.random() * 18e4;
+	const spend = [
+		0,
+		1,
+		2
+	].map(() => Math.round(base * (.9 + Math.random() * .2)));
+	const total = spend[0] + spend[1] + spend[2];
+	const budget = Math.round(total * (.92 + Math.random() * .16) / 1e3) * 1e3;
+	return [
+		name,
+		...spend,
+		total,
+		budget,
+		budget - total
+	];
+}) });
+var money = (n) => n < 0 ? `(${(-n).toLocaleString()})` : n.toLocaleString();
+var Row = ({ number, cells, total }) => /* @__PURE__ */ h("tr", { class: total ? Boss_module_default.total : null }, /* @__PURE__ */ h("th", { class: Boss_module_default.number }, number), columns.map((_, i) => {
+	const value = cells && cells[i];
+	const negative = typeof value === "number" && value < 0 && i === 6;
+	return /* @__PURE__ */ h("td", { class: [
+		i > 0 && Boss_module_default.figure,
+		negative && Boss_module_default.negative,
+		total && i === 4 && Boss_module_default.selected
+	].filter(Boolean).join(" ") }, typeof value === "number" ? money(value) : value);
+}));
+var saved = null;
+var cover = (el) => {
+	const link = document.querySelector("link[rel~=\"icon\"]");
+	saved = {
+		title: document.title,
+		href: link && link.getAttribute("href")
+	};
+	document.title = "Q3 budget";
+	if (link) link.setAttribute("href", icon);
+	document.documentElement.dataset.boss = "true";
+	el.focus();
+};
+var uncover = () => {
+	const link = document.querySelector("link[rel~=\"icon\"]");
+	document.title = saved.title;
+	if (link && saved.href) link.setAttribute("href", saved.href);
+	delete document.documentElement.dataset.boss;
+};
+var Boss = ({ key, state, actions }) => {
+	const sums = [
+		1,
+		2,
+		3,
+		4,
+		5,
+		6
+	].map((i) => state.rows.reduce((sum, row) => sum + row[i], 0));
+	const percent = (row) => `${(row[4] / row[5] * 100).toFixed(1)}%`;
+	const rows = [
+		headings,
+		...state.rows.map((row) => [...row, percent(row)]),
+		[
+			"Total",
+			...sums,
+			percent([0, ...sums])
+		]
+	];
+	return /* @__PURE__ */ h("section", {
+		key,
+		class: Boss_module_default.root,
+		tabindex: -1,
+		oncreate: cover,
+		ondestroy: uncover
+	}, /* @__PURE__ */ h("header", { class: Boss_module_default.header }, /* @__PURE__ */ h("div", { class: Boss_module_default.title }, "Q3 budget"), /* @__PURE__ */ h("nav", { class: Boss_module_default.menus }, [
+		"File",
+		"Edit",
+		"View",
+		"Insert",
+		"Format",
+		"Data",
+		"Tools",
+		"Help"
+	].map((name) => /* @__PURE__ */ h("span", null, name)))), /* @__PURE__ */ h("div", { class: Boss_module_default.formula }, /* @__PURE__ */ h("span", { class: Boss_module_default.ref }, "E", rows.length), /* @__PURE__ */ h("span", { class: Boss_module_default.fx }, "fx"), /* @__PURE__ */ h("span", null, "=SUM(E2:E", rows.length - 1, ")")), /* @__PURE__ */ h("div", { class: Boss_module_default.grid }, /* @__PURE__ */ h("table", { class: Boss_module_default.table }, /* @__PURE__ */ h("thead", null, /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", { class: Boss_module_default.corner }), columns.map((c) => /* @__PURE__ */ h("th", null, c)))), /* @__PURE__ */ h("tbody", null, Array.from({ length: 60 }, (_, i) => /* @__PURE__ */ h(Row, {
+		number: i + 1,
+		cells: rows[i],
+		total: i === rows.length - 1
+	}))))), /* @__PURE__ */ h("footer", { class: Boss_module_default.footer }, /* @__PURE__ */ h("div", { class: Boss_module_default.tabs }, /* @__PURE__ */ h("span", { class: Boss_module_default.tab }, "Summary"), /* @__PURE__ */ h("span", { class: Boss_module_default.tabActive }, "Departments"), /* @__PURE__ */ h("span", { class: Boss_module_default.tab }, "Assumptions")), /* @__PURE__ */ h("div", { class: Boss_module_default.status }, /* @__PURE__ */ h("span", null, "Ready"), /* @__PURE__ */ h("span", null, "Sum: ", money(sums[3])), /* @__PURE__ */ h("button", {
+		type: "button",
+		class: Boss_module_default.exit,
+		onclick: () => actions.boss()
+	}, "100%"))));
+};
+var BossButton = ({ key, actions }) => /* @__PURE__ */ h("div", {
+	key,
+	class: Boss_module_default.button
+}, /* @__PURE__ */ h(Button, {
+	tabIndex: -1,
+	title: "Boss key (Esc)",
+	onClick: () => actions.boss()
+}, /* @__PURE__ */ h("span", { class: Boss_module_default.label }, "Esc")));
 //#endregion
 //#region src/mines.js
 var neighbourCache = /* @__PURE__ */ new Map();
@@ -3099,6 +3284,8 @@ var createGame = ({ level, width, height, mines }) => {
 		win: false,
 		touch: false,
 		hinted: false,
+		paused: false,
+		pausedAt: 0,
 		openedAt: {
 			x: -1,
 			y: -1,
@@ -3193,6 +3380,7 @@ var state = {
 	winner: null,
 	bestTime: null,
 	about: false,
+	boss: null,
 	customField: null,
 	backgrounds: loadSettings(),
 	backgroundSettings: null,
@@ -3206,6 +3394,8 @@ var state = {
 var actions = {
 	init: () => (state, actions) => {
 		window.addEventListener("keydown", actions.press);
+		document.addEventListener("visibilitychange", () => document.hidden && actions.pause(true));
+		window.addEventListener("blur", () => actions.pause(true));
 		if (window.matchMedia) matchMedia("(orientation: portrait)").addEventListener("change", (event) => actions.setPortrait(event.matches));
 	},
 	setPortrait: (portrait) => ({ portrait }),
@@ -3215,8 +3405,44 @@ var actions = {
 			"SELECT",
 			"TEXTAREA"
 		].includes(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
-		if (event.keyCode === 113 || event.keyCode === 78) actions.reset();
+		if (event.keyCode === 27) actions.boss();
+		else if (state.boss) {} else if (event.keyCode === 113 || event.keyCode === 78) actions.reset();
 		else if (event.keyCode === 72) actions.hint();
+		else if (event.keyCode === 80) actions.pause();
+	},
+	pause: (paused) => ({ game }, actions) => {
+		const next = paused === void 0 ? !game.paused : paused;
+		if (game.start < 0 || game.win || game.lose || next === game.paused) return null;
+		if (!next) {
+			game.raf = requestAnimationFrame(actions.tick);
+			return { game: {
+				...game,
+				paused: false,
+				start: game.start + performance.now() - game.pausedAt
+			} };
+		}
+		cancelAnimationFrame(game.raf);
+		window.removeEventListener("mouseup", actions.up);
+		return {
+			menu: null,
+			game: {
+				...game,
+				paused: true,
+				pausedAt: performance.now(),
+				pressed: false,
+				group: false,
+				pressedX: -1,
+				pressedY: -1
+			}
+		};
+	},
+	boss: () => ({ boss }, actions) => {
+		if (boss) return { boss: null };
+		actions.pause(true);
+		return {
+			menu: null,
+			boss: makeSheet()
+		};
 	},
 	reset: (payload) => ({ game }) => {
 		cancelAnimationFrame(game.raf);
@@ -3234,7 +3460,7 @@ var actions = {
 	},
 	hint: () => (state) => {
 		const { game } = state;
-		if (game.win || game.lose) return { menu: null };
+		if (game.win || game.lose || game.paused) return { menu: null };
 		if (game.start < 0) return {
 			menu: null,
 			hint: noHint("Open a cell first, then ask for a hint.")
@@ -3256,7 +3482,7 @@ var actions = {
 		};
 	},
 	touch: ({ event, x, y }) => ({ game }, actions) => {
-		if (game.win || game.lose) return null;
+		if (game.win || game.lose || game.paused) return null;
 		const rect = event.currentTarget.getBoundingClientRect();
 		const timer = setTimeout(actions.flag, 600);
 		const move = ({ touches }) => {
@@ -3292,7 +3518,7 @@ var actions = {
 	},
 	flag: () => ({ game, marks }) => {
 		const { pressedX, pressedY } = game;
-		if (pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null;
+		if (game.paused || pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null;
 		return {
 			hint: null,
 			game: {
@@ -3304,7 +3530,7 @@ var actions = {
 		};
 	},
 	down: ({ event, x, y }) => ({ game, marks }, actions) => {
-		if (game.touch || event.button > 2 || game.win || game.lose) return null;
+		if (game.touch || event.button > 2 || game.win || game.lose || game.paused) return null;
 		window.addEventListener("mouseup", actions.up);
 		const { field, flags } = !game.pressed && event.button === 2 && !game.field[y][x].opened ? toggleFlag(game, x, y, marks) : game;
 		return {
@@ -3321,7 +3547,7 @@ var actions = {
 		};
 	},
 	chord: ({ x, y }) => ({ game }, actions) => {
-		if (game.win || game.lose) return null;
+		if (game.win || game.lose || game.paused) return null;
 		if (!openable(game, x, y)) {
 			const { openedAt } = game;
 			return openedAt.x === x && openedAt.y === y && performance.now() - openedAt.time < 500 ? null : { hint: explainChord(game, x, y) };
@@ -3351,7 +3577,7 @@ var actions = {
 	up: () => ({ game, safeStart, noGuess }, actions) => {
 		window.removeEventListener("mouseup", actions.up);
 		const { width, height, pressedX, pressedY } = game;
-		if (game.win || game.lose || pressedX < 0 || pressedY < 0) {
+		if (game.win || game.lose || game.paused || pressedX < 0 || pressedY < 0) {
 			if (!game.pressed && !game.group) return null;
 			return { game: {
 				...game,
@@ -3617,6 +3843,9 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	key: "a",
 	state,
 	actions
+}), /* @__PURE__ */ h(BossButton, {
+	key: "h",
+	actions
 }), state.winner && /* @__PURE__ */ h(Winner, {
 	key: "b",
 	state: state.winner,
@@ -3635,6 +3864,10 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	actions
 }), state.about && /* @__PURE__ */ h(About, {
 	key: "f",
+	actions
+}), state.boss && /* @__PURE__ */ h(Boss, {
+	key: "g",
+	state: state.boss,
 	actions
 }));
 //#endregion

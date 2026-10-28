@@ -528,6 +528,7 @@ main::before {
 }
 
 .Game_field {
+  position: relative;
   white-space: nowrap;
   border-width: 2px 3px 3px 2px;
   border-style: solid;
@@ -542,6 +543,25 @@ main::before {
 
 .Game_inactive {
   cursor: default;
+}
+
+/*play button over the hidden board*/
+.Game_paused {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Game_paused svg {
+  display: block;
+  margin: 2px;
+  fill: currentColor;
 }
 
 /*neon theme meltdown after hitting a mine*/
@@ -1510,4 +1530,179 @@ main::before {
   display: block;
   min-width: 60px;
   padding: 4px 5px 3px;
+}
+/*a plain office spreadsheet over everything, the same in every theme*/
+.Boss_root {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  color: #202124;
+  font:
+    13px/1.4 'Segoe UI',
+    Arial,
+    sans-serif;
+  text-shadow: none;
+  background: #fff;
+  outline: 0;
+  cursor: default;
+  user-select: none;
+}
+
+.Boss_header {
+  padding: 8px 12px 4px;
+  background: #f8f9fa;
+}
+
+.Boss_title {
+  font-size: 18px;
+}
+
+.Boss_menus {
+  display: flex;
+  gap: 14px;
+  margin-top: 2px;
+  color: #444;
+}
+
+.Boss_formula {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 4px 12px;
+  border-top: 1px solid #dadce0;
+  border-bottom: 1px solid #dadce0;
+}
+
+.Boss_ref {
+  width: 60px;
+  padding-right: 12px;
+  border-right: 1px solid #dadce0;
+}
+
+.Boss_fx {
+  color: #888;
+  font-style: italic;
+}
+
+.Boss_grid {
+  flex: 1;
+  overflow: hidden;
+}
+
+.Boss_table {
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+
+.Boss_table th,
+.Boss_table td {
+  height: 21px;
+  padding: 0 6px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 1px solid #e2e3e3;
+}
+
+.Boss_table th {
+  width: 90px;
+  color: #555;
+  font-weight: normal;
+  background: #f8f9fa;
+}
+
+.Boss_table td:first-of-type {
+  width: 150px;
+}
+
+.Boss_table th.Boss_corner,
+.Boss_table th.Boss_number {
+  width: 40px;
+  text-align: center;
+}
+
+.Boss_table tr:first-child td {
+  font-weight: 600;
+}
+
+.Boss_figure {
+  text-align: right;
+}
+
+.Boss_negative {
+  color: #c5221f;
+}
+
+.Boss_total td {
+  font-weight: 600;
+  border-top: 2px solid #999;
+}
+
+.Boss_table td.Boss_selected {
+  outline: 2px solid #2b6cb0;
+  outline-offset: -2px;
+}
+
+.Boss_footer {
+  background: #f8f9fa;
+  border-top: 1px solid #dadce0;
+}
+
+.Boss_tabs {
+  display: flex;
+  padding: 0 12px;
+}
+
+.Boss_tab {
+  padding: 4px 14px;
+  color: #555;
+}
+
+.Boss_tabActive {
+  color: #2b6cb0;
+  background: #fff;
+  border-bottom: 2px solid #2b6cb0;
+}
+
+.Boss_status {
+  display: flex;
+  gap: 24px;
+  justify-content: flex-end;
+  padding: 2px 12px 3px;
+  color: #555;
+  font-size: 12px;
+  border-top: 1px solid #dadce0;
+}
+
+.Boss_status span:first-child {
+  margin-right: auto;
+}
+
+.Boss_exit {
+  padding: 0;
+  color: inherit;
+  font: inherit;
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+
+/*floating boss key in the bottom right corner*/
+.Boss_button {
+  position: fixed;
+  right: calc(16px + env(safe-area-inset-right));
+  bottom: calc(16px + env(safe-area-inset-bottom));
+  z-index: 3;
+  box-shadow: var(--glow-dim);
+}
+
+.Boss_label {
+  display: block;
+  padding: 3px 8px 2px;
+  font-family: var(--ui-font);
+  text-shadow: var(--text-glow);
 }
