@@ -208,6 +208,19 @@ function app(state, actions, view, container) {
 		return element;
 	}
 }
+var Game_module_default = {
+	root: "Game_root",
+	scoreboard: "Game_scoreboard",
+	buttons: "Game_buttons",
+	field: "Game_field",
+	active: "Game_active",
+	inactive: "Game_inactive",
+	fieldLost: "Game_fieldLost Game_field",
+	jitter: "Game_jitter",
+	chroma: "Game_chroma",
+	band: "Game_band",
+	flicker: "Game_flicker"
+};
 var Dialog_module_default = {
 	a: "Dialog_a",
 	b: "Dialog_b",
@@ -383,7 +396,6 @@ var buildAtlas = (glyphs, cell) => {
 	});
 	return atlas;
 };
-encodings.matrix;
 var glyphImage = (glyph, cell, colour = GLYPH) => {
 	const canvas = document.createElement("canvas");
 	canvas.width = canvas.height = cell;
@@ -1308,54 +1320,59 @@ var rgb = (hex) => [
 var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
 var brightness = ([r, g, b]) => Math.max(r, g, b);
 var sources = /* #__PURE__ */ Object.assign({
-	"/src/About.jsx": () => __vitePreload(() => import("./About-BpTtFm3r.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/BestTime.jsx": () => __vitePreload(() => import("./BestTime-DP2HOKJh.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/About.jsx": () => __vitePreload(() => import("./About-DEpsAxqj.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/BestTime.jsx": () => __vitePreload(() => import("./BestTime-qV8WJr3z.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Game.jsx": () => __vitePreload(() => import("./Game-Dg6wgQO8.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Game.jsx": () => __vitePreload(() => import("./Game-CuFEYF5N.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-CsDqIfnR.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/app.jsx": () => __vitePreload(() => import("./app-bCM5tAFQ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/app.jsx": () => __vitePreload(() => import("./app-B_1TrhCZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/index.js": () => __vitePreload(() => import("./src-2iRfJ9t-.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/About.jsx": () => __vitePreload(() => import("./About-C3ovWGOG.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-C7OYl7t1.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/Board.jsx": () => __vitePreload(() => import("./Board-DPSJdVmY.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Boss.jsx": () => __vitePreload(() => import("./Boss-CgNRzjtu.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/SideButton.jsx": () => __vitePreload(() => import("./SideButton-CAoiUk4E.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/Tabs.jsx": () => __vitePreload(() => import("./Tabs-ClkdhSrf.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/ThemeMenu.jsx": () => __vitePreload(() => import("./ThemeMenu-CjGFC0cl.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/WindowControls.jsx": () => __vitePreload(() => import("./WindowControls-Cz0TNK3C.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-gO6iL7Az.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-DphZoY6B.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/hill.js": () => __vitePreload(() => import("./hill-C0RBa6DT.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/index.js": () => __vitePreload(() => import("./backgrounds-DqF45KDc.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/backgrounds/matrix.js": () => __vitePreload(() => import("./matrix-B34wIKLw.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/matrix.js": () => __vitePreload(() => import("./matrix-BPjC-X-W.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/substrate.js": () => __vitePreload(() => import("./substrate-PZSDDw_U.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/truchet.js": () => __vitePreload(() => import("./truchet-MOZfSJKS.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/clock.js": () => __vitePreload(() => import("./clock-_tnDKn1R.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/prepaint.js": () => __vitePreload(() => import("./prepaint-BOQns3Rk.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/storage.js": () => __vitePreload(() => import("./storage-Cj0EFyod.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/themes.js": () => __vitePreload(() => import("./themes-DFrkB3pZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/worker.js": () => __vitePreload(() => import("./worker-D6fmPkLz.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C_qZLAIo.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-CzUpVlb7.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-bpI06IUh.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-Di5OkK2F.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-CO-gWBZY.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-BjPsN-o6.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-BPUyXzE6.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-C4C3lgHN.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Prompt.jsx": () => __vitePreload(() => import("./Prompt-zY7l38Ey.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-BQTvLBbz.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-BO0x2QS5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-zf0-JfD5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-CXGq3ded.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Bpc4lY75.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Dikzn-tm.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CdZRjkO5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/index.js": () => __vitePreload(() => import("./takuzu-AO7c84x8.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-Dc-4LR4I.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-JSobALHn.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-XOjlfRlB.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-BWmIttHM.js").then((m) => m["default"]), [], import.meta.url)
+	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-OtVkdrpA.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-DSUf_BR0.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-C0hPPQel.js").then((m) => m["default"]), [], import.meta.url)
 });
 var texts = null;
 var loadTexts = () => texts ??= Promise.all(Object.entries(sources).map(async ([path, load]) => ({
@@ -2349,6 +2366,11 @@ var WindowControls = ({ scale, onZoom, paused, canPause, onPause }) => [
 		height: "11"
 	}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))
 ];
+var Board_module_default = {
+	paused: "Board_paused",
+	hint: "Board_hint",
+	outline: "Board_outline"
+};
 //#endregion
 //#region src/shell/zoom.js
 var root$7 = document.documentElement;
@@ -2413,6 +2435,21 @@ var watchWindow = (dialog, refit) => {
 	if (typeof ResizeObserver !== "undefined") new ResizeObserver(() => refit()).observe(dialog);
 	window.addEventListener("resize", () => refit());
 };
+//#endregion
+//#region src/shell/Board.jsx
+var PausedCover = ({ onResume }) => /* @__PURE__ */ h("div", { class: Board_module_default.paused }, /* @__PURE__ */ h(Button, {
+	tabIndex: -1,
+	title: "Resume (P)",
+	onClick: () => onResume()
+}, /* @__PURE__ */ h("svg", {
+	width: "40",
+	height: "40"
+}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))));
+var HintPanel = ({ text }) => /* @__PURE__ */ h("p", {
+	class: Board_module_default.hint,
+	role: "status",
+	...hangBelow
+}, text);
 var Winner_module_default = {
 	root: "Winner_root",
 	text: "Winner_text",
@@ -2488,6 +2525,19 @@ var BestTime_module_default = {
 	tab: "BestTime_tab",
 	tabActive: "BestTime_tabActive BestTime_tab"
 };
+//#endregion
+//#region src/shell/Tabs.jsx
+var Tabs = ({ tabs, active, onSelect }) => /* @__PURE__ */ h("div", {
+	class: BestTime_module_default.tabs,
+	role: "tablist"
+}, tabs.map((tab) => /* @__PURE__ */ h("button", {
+	type: "button",
+	role: "tab",
+	tabindex: -1,
+	"aria-selected": active === tab.id,
+	class: active === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
+	onclick: () => onSelect(tab.id)
+}, tab.name)));
 var BackgroundSettings_module_default = {
 	root: "BackgroundSettings_root",
 	row: "BackgroundSettings_row",
@@ -2559,6 +2609,25 @@ var About_module_default = {
 	footer: "About_footer",
 	button: "About_button"
 };
+//#endregion
+//#region src/shell/About.jsx
+var Link = ({ href }, children) => /* @__PURE__ */ h("a", {
+	class: About_module_default.link,
+	href,
+	target: "_blank",
+	rel: "noopener noreferrer"
+}, children);
+var About = ({ key, name, actions }, children) => /* @__PURE__ */ h(Overlay, {
+	key,
+	onKeyDown: (event) => event.keyCode === 27 && actions.toggleAbout()
+}, /* @__PURE__ */ h(Dialog, {
+	title: `About ${name}`,
+	onClose: actions.toggleAbout
+}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, name), children, /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzles" }, "github.com/fexofenadine/puzzles")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
+	type: "button",
+	onClick: actions.toggleAbout,
+	onCreate: (el) => el.focus()
+}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
 var Boss_module_default = {
 	root: "Boss_root",
 	header: "Boss_header",
@@ -2731,12 +2800,13 @@ var listen = (actions) => {
 	window.addEventListener("blur", () => actions.pause(true));
 	if (window.matchMedia) matchMedia("(orientation: portrait)").addEventListener("change", (event) => actions.setPortrait(event.matches));
 };
+var typing = (event) => [
+	"INPUT",
+	"SELECT",
+	"TEXTAREA"
+].includes(event.target.tagName);
 var shortcut = (event, state, actions) => {
-	if ([
-		"INPUT",
-		"SELECT",
-		"TEXTAREA"
-	].includes(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return null;
+	if (typing(event) || event.ctrlKey || event.metaKey || event.altKey) return null;
 	if (event.keyCode === 27) {
 		if (state.menu) actions.closeMenu();
 		else actions.boss();
@@ -2833,9 +2903,33 @@ var shellActions = {
 	}
 };
 //#endregion
+//#region src/shell/clock.js
+var pauseAction = (running, onPause = () => ({})) => (paused) => ({ game }, actions) => {
+	const next = paused === void 0 ? !game.paused : paused;
+	if (!running(game) || next === game.paused) return null;
+	if (!next) {
+		game.raf = requestAnimationFrame(actions.tick);
+		return { game: {
+			...game,
+			paused: false,
+			start: game.start + performance.now() - game.pausedAt
+		} };
+	}
+	cancelAnimationFrame(game.raf);
+	return {
+		menu: null,
+		game: {
+			...game,
+			...onPause(game, actions),
+			paused: true,
+			pausedAt: performance.now()
+		}
+	};
+};
+//#endregion
 //#region src/shell/worker.js
 var registerWorker = () => {
 	if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("../service-worker.js", { scope: "./" }).catch(() => {});
 };
 //#endregion
-export { glyphImage as A, MenuItem as C, startBackgrounds as D, ThemeMenu as E, Dialog as F, Button as I, app as L, remove as M, save as N, BRIGHT as O, Menu_module_default as P, h as R, Menu as S, SubMenuItem as T, HintIcon as _, shortcut as a, Play as b, About_module_default as c, Winner as d, Input as f, WindowControls as g, watchWindow as h, shellState as i, load as j, GLYPH as k, BackgroundSettings as l, hangBelow as m, listen as n, Boss as o, Overlay as p, shellActions as r, BossButton as s, registerWorker as t, BestTime_module_default as u, SideButton as v, Separator as w, Digit as x, UndoIcon as y };
+export { SubMenuItem as A, Dialog as B, SideButton as C, Menu as D, Digit as E, glyphImage as F, Game_module_default as H, load as I, remove as L, startBackgrounds as M, BRIGHT as N, MenuItem as O, GLYPH as P, save as R, HintIcon as S, Play as T, app as U, Button as V, h as W, Overlay as _, shellState as a, watchWindow as b, Boss as c, Link as d, BackgroundSettings as f, Input as g, Winner as h, shellActions as i, ThemeMenu as j, Separator as k, BossButton as l, BestTime_module_default as m, pauseAction as n, shortcut as o, Tabs as p, listen as r, typing as s, registerWorker as t, About as u, HintPanel as v, UndoIcon as w, WindowControls as x, PausedCover as y, Menu_module_default as z };

@@ -1,19 +1,4 @@
-import { D as startBackgrounds, F as Dialog, I as Button, L as app, M as remove, N as save, R as h, S as Menu, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, f as Input, g as WindowControls, h as watchWindow, i as shellState, j as load, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, x as Digit } from "./worker-COk6R1rk.js";
-var Game_module_default = {
-	root: "Game_root",
-	scoreboard: "Game_scoreboard",
-	buttons: "Game_buttons",
-	field: "Game_field",
-	active: "Game_active",
-	inactive: "Game_inactive",
-	paused: "Game_paused",
-	fieldLost: "Game_fieldLost Game_field",
-	jitter: "Game_jitter",
-	chroma: "Game_chroma",
-	band: "Game_band",
-	flicker: "Game_flicker",
-	hint: "Game_hint"
-};
+import { B as Dialog, C as SideButton, D as Menu, E as Digit, H as Game_module_default, I as load, L as remove, M as startBackgrounds, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, g as Input, h as Winner, i as shellActions, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, t as registerWorker, u as About, v as HintPanel, x as WindowControls, y as PausedCover } from "./worker-D-X_Ba-8.js";
 var Cell_module_default = {
 	root: "Cell_root",
 	pressed: "Cell_pressed Cell_root",
@@ -31,11 +16,11 @@ var Cell_module_default = {
 	wrong: "Cell_wrong",
 	mine: "Cell_mine",
 	shine: "Cell_shine",
-	hintSource: "Cell_hintSource",
-	hintSafe: "Cell_hintSafe",
-	hintMine: "Cell_hintMine",
-	hintWrong: "Cell_hintWrong",
-	hintUnsure: "Cell_hintUnsure"
+	hintSource: "Cell_hintSource Board_outline",
+	hintSafe: "Cell_hintSafe Board_outline",
+	hintMine: "Cell_hintMine Board_outline",
+	hintWrong: "Cell_hintWrong Board_outline",
+	hintUnsure: "Cell_hintUnsure Board_outline"
 };
 //#endregion
 //#region src/Cell.jsx
@@ -253,18 +238,7 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	onMove: actions.move,
 	onTouch: actions.touch,
 	onChord: actions.chord
-})))), state.game.paused && /* @__PURE__ */ h("div", { class: Game_module_default.paused }, /* @__PURE__ */ h(Button, {
-	tabIndex: -1,
-	title: "Resume (P)",
-	onClick: () => actions.pause(false)
-}, /* @__PURE__ */ h("svg", {
-	width: "40",
-	height: "40"
-}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), state.hint && !state.game.paused && /* @__PURE__ */ h("p", {
-	class: Game_module_default.hint,
-	role: "status",
-	...hangBelow
-}, state.hint.text)));
+})))), state.game.paused && /* @__PURE__ */ h(PausedCover, { onResume: () => actions.pause(false) })), state.hint && !state.game.paused && /* @__PURE__ */ h(HintPanel, { text: state.hint.text })));
 //#endregion
 //#region src/BestTime.jsx
 var tabs = [{
@@ -280,17 +254,11 @@ var BestTime = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h(Dialog, {
 	title: "Fastest Mine Sweepers",
 	onClose: actions.toggleBestTime
-}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("div", {
-	class: BestTime_module_default.tabs,
-	role: "tablist"
-}, tabs.map((tab) => /* @__PURE__ */ h("button", {
-	type: "button",
-	role: "tab",
-	tabindex: -1,
-	"aria-selected": state.tab === tab.id,
-	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
-	onclick: () => actions.setBestTimeTab(tab.id)
-}, tab.name))), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
+}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h(Tabs, {
+	tabs,
+	active: state.tab,
+	onSelect: actions.setBestTimeTab
+}), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
 	onClick: actions.resetBestTime
 }, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "Reset Scores")), /* @__PURE__ */ h(Button, {
@@ -339,23 +307,11 @@ var CustomField = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h("span", { class: CustomField_module_default.button }, "Cancel"))))));
 //#endregion
 //#region src/About.jsx
-var Link = ({ href }, children) => /* @__PURE__ */ h("a", {
-	class: About_module_default.link,
-	href,
-	target: "_blank",
-	rel: "noopener noreferrer"
-}, children);
-var About = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
+var MinesweeperAbout = ({ key, actions }) => /* @__PURE__ */ h(About, {
 	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleAbout()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "About Minesweeper Plus",
-	onClose: actions.toggleAbout
-}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, "Minesweeper Plus"), /* @__PURE__ */ h("p", null, "A Windows style minesweeper with boards that never need a guess, hints that explain their reasoning, zoom, and animated themes ported from xscreensaver."), /* @__PURE__ */ h("p", null, "Based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov, extended by fexofenadine."), /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzles" }, "github.com/fexofenadine/puzzles")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleAbout,
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
+	name: "Minesweeper Plus",
+	actions
+}, /* @__PURE__ */ h("p", null, "A Windows style minesweeper with boards that never need a guess, hints that explain their reasoning, zoom, and animated themes ported from xscreensaver."), /* @__PURE__ */ h("p", null, "Based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov, extended by fexofenadine."));
 //#endregion
 //#region src/mines.js
 var neighbourCache = /* @__PURE__ */ new Map();
@@ -770,32 +726,15 @@ var actions = {
 		else if (key === 72) actions.hint();
 		else if (key === 80) actions.pause();
 	},
-	pause: (paused) => ({ game }, actions) => {
-		const next = paused === void 0 ? !game.paused : paused;
-		if (game.start < 0 || game.win || game.lose || next === game.paused) return null;
-		if (!next) {
-			game.raf = requestAnimationFrame(actions.tick);
-			return { game: {
-				...game,
-				paused: false,
-				start: game.start + performance.now() - game.pausedAt
-			} };
-		}
-		cancelAnimationFrame(game.raf);
+	pause: pauseAction(running, (game, actions) => {
 		window.removeEventListener("mouseup", actions.up);
 		return {
-			menu: null,
-			game: {
-				...game,
-				paused: true,
-				pausedAt: performance.now(),
-				pressed: false,
-				group: false,
-				pressedX: -1,
-				pressedY: -1
-			}
+			pressed: false,
+			group: false,
+			pressedX: -1,
+			pressedY: -1
 		};
-	},
+	}),
 	reset: (payload) => ({ game }) => {
 		cancelAnimationFrame(game.raf);
 		const params = payload && levels[payload.level] || payload || game;
@@ -1138,7 +1077,7 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	key: "e",
 	state: state.backgroundSettings,
 	actions
-}), state.about && /* @__PURE__ */ h(About, {
+}), state.about && /* @__PURE__ */ h(MinesweeperAbout, {
 	key: "f",
 	actions
 }), state.boss && /* @__PURE__ */ h(Boss, {

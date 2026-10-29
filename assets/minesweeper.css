@@ -1,46 +1,4 @@
-.Game_root {
-  padding: 6px 5px 5px 6px;
-  background: var(--panel);
-  border: solid var(--light);
-  border-width: 3px 0 0 3px;
-}
-
-.Game_scoreboard {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin: 0 0 6px;
-  padding: 4px 7px 3px 5px;
-  text-align: center;
-  border: 2px solid;
-  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
-}
-
-.Game_buttons {
-  display: flex;
-  gap: 4px;
-}
-
-.Game_field {
-  position: relative;
-  white-space: nowrap;
-  border-width: 2px 3px 3px 2px;
-  border-style: solid;
-  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
-  border-radius: 0 2px;
-  -webkit-tap-highlight-color: transparent;
-}
-
-.Game_active {
-  cursor: pointer;
-}
-
-.Game_inactive {
-  cursor: default;
-}
-
-/*play button over the hidden board*/
-.Game_paused {
+/*play button over the hidden board*/.Board_paused {
   position: absolute;
   top: 0;
   right: 0;
@@ -50,136 +8,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.Game_paused svg {
+}.Board_paused svg {
   display: block;
   margin: 2px;
   fill: currentColor;
-}
-
-/*neon theme meltdown after hitting a mine*/
-.Game_fieldLost {
-}
-
-:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost {
-  position: relative;
-  animation:
-    Game_jitter 2.4s steps(1, end) infinite,
-    Game_chroma 3.1s steps(1, end) infinite;
-}
-
-:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::before,
-:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: none;
-  content: '';
-}
-
-:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::before {
-  background: linear-gradient(
-      transparent,
-      color-mix(in srgb, var(--fringe-b) 40%, transparent) 45%,
-      color-mix(in srgb, var(--fringe-a) 40%, transparent) 55%,
-      transparent
-    )
-    0 -20% / 100% 20% no-repeat;
-  mix-blend-mode: screen;
-  animation: Game_band 1.7s linear infinite;
-}
-
-:root:is([data-theme='synthwave'], [data-theme='matrix']) .Game_fieldLost::after {
-  background: repeating-linear-gradient(transparent 0 2px, rgba(0, 0, 0, 0.3) 2px 3px);
-  animation: Game_flicker 0.15s steps(2) infinite;
-}
-
-@keyframes Game_jitter {
-  0% {
-    transform: none;
-    clip-path: none;
-  }
-  7% {
-    transform: translate(-3px, 1px) skewX(4deg);
-    clip-path: inset(10% 0 55% 0);
-  }
-  9% {
-    transform: translate(4px, -1px);
-    clip-path: inset(50% 0 20% 0);
-  }
-  11% {
-    transform: none;
-    clip-path: none;
-  }
-  38% {
-    transform: translateX(2px);
-    clip-path: inset(30% 0 40% 0);
-  }
-  40% {
-    transform: none;
-    clip-path: none;
-  }
-  68% {
-    transform: translate(-5px, 0) skewX(-7deg);
-    clip-path: inset(70% 0 5% 0);
-  }
-  70% {
-    transform: translate(3px, 2px);
-    clip-path: inset(0 0 75% 0);
-  }
-  72% {
-    transform: translateY(-2px) scaleY(1.03);
-    clip-path: none;
-  }
-  74% {
-    transform: none;
-  }
-}
-
-@keyframes Game_chroma {
-  0% {
-    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
-  }
-  30% {
-    filter: drop-shadow(-4px 0 var(--fringe-a)) drop-shadow(4px 0 var(--fringe-b)) hue-rotate(90deg)
-      saturate(2);
-  }
-  34% {
-    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
-  }
-  61% {
-    filter: invert(1) hue-rotate(180deg);
-  }
-  63% {
-    filter: drop-shadow(1px 0 var(--fringe-a)) drop-shadow(-1px 0 var(--fringe-b)) contrast(1.4);
-  }
-  90% {
-    filter: drop-shadow(3px 1px var(--fringe-a)) drop-shadow(-3px -1px var(--fringe-b))
-      hue-rotate(-60deg);
-  }
-  93% {
-    filter: drop-shadow(2px 0 var(--fringe-a)) drop-shadow(-2px 0 var(--fringe-b));
-  }
-}
-
-@keyframes Game_band {
-  to {
-    background-position: 0 120%;
-  }
-}
-
-@keyframes Game_flicker {
-  50% {
-    opacity: 0.4;
-  }
-}
-
-/*explanation under the field, never wider than it*/
-.Game_hint {
+}/*explanation under the field, never wider than it*/.Board_hint {
   box-sizing: border-box;
   width: 0;
   min-width: 100%;
@@ -190,7 +23,20 @@
   background: var(--input);
   border: 2px solid;
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}/*a hint's outline on a board cell, dark edged to show on every theme*/.Board_outline::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
 }
+
 .Cell_root {
   position: relative;
   display: inline-block;
@@ -287,23 +133,6 @@
 }
 
 /*hint outlines, dark edged to show on every theme*/
-.Cell_hintSource::after,
-.Cell_hintSafe::after,
-.Cell_hintMine::after,
-.Cell_hintWrong::after,
-.Cell_hintUnsure::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border: 2px solid var(--hint-color);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-  content: '';
-}
 
 .Cell_hintSource {
   --hint-color: #2e8bff;

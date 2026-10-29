@@ -1,13 +1,8 @@
-import { A as glyphImage, C as MenuItem, D as startBackgrounds, E as ThemeMenu, F as Dialog, I as Button, L as app, M as remove, N as save, O as BRIGHT, P as Menu_module_default, R as h, T as SubMenuItem, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, g as WindowControls, h as watchWindow, i as shellState, j as load, k as GLYPH, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, w as Separator, x as Digit, y as UndoIcon } from "./worker-COk6R1rk.js";
+import { A as SubMenuItem, B as Dialog, C as SideButton, E as Digit, F as glyphImage, H as Game_module_default$1, I as load, L as remove, M as startBackgrounds, N as BRIGHT, O as MenuItem, P as GLYPH, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, h as Winner, i as shellActions, j as ThemeMenu, k as Separator, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, s as typing, t as registerWorker, u as About, v as HintPanel, w as UndoIcon, x as WindowControls, y as PausedCover, z as Menu_module_default } from "./worker-D-X_Ba-8.js";
 var Game_module_default = {
-	root: "Game_root",
-	scoreboard: "Game_scoreboard",
-	buttons: "Game_buttons",
 	field: "Game_field",
 	active: "Game_active Game_field",
-	inactive: "Game_inactive Game_field",
-	paused: "Game_paused",
-	hint: "Game_hint"
+	inactive: "Game_inactive Game_field"
 };
 var sizes = [
 	6,
@@ -48,7 +43,7 @@ var readLine = (board, cells) => {
 var emptyBoard = (n) => new Int8Array(n * n).fill(-1);
 var full = (board) => !board.includes(-1);
 var lineName = (line, n) => line < n ? `row ${line + 1}` : `column ${line - n + 1}`;
-var capital$1 = (text) => text[0].toUpperCase() + text.slice(1);
+var capital = (text) => text[0].toUpperCase() + text.slice(1);
 var breaks = (board, n) => {
 	const found = [];
 	const lines = cellsOf(n);
@@ -63,14 +58,14 @@ var breaks = (board, n) => {
 					cells[k - 1],
 					cells[k]
 				],
-				text: `${capital$1(name)} has three ${v}s in a row.`
+				text: `${capital(name)} has three ${v}s in a row.`
 			});
 		}
 		for (const v of [0, 1]) {
 			const same = cells.filter((i) => board[i] === v);
 			if (same.length * 2 > n) found.push({
 				cells: same,
-				text: `${capital$1(name)} has ${same.length} ${v}s, but only ${n / 2} fit in a line of ${n}.`
+				text: `${capital(name)} has ${same.length} ${v}s, but only ${n / 2} fit in a line of ${n}.`
 			});
 		}
 		const { known, value } = readLine(board, cells);
@@ -80,7 +75,7 @@ var breaks = (board, n) => {
 			const twin = done.get(key);
 			found.push({
 				cells: [...lines[twin], ...cells],
-				text: `${capital$1(lineName(twin, n))} and ${name} are the same, and no two ${line < n ? "rows" : "columns"} may match.`
+				text: `${capital(lineName(twin, n))} and ${name} are the same, and no two ${line < n ? "rows" : "columns"} may match.`
 			});
 		} else done.set(key, line);
 	});
@@ -132,7 +127,8 @@ var propagate = (board, n, candidates) => {
 	}
 	return next;
 };
-var search = (board, n, candidates, limit, order, found) => {
+var search = (board, n, candidates, limit, order, found, budget) => {
+	if (--budget.left < 0) return 0;
 	const narrowed = propagate(board, n, candidates);
 	if (!narrowed) return 0;
 	let pick = -1;
@@ -151,16 +147,16 @@ var search = (board, n, candidates, limit, order, found) => {
 		cells.forEach((i, k) => copy[i] = mask >> k & 1);
 		const branch = narrowed.slice();
 		branch[pick] = [mask];
-		total += search(copy, n, branch, limit - total, order, found);
+		total += search(copy, n, branch, limit - total, order, found, budget);
 		if (total >= limit) break;
 	}
 	return total;
 };
 var asIs = (list) => list;
-var countSolutions = (board, n, limit = 2) => search(board.slice(), n, startCandidates(n), limit, asIs, []);
-var solve = (board, n, shuffle = asIs) => {
+var countSolutions = (board, n, limit = 2) => search(board.slice(), n, startCandidates(n), limit, asIs, [], { left: Infinity });
+var solve = (board, n, shuffle = asIs, tries = Infinity) => {
 	const found = [];
-	search(board.slice(), n, startCandidates(n), 1, shuffle, found);
+	search(board.slice(), n, startCandidates(n), 1, shuffle, found, { left: tries });
 	return found[0] ?? null;
 };
 //#endregion
@@ -172,7 +168,6 @@ var levels = [
 	"hard",
 	"expert"
 ];
-var capital = (text) => text[0].toUpperCase() + text.slice(1);
 var words = [
 	"no",
 	"one",
@@ -476,9 +471,9 @@ var Cell_module_default = {
 	given: "Cell_given",
 	error: "Cell_error",
 	ghost: "Cell_ghost",
-	hintSource: "Cell_hintSource",
-	hintPlace: "Cell_hintPlace",
-	hintWrong: "Cell_hintWrong"
+	hintSource: "Cell_hintSource Board_outline",
+	hintPlace: "Cell_hintPlace Board_outline",
+	hintWrong: "Cell_hintWrong Board_outline"
 };
 //#endregion
 //#region src/takuzu/Cell.jsx
@@ -537,7 +532,7 @@ var Game = ({ key, state, actions }) => {
 	}, /* @__PURE__ */ h(Menu, {
 		state,
 		actions
-	}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: game.dealing ? 0 : left }), /* @__PURE__ */ h("div", { class: Game_module_default.buttons }, /* @__PURE__ */ h(SideButton, {
+	}), /* @__PURE__ */ h("div", { class: Game_module_default$1.root }, /* @__PURE__ */ h("div", { class: Game_module_default$1.scoreboard }, /* @__PURE__ */ h(Digit, { value: game.dealing ? 0 : left }), /* @__PURE__ */ h("div", { class: Game_module_default$1.buttons }, /* @__PURE__ */ h(SideButton, {
 		title: "Undo (Ctrl+Z)",
 		disabled: !game.history.length || game.win || paused,
 		onClick: actions.undo
@@ -560,18 +555,7 @@ var Game = ({ key, state, actions }) => {
 		error: errors && errors.has(i),
 		mark: marks[i],
 		onPress: actions.play
-	})), paused && /* @__PURE__ */ h("div", { class: Game_module_default.paused }, /* @__PURE__ */ h(Button, {
-		tabIndex: -1,
-		title: "Resume (P)",
-		onClick: () => actions.pause(false)
-	}, /* @__PURE__ */ h("svg", {
-		width: "40",
-		height: "40"
-	}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), hint && !paused && /* @__PURE__ */ h("p", {
-		class: Game_module_default.hint,
-		role: "status",
-		...hangBelow
-	}, hint.text)));
+	})), paused && /* @__PURE__ */ h(PausedCover, { onResume: () => actions.pause(false) })), hint && !paused && /* @__PURE__ */ h(HintPanel, { text: hint.text })));
 };
 var BestTimes_module_default = {
 	table: "BestTimes_table",
@@ -596,17 +580,11 @@ var BestTimes = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h(Dialog, {
 	title: "Fastest Takuzu Solvers",
 	onClose: actions.toggleBestTime
-}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("div", {
-	class: BestTime_module_default.tabs,
-	role: "tablist"
-}, tabs.map((tab) => /* @__PURE__ */ h("button", {
-	type: "button",
-	role: "tab",
-	tabindex: -1,
-	"aria-selected": state.tab === tab.id,
-	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
-	onclick: () => actions.setBestTimeTab(tab.id)
-}, tab.name))), /* @__PURE__ */ h("table", { class: BestTimes_module_default.table }, /* @__PURE__ */ h("thead", null, /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", null), levelNames.map((name) => /* @__PURE__ */ h("th", { class: BestTimes_module_default.level }, name)))), /* @__PURE__ */ h("tbody", null, sizes.map((n) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", { class: BestTimes_module_default.size }, n, " × ", n), levelNames.map((_, level) => {
+}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h(Tabs, {
+	tabs,
+	active: state.tab,
+	onSelect: actions.setBestTimeTab
+}), /* @__PURE__ */ h("table", { class: BestTimes_module_default.table }, /* @__PURE__ */ h("thead", null, /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", null), levelNames.map((name) => /* @__PURE__ */ h("th", { class: BestTimes_module_default.level }, name)))), /* @__PURE__ */ h("tbody", null, sizes.map((n) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", { class: BestTimes_module_default.size }, n, " × ", n), levelNames.map((_, level) => {
 	const best = allowed(n, level) && state[state.tab][`${n}.${level}`];
 	return /* @__PURE__ */ h("td", { class: BestTimes_module_default.slot }, !allowed(n, level) && "–", best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.time }, best.time, " s"), best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.name }, best.name));
 }))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
@@ -702,7 +680,12 @@ var shuffled = (list, rng) => {
 	}
 	return copy;
 };
-var makeSolution = (n, rng) => solve(emptyBoard(n), n, (list) => shuffled(list, rng));
+var makeSolution = (n, rng) => {
+	for (;;) {
+		const board = solve(emptyBoard(n), n, (list) => shuffled(list, rng), 4 * n);
+		if (board) return board;
+	}
+};
 var makePuzzle = (n, rng, keep = (board) => countSolutions(board, n, 2) === 1) => {
 	const solution = makeSolution(n, rng);
 	const givens = solution.slice();
@@ -738,33 +721,46 @@ var makeGame = (n, level, rng, budget = 1500) => {
 var worker = null;
 var waiting = /* @__PURE__ */ new Map();
 var count = 0;
+var here = ({ n, level, seed }) => makeGame(n, level, random(seed));
+var giveUp = () => {
+	worker = false;
+	waiting.forEach(({ ask, resolve }) => resolve(here(ask)));
+	waiting.clear();
+};
 var start = () => {
 	if (worker !== null) return worker;
 	try {
 		worker = new Worker(new URL(
 			/* @vite-ignore */
-			new URL("deal.worker-CuayEGjx.js", import.meta.url).href,
+			new URL("deal.worker-BMjSpnL2.js", import.meta.url).href,
 			"" + import.meta.url
 		), { type: "module" });
 		worker.onmessage = ({ data }) => {
-			waiting.get(data.id)?.(data);
+			waiting.get(data.id)?.resolve(data);
 			waiting.delete(data.id);
 		};
+		worker.onerror = giveUp;
 	} catch {
 		worker = false;
 	}
 	return worker;
 };
 var deal = (n, level, seed) => {
-	if (typeof Worker === "undefined" || !start()) return Promise.resolve(makeGame(n, level, random(seed)));
+	const ask = {
+		n,
+		level,
+		seed
+	};
+	if (typeof Worker === "undefined" || !start()) return Promise.resolve(here(ask));
 	const id = ++count;
 	return new Promise((resolve) => {
-		waiting.set(id, resolve);
+		waiting.set(id, {
+			ask,
+			resolve
+		});
 		worker.postMessage({
 			id,
-			n,
-			level,
-			seed
+			...ask
 		});
 	});
 };
@@ -788,23 +784,11 @@ var showRain = (on) => {
 };
 //#endregion
 //#region src/takuzu/About.jsx
-var Link = ({ href }, children) => /* @__PURE__ */ h("a", {
-	class: About_module_default.link,
-	href,
-	target: "_blank",
-	rel: "noopener noreferrer"
-}, children);
-var About = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
+var TakuzuAbout = ({ key, actions }) => /* @__PURE__ */ h(About, {
 	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleAbout()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "About Takuzu Plus",
-	onClose: actions.toggleAbout
-}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, "Takuzu Plus"), /* @__PURE__ */ h("p", null, "Binary puzzles: fill the grid with 0s and 1s so that no row or column has three alike in a row, every row and column holds as many 0s as 1s, and no two rows or two columns are the same."), /* @__PURE__ */ h("p", null, "Every board has exactly one solution and can be solved by logic alone, from easy to expert, and hints explain their reasoning. Takuzu, also known as Binairo, was devised by Frank Coussement and Peter De Schepper."), /* @__PURE__ */ h("p", null, "Part of Puzzles by fexofenadine, sharing its window, themes and backgrounds with Minesweeper Plus, which is based on", " ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov."), /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzles" }, "github.com/fexofenadine/puzzles")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleAbout,
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
+	name: "Takuzu Plus",
+	actions
+}, /* @__PURE__ */ h("p", null, "Binary puzzles: fill the grid with 0s and 1s so that no row or column has three alike in a row, every row and column holds as many 0s as 1s, and no two rows or two columns are the same."), /* @__PURE__ */ h("p", null, "Every board has exactly one solution and can be solved by logic alone, from easy to expert, and hints explain their reasoning. Takuzu, also known as Binairo, was devised by Frank Coussement and Peter De Schepper."), /* @__PURE__ */ h("p", null, "Part of Puzzles by fexofenadine, sharing its window, themes and backgrounds with Minesweeper Plus, which is based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " ", "by Vladimir Kutepov."));
 //#endregion
 //#region src/takuzu/app.jsx
 var loadChoice = () => {
@@ -929,13 +913,8 @@ var actions = {
 		actions.reset();
 	},
 	press: (event) => (state, actions) => {
-		const typing = [
-			"INPUT",
-			"SELECT",
-			"TEXTAREA"
-		].includes(event.target.tagName);
 		if ((event.ctrlKey || event.metaKey) && !event.altKey && event.keyCode === 90) {
-			if (typing || state.boss) return;
+			if (typing(event) || state.boss) return;
 			event.preventDefault();
 			actions.undo();
 			return;
@@ -1043,27 +1022,7 @@ var actions = {
 		menu: null,
 		about: !about
 	}),
-	pause: (paused) => ({ game }, actions) => {
-		const next = paused === void 0 ? !game.paused : paused;
-		if (!running(game) || next === game.paused) return null;
-		if (!next) {
-			game.raf = requestAnimationFrame(actions.tick);
-			return { game: {
-				...game,
-				paused: false,
-				start: game.start + performance.now() - game.pausedAt
-			} };
-		}
-		cancelAnimationFrame(game.raf);
-		return {
-			menu: null,
-			game: {
-				...game,
-				paused: true,
-				pausedAt: performance.now()
-			}
-		};
-	},
+	pause: pauseAction(running),
 	tick: (now) => ({ game }, actions) => {
 		game.raf = requestAnimationFrame(actions.tick);
 		const next = Math.floor((now - game.start) / 1e3) + 1;
@@ -1142,7 +1101,7 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	key: "e",
 	state: state.backgroundSettings,
 	actions
-}), state.about && /* @__PURE__ */ h(About, {
+}), state.about && /* @__PURE__ */ h(TakuzuAbout, {
 	key: "f",
 	actions
 }), state.boss && /* @__PURE__ */ h(Boss, {

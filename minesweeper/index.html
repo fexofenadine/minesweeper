@@ -28,30 +28,32 @@
     <link rel="manifest" href="../minesweeper/site.webmanifest" />
     <link rel="apple-touch-icon" href="../minesweeper/icon.png" />
     <link rel="shortcut icon" href="../minesweeper/favicon.ico" />
-    <script>
-      //apply the saved theme and window size before first paint
-      try {
-        document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
-        //assume animated off classic, the script corrects it
-        if (document.documentElement.dataset.theme !== 'classic') {
-          document.documentElement.dataset.background = 'animated'
-        }
-        document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
-      } catch {}
-      //if the game fails to start, show why instead of an empty desktop
-      addEventListener('error', (event) => {
-        if (document.querySelector('main *')) return
-        const note = document.createElement('pre')
-        note.style.cssText =
-          'position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;padding:8px;background:#000;color:#fff;font:12px monospace;white-space:pre-wrap'
-        note.textContent = 'Minesweeper could not start: ' + event.message
-        document.body.append(note)
-      })
-    </script>
-    <script type="module" crossorigin src="../assets/minesweeper.js?v=6c0287dd"></script>
-    <link rel="modulepreload" crossorigin href="../assets/worker-COk6R1rk.js?v=98723c39">
-    <link rel="stylesheet" crossorigin href="../assets/worker.css?v=dfc38372">
-    <link rel="stylesheet" crossorigin href="../assets/minesweeper.css?v=67227984">
+    <script>//inlined into each game's page head by vite.config.js, so it runs before first paint
+//apply the saved theme and window size before first paint
+try {
+  document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
+  //assume animated off classic, the script corrects it
+  if (document.documentElement.dataset.theme !== 'classic') {
+    document.documentElement.dataset.background = 'animated'
+  }
+  document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
+} catch {
+  //blocked storage keeps the defaults
+}
+//if the game fails to start, show why instead of an empty desktop
+addEventListener('error', (event) => {
+  if (document.querySelector('main *')) return
+  const note = document.createElement('pre')
+  note.style.cssText =
+    'position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;padding:8px;background:#000;color:#fff;font:12px monospace;white-space:pre-wrap'
+  note.textContent = `${document.title} could not start: ${event.message}`
+  document.body.append(note)
+})
+</script>
+    <script type="module" crossorigin src="../assets/minesweeper.js?v=5baf8c85"></script>
+    <link rel="modulepreload" crossorigin href="../assets/worker-D-X_Ba-8.js?v=879e1a56">
+    <link rel="stylesheet" crossorigin href="../assets/worker.css?v=463446b8">
+    <link rel="stylesheet" crossorigin href="../assets/minesweeper.css?v=405e39fb">
   </head>
   <body>
     <div id="app">

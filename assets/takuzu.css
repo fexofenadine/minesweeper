@@ -1,26 +1,3 @@
-.Game_root {
-  padding: 6px 5px 5px 6px;
-  background: var(--panel);
-  border: solid var(--light);
-  border-width: 3px 0 0 3px;
-}
-
-.Game_scoreboard {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin: 0 0 6px;
-  padding: 4px 7px 3px 5px;
-  text-align: center;
-  border: 2px solid;
-  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
-}
-
-.Game_buttons {
-  display: flex;
-  gap: 4px;
-}
-
 .Game_field {
   position: relative;
   display: grid;
@@ -40,9 +17,7 @@
 .Game_inactive {
   cursor: default;
 }
-
-/*play button over the hidden board*/
-.Game_paused {
+/*play button over the hidden board*/.Board_paused {
   position: absolute;
   top: 0;
   right: 0;
@@ -52,16 +27,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.Game_paused svg {
+}.Board_paused svg {
   display: block;
   margin: 2px;
   fill: currentColor;
-}
-
-/*explanation under the field, never wider than it*/
-.Game_hint {
+}/*explanation under the field, never wider than it*/.Board_hint {
   box-sizing: border-box;
   width: 0;
   min-width: 100%;
@@ -72,6 +42,18 @@
   background: var(--input);
   border: 2px solid;
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}/*a hint's outline on a board cell, dark edged to show on every theme*/.Board_outline::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
 }
 /*the two values in near complementary colours for each theme, the digit in a contrasting one*/
 :root {
@@ -183,21 +165,6 @@
 }
 
 /*hint outlines, the same colours minesweeper uses*/
-.Cell_hintSource::after,
-.Cell_hintPlace::after,
-.Cell_hintWrong::after {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border: 2px solid var(--hint-color);
-  box-shadow:
-    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(0, 0, 0, 0.6);
-  pointer-events: none;
-  content: '';
-}
 
 .Cell_hintSource {
   --hint-color: #2e8bff;

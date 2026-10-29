@@ -31,7 +31,7 @@
 	const emptyBoard = (n) => new Int8Array(n * n).fill(-1);
 	const full = (board) => !board.includes(-1);
 	const lineName = (line, n) => line < n ? `row ${line + 1}` : `column ${line - n + 1}`;
-	const capital$1 = (text) => text[0].toUpperCase() + text.slice(1);
+	const capital = (text) => text[0].toUpperCase() + text.slice(1);
 	const breaks = (board, n) => {
 		const found = [];
 		const lines = cellsOf(n);
@@ -46,14 +46,14 @@
 						cells[k - 1],
 						cells[k]
 					],
-					text: `${capital$1(name)} has three ${v}s in a row.`
+					text: `${capital(name)} has three ${v}s in a row.`
 				});
 			}
 			for (const v of [0, 1]) {
 				const same = cells.filter((i) => board[i] === v);
 				if (same.length * 2 > n) found.push({
 					cells: same,
-					text: `${capital$1(name)} has ${same.length} ${v}s, but only ${n / 2} fit in a line of ${n}.`
+					text: `${capital(name)} has ${same.length} ${v}s, but only ${n / 2} fit in a line of ${n}.`
 				});
 			}
 			const { known, value } = readLine(board, cells);
@@ -63,7 +63,7 @@
 				const twin = done.get(key);
 				found.push({
 					cells: [...lines[twin], ...cells],
-					text: `${capital$1(lineName(twin, n))} and ${name} are the same, and no two ${line < n ? "rows" : "columns"} may match.`
+					text: `${capital(lineName(twin, n))} and ${name} are the same, and no two ${line < n ? "rows" : "columns"} may match.`
 				});
 			} else done.set(key, line);
 		});
@@ -114,7 +114,8 @@
 		}
 		return next;
 	};
-	const search = (board, n, candidates, limit, order, found) => {
+	const search = (board, n, candidates, limit, order, found, budget) => {
+		if (--budget.left < 0) return 0;
 		const narrowed = propagate(board, n, candidates);
 		if (!narrowed) return 0;
 		let pick = -1;
@@ -133,16 +134,16 @@
 			cells.forEach((i, k) => copy[i] = mask >> k & 1);
 			const branch = narrowed.slice();
 			branch[pick] = [mask];
-			total += search(copy, n, branch, limit - total, order, found);
+			total += search(copy, n, branch, limit - total, order, found, budget);
 			if (total >= limit) break;
 		}
 		return total;
 	};
 	const asIs = (list) => list;
-	const countSolutions = (board, n, limit = 2) => search(board.slice(), n, startCandidates(n), limit, asIs, []);
-	const solve = (board, n, shuffle = asIs) => {
+	const countSolutions = (board, n, limit = 2) => search(board.slice(), n, startCandidates(n), limit, asIs, [], { left: Infinity });
+	const solve = (board, n, shuffle = asIs, tries = Infinity) => {
 		const found = [];
-		search(board.slice(), n, startCandidates(n), 1, shuffle, found);
+		search(board.slice(), n, startCandidates(n), 1, shuffle, found, { left: tries });
 		return found[0] ?? null;
 	};
 	//#endregion
@@ -154,7 +155,6 @@
 		"hard",
 		"expert"
 	];
-	const capital = (text) => text[0].toUpperCase() + text.slice(1);
 	const words = [
 		"no",
 		"one",
@@ -398,7 +398,12 @@
 		}
 		return copy;
 	};
-	const makeSolution = (n, rng) => solve(emptyBoard(n), n, (list) => shuffled(list, rng));
+	const makeSolution = (n, rng) => {
+		for (;;) {
+			const board = solve(emptyBoard(n), n, (list) => shuffled(list, rng), 4 * n);
+			if (board) return board;
+		}
+	};
 	const makePuzzle = (n, rng, keep = (board) => countSolutions(board, n, 2) === 1) => {
 		const solution = makeSolution(n, rng);
 		const givens = solution.slice();
