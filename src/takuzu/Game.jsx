@@ -6,7 +6,7 @@ import Play from '../Play'
 import Button from '../Button'
 import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
 import WindowControls from '../shell/WindowControls'
-import { watchWindow } from '../shell/zoom'
+import { hangBelow, watchWindow } from '../shell/zoom'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, violations } from './rules'
@@ -84,7 +84,7 @@ const Game = ({ key, state, actions }) => {
           )}
         </div>
         {hint && !paused && (
-          <p class={s.hint} role="status">
+          <p class={s.hint} role="status" {...hangBelow}>
             {hint.text}
           </p>
         )}

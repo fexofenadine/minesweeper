@@ -8,7 +8,7 @@ import Cell from './Cell'
 import Button from './Button'
 import SideButton, { HintIcon } from './shell/SideButton'
 import WindowControls from './shell/WindowControls'
-import { watchWindow } from './shell/zoom'
+import { hangBelow, watchWindow } from './shell/zoom'
 
 const running = ({ start, win, lose }) => start >= 0 && !win && !lose
 
@@ -110,7 +110,7 @@ const Game = ({ key, state, actions }) => (
         )}
       </div>
       {state.hint && !state.game.paused && (
-        <p class={s.hint} role="status">
+        <p class={s.hint} role="status" {...hangBelow}>
           {state.hint.text}
         </p>
       )}

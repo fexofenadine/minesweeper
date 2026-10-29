@@ -27,6 +27,8 @@ export const applyZoom = (scale) => root.style.setProperty('--scale', scale)
 export const saveZoom = (scale) => save('scale', scale)
 
 let gameWindow = null
+//page pixels of explanation panel below the board, left out of layout and fitting
+let hanging = 0
 
 //the largest zoom that fits, and the window's unzoomed size and room
 export const measureFit = (scale) => {
@@ -38,7 +40,7 @@ export const measureFit = (scale) => {
   const height = innerHeight - parseFloat(frame.marginTop) - parseFloat(frame.marginBottom)
   const size = {
     width: rect.width / scale,
-    height: rect.height / scale,
+    height: (rect.height - hanging) / scale,
     room: `${width}x${height}`,
   }
   //borders and text do not scale exactly, so leave 1% to spare
@@ -51,6 +53,27 @@ export const sameSize = (a, b) =>
   a.room === b.room &&
   Math.abs(a.width / b.width - 1) < 0.03 &&
   Math.abs(a.height / b.height - 1) < 0.03
+
+//the explanation under the board hangs below the window's place instead of growing it
+//so the board never moves under the pointer when one appears or goes, nor does the zoom
+const hang = (panel) => {
+  const height = panel
+    ? panel.getBoundingClientRect().bottom -
+      panel.previousElementSibling.getBoundingClientRect().bottom
+    : 0
+  if (!gameWindow || Math.abs(height - hanging) < 0.5) return
+  hanging = height
+  gameWindow.parentElement.style.marginBottom = height
+    ? `calc(env(safe-area-inset-bottom) - ${height}px)`
+    : ''
+}
+
+//lifecycle for the panel element
+export const hangBelow = {
+  oncreate: (panel) => hang(panel),
+  onupdate: (panel) => hang(panel),
+  ondestroy: () => hang(null),
+}
 
 //refit when the window or browser changes size
 export const watchWindow = (dialog, refit) => {
