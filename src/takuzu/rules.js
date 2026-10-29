@@ -1,12 +1,15 @@
+import { capital, cellsOf, lineName } from '../shell/grid'
+
 //a board is n * n cells in row order, each -1 (empty), 0 or 1
 //lines 0 to n - 1 are the rows, n to 2n - 1 the columns, a line's bit k is its kth cell
+
+export { capital, cellsOf, lineName }
 
 export const EMPTY = -1
 
 export const sizes = [6, 8, 10, 12, 14]
 
 const lineCache = {}
-const cellCache = {}
 
 //every possible line: as many 0s as 1s and never three alike in a row
 export const linesOf = (n) =>
@@ -21,12 +24,6 @@ export const linesOf = (n) =>
     }
     return ones * 2 === n
   }))
-
-//the cell indexes of each line, rows then columns
-export const cellsOf = (n) =>
-  (cellCache[n] ??= Array.from({ length: 2 * n }, (_, line) =>
-    Array.from({ length: n }, (_, k) => (line < n ? line * n + k : k * n + line - n)),
-  ))
 
 //which cells of a line are filled, and which of those are 1
 export const readLine = (board, cells) => {
@@ -45,10 +42,6 @@ export const readLine = (board, cells) => {
 export const emptyBoard = (n) => new Int8Array(n * n).fill(EMPTY)
 
 export const full = (board) => !board.includes(EMPTY)
-
-export const lineName = (line, n) => (line < n ? `row ${line + 1}` : `column ${line - n + 1}`)
-
-export const capital = (text) => text[0].toUpperCase() + text.slice(1)
 
 //each broken rule with its cells and a sentence: three alike in a row, too many of one value,
 //or a full line repeated

@@ -2,6 +2,7 @@ import { h } from 'hyperapp'
 import m from '../Menu.module.css'
 import { MenuItem, Separator, SubMenuItem } from '../Menu'
 import ThemeMenu from '../shell/ThemeMenu'
+import { gameLinks } from '../shell/GameLinks'
 import { sizes } from './rules'
 import { levels } from './techniques'
 
@@ -33,7 +34,7 @@ const Menu = ({ state, actions }) => (
       <Separator />
       <SubMenuItem name="Best Times..." onClick={actions.toggleBestTime} />
       <Separator />
-      <SubMenuItem name="Minesweeper" onClick={() => location.assign('../minesweeper/')} />
+      {gameLinks('takuzu')}
     </MenuItem>
     <MenuItem name="Size" type="size" active={state.menu} onChange={actions.toggleMenu}>
       {sizes.map((n) => (
@@ -51,6 +52,8 @@ const Menu = ({ state, actions }) => (
       )}
     </ThemeMenu>
     <MenuItem name="Help" type="help" active={state.menu} onChange={actions.toggleMenu}>
+      <SubMenuItem name="How to Play..." onClick={actions.toggleHowTo} />
+      <Separator />
       <SubMenuItem name="About Takuzu Plus..." onClick={actions.toggleAbout} />
     </MenuItem>
   </ul>

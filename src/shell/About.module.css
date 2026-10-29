@@ -3,6 +3,12 @@
   padding: 10px 14px 12px;
 }
 
+/*rules read better in longer lines*/
+.wide {
+  composes: root;
+  max-width: 460px;
+}
+
 .root p {
   margin: 0 0 8px;
   line-height: 1.35;

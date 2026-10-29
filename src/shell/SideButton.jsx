@@ -25,4 +25,10 @@ export const UndoIcon = () => (
   <path d="M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z" />
 )
 
+export const FillIcon = () => <path d="M4 4h11v11H4z" />
+
+export const CrossIcon = () => (
+  <path d="M4.5 3L3 4.5 8 9.5l-5 5L4.5 16l5-5 5 5 1.5-1.5-5-5 5-5L14.5 3l-5 5z" />
+)
+
 export default SideButton

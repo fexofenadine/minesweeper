@@ -1,10 +1,10 @@
 import { h } from 'hyperapp'
 import s from './Digit.module.css'
 
-const Digit = ({ value }) => (
+const Digit = ({ value, digits = 3 }) => (
   <div class={s.root}>
-    {`00${Math.max(-99, Math.min(999, value))}`
-      .slice(-3)
+    {`000${Math.max(-99, Math.min(10 ** digits - 1, value))}`
+      .slice(-digits)
       .split('')
       .sort((a) => (a === '-' ? -1 : 0))
       .map((digit) => (

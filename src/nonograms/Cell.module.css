@@ -1,0 +1,126 @@
+/*filled cells in each theme's strongest colour, crosses in a quiet one*/
+:global(:root) {
+  --ng-fill: #1a1a1a;
+  --ng-cross: #7b7b7b;
+}
+
+:global(:root[data-theme='synthwave']) {
+  --ng-fill: #ff7edb;
+  --ng-cross: #848bbd;
+}
+
+:global(:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])) {
+  --ng-fill: #268bd2;
+  --ng-cross: #93a1a1;
+}
+
+:global(:root[data-theme='nord']) {
+  --ng-fill: #88c0d0;
+  --ng-cross: #4c566a;
+}
+
+:global(:root[data-theme='matrix']) {
+  --ng-fill: #39d26b;
+  --ng-cross: #1d6b37;
+}
+
+.root {
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*an empty cell is a raised tile like an unopened one in minesweeper*/
+.empty {
+  composes: root;
+  background: var(--cell);
+}
+
+.empty::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.fill {
+  composes: root;
+  background: var(--ng-fill);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*a crossed out cell lies flat with a faint x, drawn in the background so both pseudo elements stay
+free for the tile edge and a hint's outline*/
+.cross {
+  composes: root;
+  --mark: var(--ng-cross);
+  background:
+    linear-gradient(
+        45deg,
+        transparent calc(50% - 1px),
+        var(--mark) calc(50% - 1px) calc(50% + 1px),
+        transparent calc(50% + 1px)
+      )
+      center / 50% 50% no-repeat,
+    linear-gradient(
+        -45deg,
+        transparent calc(50% - 1px),
+        var(--mark) calc(50% - 1px) calc(50% + 1px),
+        transparent calc(50% + 1px)
+      )
+      center / 50% 50% no-repeat,
+    var(--cell);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*once solved only the picture is left*/
+.blank {
+  background: var(--cell);
+}
+
+/*a hint's fill or cross shows faintly in the raised tile it goes on*/
+.ghostFill {
+  composes: empty;
+  background: color-mix(in srgb, var(--ng-fill) 40%, var(--cell));
+}
+
+.ghostCross {
+  composes: cross empty;
+  --mark: color-mix(in srgb, var(--ng-cross) 70%, transparent);
+  box-shadow: none;
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+
+.hintSource {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #2e8bff;
+}
+
+.hintPlace {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #12d12a;
+}
+
+.hintWrong {
+  composes: outline from '../shell/Board.module.css';
+  --hint-color: #ff3b3b;
+}
+
+/*rain glyphs on matrix: filled cells show the bright glyph on black, like the rain itself*/
+:global(:root[data-theme='matrix'][data-rain]) .fill {
+  background: #020a04 var(--rain-1) center / 140% no-repeat;
+}

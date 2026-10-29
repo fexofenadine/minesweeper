@@ -4,17 +4,19 @@ import Winner from '../Winner'
 import BackgroundSettings from '../shell/BackgroundSettings'
 import Boss, { BossButton } from '../shell/Boss'
 import { load, remove, save } from '../shell/storage'
+import { records } from '../shell/records'
 import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
 import { pauseAction } from '../shell/clock'
 import Game, { running } from './Game'
-import BestTimes from './BestTimes'
-import Prompt from './Prompt'
-import { fallback, levelNames } from './Menu'
+import BestTimes from '../shell/BestTimes'
+import Prompt from '../shell/Prompt'
+import { allowed, fallback, levelNames } from './Menu'
 import { EMPTY, emptyBoard, full, sizes, solved } from './rules'
-import { findHint } from './hint'
+import { completeWithErrors, findHint } from './hint'
 import { deal } from './deal'
-import { showRain } from './rain'
+import { showRain } from '../shell/rain'
 import About from './About'
+import HowToPlay from './HowToPlay'
 
 //the saved size and level, medium 8x8 when missing or out of range
 const loadChoice = () => {
@@ -45,29 +47,7 @@ export const createGame = ({ n, level }) => ({
   hinted: false,
 })
 
-//best times by size and level, kept apart for games with and without hints
-const timeKey = (n, level, hinted) => `takuzu.${n}.${level}${hinted ? '.hints' : ''}`
-
-const eachSlot = (fn) =>
-  sizes.flatMap((n) => levelNames.map((_, level) => fn(n, level, `${n}.${level}`)))
-
-const bestTimes = (hinted) =>
-  Object.fromEntries(
-    eachSlot((n, level, slot) => {
-      const key = timeKey(n, level, hinted)
-      const time = parseInt(load(key), 10) || 999
-      return [slot, { time, name: load(`${key}.name`) || 'Anonymous' }]
-    }),
-  )
-
-const clearBestTimes = (hinted) => {
-  eachSlot((n, level) => {
-    const key = timeKey(n, level, hinted)
-    remove(key)
-    remove(`${key}.name`)
-  })
-  return bestTimes(hinted)
-}
+const { timeKey, eachSlot, actions: recordActions } = records('takuzu', sizes, levelNames)
 
 //a click steps forward through these, a right click back
 const cycle = [EMPTY, 0, 1]
@@ -253,54 +233,7 @@ export const actions = {
       if (game.time === next) return null
       return { game: { ...game, time: next } }
     },
-  win:
-    ({ n, level, hinted, time }) =>
-    () => {
-      const key = timeKey(n, level, hinted)
-      const best = parseInt(load(key), 10)
-      if (best && best <= time) return null
-      return {
-        winner: {
-          key,
-          time,
-          hinted,
-          level: `${levelNames[level].toLowerCase()} ${n} × ${n}`,
-          name: load('takuzu.name') || '',
-        },
-      }
-    },
-  changeWinner:
-    (payload) =>
-    ({ winner }) => ({
-      winner: { ...winner, ...payload },
-    }),
-  submitBestTime:
-    (event) =>
-    ({ winner }, actions) => {
-      event.preventDefault()
-      const name = winner.name.trim()
-      save(winner.key, winner.time)
-      save(`${winner.key}.name`, name)
-      save('takuzu.name', name)
-      actions.toggleBestTime()
-      actions.setBestTimeTab(winner.hinted ? 'hinted' : 'clean')
-      return { winner: null }
-    },
-  toggleBestTime:
-    () =>
-    ({ bestTime }) => ({
-      menu: null,
-      bestTime: bestTime
-        ? null
-        : { tab: 'clean', clean: bestTimes(false), hinted: bestTimes(true) },
-    }),
-  setBestTimeTab: (tab) => (state) =>
-    state.bestTime ? { bestTime: { ...state.bestTime, tab } } : null,
-  resetBestTime:
-    () =>
-    ({ bestTime }) => ({
-      bestTime: { ...bestTime, [bestTime.tab]: clearBestTimes(bestTime.tab === 'hinted') },
-    }),
+  ...recordActions,
 }
 
 export const view = (state, actions) => (
@@ -308,12 +241,23 @@ export const view = (state, actions) => (
     <Game key="a" state={state} actions={actions} />
     <BossButton key="h" actions={actions} />
     {state.winner && <Winner key="b" state={state.winner} actions={actions} />}
-    {state.bestTime && <BestTimes key="c" state={state.bestTime} actions={actions} />}
-    {state.prompt && <Prompt key="d" actions={actions} />}
+    {state.bestTime && (
+      <BestTimes
+        key="c"
+        title="Fastest Takuzu Solvers"
+        sizes={sizes}
+        levelNames={levelNames}
+        allowed={allowed}
+        state={state.bestTime}
+        actions={actions}
+      />
+    )}
+    {state.prompt && <Prompt key="d" title="Takuzu" text={completeWithErrors} actions={actions} />}
     {state.backgroundSettings && (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
     {state.about && <About key="f" actions={actions} />}
+    {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.boss && <Boss key="g" state={state.boss} actions={actions} />}
   </main>
 )

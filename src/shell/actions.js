@@ -18,6 +18,7 @@ export const shellState = () => ({
   boss: null,
   backgrounds: loadSettings(),
   backgroundSettings: null,
+  howTo: false,
   zoom: { chosen: loadZoom(), scale: loadZoom(), seen: null },
   portrait: Boolean(window.matchMedia && matchMedia('(orientation: portrait)').matches),
 })
@@ -53,6 +54,9 @@ export const shortcut = (event, state, actions) => {
 export const shellActions = {
   closeMenu: () => ({ menu: null }),
   setPortrait: (portrait) => ({ portrait }),
+  toggleHowTo:
+    () =>
+    ({ howTo }) => ({ menu: null, howTo: !howTo }),
   //esc covers everything with a spreadsheet and pauses the game
   boss:
     () =>

@@ -56,6 +56,7 @@ export default defineConfig({
         index: 'index.html',
         minesweeper: 'minesweeper/index.html',
         takuzu: 'takuzu/index.html',
+        nonograms: 'nonograms/index.html',
       },
       output: {
         entryFileNames: 'assets/[name].js',

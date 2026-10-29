@@ -6,6 +6,7 @@ import BestTime from './BestTime'
 import CustomField from './CustomField'
 import BackgroundSettings from './shell/BackgroundSettings'
 import About from './About'
+import HowToPlay from './HowToPlay'
 import Boss, { BossButton } from './shell/Boss'
 import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
@@ -560,6 +561,7 @@ export const view = (state, actions) => (
       <BackgroundSettings key="e" state={state.backgroundSettings} actions={actions} />
     )}
     {state.about && <About key="f" actions={actions} />}
+    {state.howTo && <HowToPlay key="i" actions={actions} />}
     {state.boss && <Boss key="g" state={state.boss} actions={actions} />}
   </main>
 )

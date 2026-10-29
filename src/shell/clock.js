@@ -1,3 +1,6 @@
+//the clock grows a fourth digit past 999, except on classic which stops there like the original
+export const clockDigits = (theme, time) => (theme !== 'classic' && time > 999 ? 4 : 3)
+
 //pausing stops the clock and hides the board, only while running(game) holds
 //onPause adds the game's own changes, like dropping a half done click
 export const pauseAction =

@@ -1,10 +1,10 @@
 # Puzzles
 
-Windows style puzzle games with hints that explain their reasoning, boards you can solve by logic alone, zoom and animated themes ported from xscreensaver. Both games share the window, the six themes and their backgrounds, pause and the boss key, and your theme and zoom carry over between them.
+Windows style puzzle games with hints that explain their reasoning, boards you can solve by logic alone, zoom and animated themes ported from xscreensaver. All three games share the window, the six themes and their backgrounds, pause and the boss key, and your theme and zoom carry over between them. The Game menu switches between them, and Help → How to Play sums up each game's rules.
 
-| [Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)                                        | [Play Takuzu Plus](https://fexofenadine.github.io/puzzles/takuzu/)                              |
-| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
-| [![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/) | [![Play Takuzu Plus](public/takuzu/takuzu.jpg)](https://fexofenadine.github.io/puzzles/takuzu/) |
+| [Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)                                        | [Play Takuzu Plus](https://fexofenadine.github.io/puzzles/takuzu/)                              | [Play Nonograms Plus](https://fexofenadine.github.io/puzzles/nonograms/)                                    |
+| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| [![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/) | [![Play Takuzu Plus](public/takuzu/takuzu.jpg)](https://fexofenadine.github.io/puzzles/takuzu/) | [![Play Nonograms Plus](public/nonograms/nonograms.jpg)](https://fexofenadine.github.io/puzzles/nonograms/) |
 
 ## Themes
 
@@ -39,6 +39,27 @@ Binary puzzles: fill the grid with 0s and 1s so that no row or column has three 
 - **Colours**: the two values are tiles in near complementary colours from each theme, blue and orange on Classic, cyan and magenta on the Solarized themes, cyan and pink on Synthwave, frost and aurora on Nord, and green on black against black on green on Matrix. **Rain Glyphs** (Theme menu, on Matrix) draws them as two glyphs from the digital rain instead.
 - **Best times** for every size and level, with and without hints, the window title (Takuzu on Classic, Takuzu Plus elsewhere), zoom and fit, pause, the boss key and the shortcuts work as in Minesweeper Plus. Big expert boards are dealt in the background, so the window never stalls.
 
+## Nonograms Plus
+
+Picture logic puzzles: the numbers beside each row and above each column give the lengths of its runs of filled cells, in order, with at least one empty cell between runs. Fill the cells that match every clue and a picture appears.
+
+| Classic, with a hint                                            | Synthwave, with Show Errors                                         |
+| --------------------------------------------------------------- | ------------------------------------------------------------------- |
+| ![Nonograms on Classic](docs/screenshots/nonograms-classic.jpg) | ![Nonograms on Synthwave](docs/screenshots/nonograms-synthwave.jpg) |
+| **Matrix, with rain glyphs**                                    | **Nord, 25 × 25 expert**                                            |
+| ![Nonograms on Matrix](docs/screenshots/nonograms-matrix.jpg)   | ![Nonograms on Nord](docs/screenshots/nonograms-nord.jpg)           |
+| **Every fill placed, with a mistake**                           | **Best times**                                                      |
+| ![Full board prompt](docs/screenshots/nonograms-solarized.jpg)  | ![Nonograms best times](docs/screenshots/nonograms-phosphor.jpg)    |
+
+- **Every board has exactly one solution** and can be solved by logic alone. Pictures are random blobs made fresh each game, sometimes mirrored, and a picture that logic can't finish is touched up cell by cell until it can.
+- **Four levels** (Game menu), each needing its own reasoning: **Easy** uses lines a clue settles alone, overlaps (cells a run covers wherever it sits) and gaps no run can reach, counting only crossed out cells; **Medium** uses the same overlaps and reach with the filled cells too, so a filled cell can pin a run in place; **Hard** uses everything one line proves when every way of fitting its clue is tried; **Expert** adds a what-if (a cell that would leave another line unable to match its clue must be the other way). A board is only dealt at a level if it needs that level's reasoning.
+- **Five sizes** (Size menu), 5 × 5 to 25 × 25, with a thicker line every five cells. 5 × 5 has no Expert, since boards that small never need it.
+- **Playing**: click a cell to fill it, again to cross it out and again to clear it, right-click to step back. Crosses are notes for yourself and the win never needs them. Drag to paint along a row or column, one undo step per drag. On a touch screen a button beside the face picks whether taps fill or cross, and dragging paints instead of scrolling. Clues dim once their line matches, and the left counter shows the cells still to fill.
+- **Hint** (`H`, the Game menu or the ? button): points out a clue that can't be matched any more first, then a cell that can't fit the only solution, and otherwise the easiest next step, with its clue and the cells it reasons from outlined in blue, the cells it settles shown faintly in green and the reason under the board.
+- **Show Errors** (Game menu, off by default) turns a clue red once its line can't match. When every fill is placed but the picture is wrong, the game asks whether you want a hint, straight away after a drag, or after a moment when a single click may be on its way to a cross.
+- **Rain Glyphs** (Theme menu, on Matrix) draws filled cells as a glyph from the digital rain.
+- **Best times** for every size and level, with and without hints, the window title (Nonograms on Classic, Nonograms Plus elsewhere), zoom and fit, pause, the boss key and the shortcuts work as in the other games. Past 999 seconds the clock grows a fourth digit on every theme but Classic. Boards are dealt in the background, so the window never stalls.
+
 ## Minesweeper Plus
 
 On top of the [original game](https://github.com/frenzzy/minesweeper), which has the classic look, the beginner, intermediate, expert and custom levels, marks, best times and touch support, this fork adds:
@@ -67,7 +88,7 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 
 ### Window and display
 
-- **Title and About**: the window is titled Minesweeper Plus on every theme except Classic, which keeps the original's title. Help → About Minesweeper Plus describes the game, credits the original author and links to this repository and its licences.
+- **Title and About**: the window is titled Minesweeper Plus on every theme except Classic, which keeps the original's title. Help → About Minesweeper Plus describes the game, credits the original author and links to this repository and its licences, and Help → How to Play sums up the rules.
 - **Zoom**: the − and + buttons in the title bar scale the whole window in steps from 50% to 400%, and double-clicking the title bar goes back to 100%. The zoom is remembered.
 - **Fits the screen**: when a level, custom grid, theme or browser size would make the window too big, it shrinks to fit, but never below 62.5% (about 10 pixel cells), where the page scrolls instead. Zooming in past the fitted size is allowed and scrolls too. On small screens the margin around the window shrinks as well.
 - **Portrait screens**: on a screen taller than it is wide, a board that is wider than tall (Expert, Extreme or a wide custom grid) is shown turned on its side, columns as rows, so it fills the screen instead of shrinking. Numbers stay upright, and it switches back when the screen turns to landscape.
@@ -95,17 +116,17 @@ On top of the [original game](https://github.com/frenzzy/minesweeper), which has
 - Rebuilt on [Vite](https://vite.dev) with Vitest, ESLint and Prettier, replacing the abandoned hyperapp-tools webpack 4 setup.
 - A plain static build with readable asset names, versioned links so browsers never mix old and new files, and a simple offline-capable service worker.
 - Settings survive browsers that block site storage, falling back to the defaults.
-- Both games are pages of one build. Code they share (themes, backgrounds, zoom, pause, the boss key, settings storage) lives in `src/shell`, Minesweeper keeps the original's file layout in `src`, and Takuzu has `src/takuzu`.
-- Takuzu's rules, an exact line-by-line solver, the technique ladder behind hints and difficulty, and the generator are plain modules with no interface code, and boards are dealt in a web worker.
+- The games are pages of one build. Code they share (themes, backgrounds, zoom, pause, the boss key, best times, settings storage, dealing in a worker) lives in `src/shell`, Minesweeper keeps the original's file layout in `src`, and Takuzu and Nonograms have `src/takuzu` and `src/nonograms`.
+- Takuzu's and Nonograms' rules, solvers, the technique ladders behind hints and difficulty, and the generators are plain modules with no interface code, and boards are dealt in a web worker. Nonograms solves a line by dynamic programming over every way its clue can fit.
 - Animated backgrounds are canvas ports in `src/shell/backgrounds`, one file each. A port declares its options and the settings dialog builds itself from them, so adding another xscreensaver hack needs no other code. Phosphor's source code text is only downloaded when that theme is used.
 - Google Analytics removed.
-- Tests for mine placement and the no-guessing solver, chording and its explanations, hints, best times, zoom and fitting, portrait boards and every background and its settings, and for Takuzu's rules, solver (checked against a brute force search), every technique, difficulty rating, generation at every size and level, hints that always agree with the solution, and playing.
+- Tests for mine placement and the no-guessing solver, chording and its explanations, hints, best times, zoom and fitting, portrait boards and every background and its settings, and for Takuzu's rules, solver (checked against a brute force search), every technique, difficulty rating, generation at every size and level, hints that always agree with the solution, and playing, and the same for Nonograms, whose line solver is checked against a brute force search and whose boards are played to the end by following hints.
 
 ## Development
 
 ```sh
 yarn          #install dependencies
-yarn start    #dev server, the games are at /minesweeper/ and /takuzu/
+yarn start    #dev server, the games are at /minesweeper/, /takuzu/ and /nonograms/
 yarn build    #static site in build/
 yarn test     #run tests
 yarn lint     #lint
@@ -117,6 +138,7 @@ Classic's hill (`src/shell/backgrounds/hill.webp` and `ridge.json`) is made from
 ## Credits
 
 - Takuzu, also known as Binairo, was devised by Frank Coussement and Peter De Schepper. This version's puzzles, solver and hints are its own.
+- Nonograms were devised in 1987 by Non Ishida and, independently, Tetsuya Nishio. This version's pictures, solver and hints are its own.
 - Forked from [frenzzy/minesweeper](https://github.com/frenzzy/minesweeper) by Vladimir Kutepov, bootstrapped with [Hyperapp Starter](https://github.com/kriasoft/hyperapp-starter).
 - Classic background by [Chris Barbalis](https://unsplash.com/photos/green-grass-field-under-blue-sky--nYBR0LFTvQ) on Unsplash, colour matched to resemble Bliss.
 - Classic's animated hill is cut from [Clouds above Cattle Hill, Roedean](<https://commons.wikimedia.org/wiki/File:Clouds_above_Cattle_Hill,_Roedean_(February_2011).JPG>) by Hassocks5489 (CC0), retouched, mirrored and colour matched to Bliss by `src/shell/backgrounds/hill.py`. Its sky and clouds are drawn live.

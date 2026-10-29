@@ -9,6 +9,7 @@ import SideButton, { HintIcon } from './shell/SideButton'
 import WindowControls from './shell/WindowControls'
 import { PausedCover, HintPanel } from './shell/Board'
 import { watchWindow } from './shell/zoom'
+import { clockDigits } from './shell/clock'
 
 export const running = ({ start, win, lose }) => start >= 0 && !win && !lose
 
@@ -69,7 +70,7 @@ const Game = ({ key, state, actions }) => (
             </SideButton>
           </div>
         )}
-        <Digit value={state.game.time} />
+        <Digit value={state.game.time} digits={clockDigits(state.theme, state.game.time)} />
       </div>
       <div class={state.game.lose ? s.fieldLost : s.field}>
         {rowsOf(state).map((row) => (

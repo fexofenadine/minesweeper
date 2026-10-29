@@ -4,19 +4,17 @@ import s from './BestTimes.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
-import Tabs from '../shell/Tabs'
-import { sizes } from './rules'
-import { allowed, levelNames } from './Menu'
+import Tabs from './Tabs'
 
 const tabs = [
   { id: 'clean', name: 'No hints' },
   { id: 'hinted', name: 'Hints used' },
 ]
 
-//a size a row, a level a column, empty slots stay blank
-const BestTimes = ({ key, state, actions }) => (
+//a size a row, a level a column, empty slots stay blank and levels a size can't deal show a dash
+const BestTimes = ({ key, title, sizes, levelNames, allowed, state, actions }) => (
   <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
-    <Dialog title="Fastest Takuzu Solvers" onClose={actions.toggleBestTime}>
+    <Dialog title={title} onClose={actions.toggleBestTime}>
       <div class={b.root}>
         <Tabs tabs={tabs} active={state.tab} onSelect={actions.setBestTimeTab} />
         <table class={s.table}>

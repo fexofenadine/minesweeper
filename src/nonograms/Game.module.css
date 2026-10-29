@@ -1,0 +1,90 @@
+/*clues above and to the left of the field, on the same tracks as its cells*/
+.board {
+  --size: 20px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    '. columns'
+    'rows field';
+  justify-content: center;
+  color: var(--text);
+  font: bold 12px/1 var(--text-font);
+}
+
+/*the 2px pads match the field's top and left border*/
+.columns {
+  grid-area: columns;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  align-items: end;
+  padding: 0 3px 2px 2px;
+}
+
+.rows {
+  grid-area: rows;
+  display: grid;
+  grid-template-rows: var(--tracks);
+  justify-items: end;
+  padding: 2px 3px 3px 0;
+}
+
+.columns .clue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 12px;
+}
+
+.rows .clue {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 2px;
+}
+
+/*two digits squeeze into a column so they don't run into the next one*/
+.columns .wide {
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+
+.done {
+  opacity: 0.4;
+}
+
+.error {
+  color: #ff2020;
+}
+
+/*the clue a hint is about, outlined like its cells*/
+.hinted {
+  opacity: 1;
+  outline: 2px solid #2e8bff;
+  outline-offset: 1px;
+}
+
+.field {
+  grid-area: field;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  grid-template-rows: var(--tracks);
+  background: var(--cell-shadow);
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.active {
+  composes: field;
+  cursor: pointer;
+}
+
+.inactive {
+  composes: field;
+  cursor: default;
+}

@@ -8,6 +8,7 @@ import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
 import WindowControls from '../shell/WindowControls'
 import { PausedCover, HintPanel } from '../shell/Board'
 import { watchWindow } from '../shell/zoom'
+import { clockDigits } from '../shell/clock'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, violations } from './rules'
@@ -61,7 +62,7 @@ const Game = ({ key, state, actions }) => {
               <HintIcon />
             </SideButton>
           </div>
-          <Digit value={game.time} />
+          <Digit value={game.time} digits={clockDigits(state.theme, game.time)} />
         </div>
         <div class={running(game) && !paused ? s.active : s.inactive} style={{ '--n': n }}>
           {[...board].map((value, i) => (

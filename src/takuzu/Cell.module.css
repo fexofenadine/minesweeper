@@ -138,12 +138,12 @@
 
 :global(:root[data-theme='matrix'][data-rain]) .zero {
   background-color: #020a04;
-  background-image: var(--tz-rain-0);
+  background-image: var(--rain-0);
 }
 
 :global(:root[data-theme='matrix'][data-rain]) .one {
   background-color: #0b3d1a;
-  background-image: var(--tz-rain-1);
+  background-image: var(--rain-1);
 }
 
 :global(:root[data-theme='matrix'][data-rain]) .given {
