@@ -167,6 +167,45 @@ it('gives a hint on a yes and leaves the player alone on a no', () => {
   expect(['break', 'wrong']).toContain(now().hint.kind)
 })
 
+it('asks again after each fix and points at a cell that is really wrong, with several errors', () => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  for (const [n, seed, count] of [
+    [6, 5, 2],
+    [8, 3, 3],
+    [10, 7, 4],
+  ]) {
+    const { givens, solution } = makeGame(n, 1, random(seed))
+    start({
+      game: {
+        ...createGame({ n, level: 1 }),
+        givens,
+        solution,
+        board: givens.slice(),
+        dealing: false,
+      },
+    })
+    const open = [...givens.keys()].filter((i) => givens[i] === EMPTY)
+    const errors = open.filter((_, k) => k % Math.floor(open.length / count) === 0).slice(0, count)
+    fill(solution.map((v, i) => (errors.includes(i) ? 1 - v : v)))
+    for (let fixes = 0; fixes < count; fixes++) {
+      vi.advanceTimersByTime(2500)
+      expect(now().prompt).toBe(true)
+      wired.answerPrompt(true)
+      const { marks } = now().hint
+      const wrong = Object.keys(marks)
+        .filter((i) => marks[i] === 'wrong')
+        .map(Number)
+      expect(wrong.length).toBeGreaterThan(0)
+      for (const i of wrong) {
+        expect(errors).toContain(i)
+        while (now().game.board[i] !== solution[i]) wired.play({ event: left, i })
+      }
+      if (now().game.win) break
+    }
+    expect(now().game.win).toBe(true)
+  }
+})
+
 it('wins on the solution and offers a best time', () => {
   fill(now().game.solution)
   const { game, winner } = now()

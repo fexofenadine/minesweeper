@@ -13,11 +13,14 @@ export const findHint = ({ board, solution, n }) => {
   if (solved(board, n)) return { kind: 'solved', text: 'The puzzle is solved.', marks: {} }
   const broken = breaks(board, n)
   if (broken.length) {
+    //a broken rule's cells are not all wrong, so the solution picks out the ones to change
     const { cells, text } = broken[0]
+    const bad = cells.filter((i) => board[i] !== solution[i])
+    const fix = bad.length ? bad : cells
     return {
       kind: 'break',
-      text: `${text} Change one of the highlighted cells.`,
-      marks: marked(cells.map((i) => [i, 'wrong'])),
+      text: `${text} ${fix.length > 1 ? 'The cells outlined in red are the ones' : 'The cell outlined in red is the one'} to change.`,
+      marks: marked(cells.map((i) => [i, fix.includes(i) ? 'wrong' : 'source'])),
     }
   }
   //a cell can break no rule yet and still not fit the only solution

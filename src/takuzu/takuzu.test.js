@@ -167,10 +167,17 @@ it('rules out a line that would repeat a full one', () => {
 })
 
 it('points out a broken rule before anything else', () => {
-  const rows = ['111...', '......', '......', '......', '......', '......']
-  const hint = findHint({ board: parse(rows), solution: makeSolution(6, random(1)), n: 6 })
-  expect(hint).toMatchObject({ kind: 'break', marks: { 0: 'wrong', 1: 'wrong', 2: 'wrong' } })
+  const solution = makeSolution(6, random(1))
+  const board = parse(['......', '......', '......', '......', '......', '......'])
+  //the solution's own first row with its first three cells forced to 1s
+  for (let i = 0; i < 6; i++) board[i] = i < 3 ? 1 : solution[i]
+  const hint = findHint({ board, solution, n: 6 })
+  expect(hint.kind).toBe('break')
   expect(hint.text).toMatch(/Row 1 has three 1s in a row/)
+  //only the cells that differ from the solution are called wrong, the rest of the rule is context
+  for (const i of [0, 1, 2]) {
+    expect(hint.marks[i]).toBe(solution[i] === 1 ? 'source' : 'wrong')
+  }
   expect(completeWithErrors).toMatch(/complete but there are errors/)
 })
 
