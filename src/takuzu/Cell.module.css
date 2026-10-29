@@ -14,9 +14,9 @@
 }
 
 :global(:root:is([data-theme='solarized'], [data-theme='solarized-phosphor'])) {
-  --tz-zero: #b58900;
+  --tz-zero: #2aa198;
   --tz-zero-text: #002b36;
-  --tz-one: #6c71c4;
+  --tz-one: #d33682;
   --tz-one-text: #fdf6e3;
 }
 
