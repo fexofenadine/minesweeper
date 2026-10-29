@@ -16,6 +16,11 @@
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
 }
 
+.buttons {
+  display: flex;
+  gap: 4px;
+}
+
 .field {
   position: relative;
   white-space: nowrap;

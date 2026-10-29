@@ -448,3 +448,20 @@ it('esc closes an open menu before it shows the spreadsheet', () => {
   wired.peek()
   expect(current.boss).not.toBe(null)
 })
+
+it('has a hint button by the face on every theme but classic', async () => {
+  const hintButtons = (theme) =>
+    new Promise((resolve) => {
+      const container = document.createElement('div')
+      const testView = () => (
+        <div oncreate={(el) => resolve(el.querySelectorAll('[title="Hint (H)"]').length)}>
+          {view({ ...state, theme }, actions)}
+        </div>
+      )
+      app({ ...state, theme }, actions, testView, container)
+    })
+  expect(await hintButtons('classic')).toBe(0)
+  for (const theme of ['synthwave', 'matrix', 'nord', 'solarized', 'solarized-phosphor']) {
+    expect(await hintButtons(theme)).toBe(1)
+  }
+})

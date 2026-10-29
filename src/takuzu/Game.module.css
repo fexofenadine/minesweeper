@@ -21,49 +21,6 @@
   gap: 4px;
 }
 
-/*undo and hint, drawn like the face button between them*/
-.side {
-  position: relative;
-  display: block;
-  margin: 0;
-  padding: 3px 3px 2px 2px;
-  color: var(--glyph);
-  background: var(--cell);
-  border: 1px solid var(--cell-shadow);
-  outline: 0;
-  cursor: pointer;
-}
-
-.side::before {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  border: 2px solid;
-  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
-  content: '';
-}
-
-.side:active:not(:disabled) {
-  padding: 4px 1px 1px 4px;
-}
-
-.side:active:not(:disabled)::before {
-  border-width: 1px 0 0 1px;
-  border-color: var(--cell-shadow);
-}
-
-.side:disabled {
-  color: var(--cell-shadow);
-  cursor: default;
-}
-
-.side svg {
-  display: block;
-  fill: currentColor;
-}
-
 .field {
   position: relative;
   display: grid;

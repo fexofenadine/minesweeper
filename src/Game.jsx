@@ -6,6 +6,7 @@ import Digit from './Digit'
 import Play from './Play'
 import Cell from './Cell'
 import Button from './Button'
+import SideButton, { HintIcon } from './shell/SideButton'
 import WindowControls from './shell/WindowControls'
 import { watchWindow } from './shell/zoom'
 
@@ -19,6 +20,15 @@ const rowsOf = (state) => {
   if (!transposed(state)) return field.map((row, y) => row.map((cell, x) => ({ cell, x, y })))
   return field[0].map((_, x) => field.map((row, y) => ({ cell: row[x], x, y })))
 }
+
+const Face = ({ state, actions }) => (
+  <Play
+    pressed={state.game.pressed}
+    lose={state.game.lose}
+    win={state.game.win}
+    onReset={actions.reset}
+  />
+)
 
 const Game = ({ key, state, actions }) => (
   <Dialog
@@ -44,12 +54,21 @@ const Game = ({ key, state, actions }) => (
     <div class={s.root}>
       <div class={s.scoreboard}>
         <Digit value={state.game.flags} />
-        <Play
-          pressed={state.game.pressed}
-          lose={state.game.lose}
-          win={state.game.win}
-          onReset={actions.reset}
-        />
+        {state.theme === 'classic' ? (
+          <Face state={state} actions={actions} />
+        ) : (
+          //the hint button sits by the face off classic, the pair centred like takuzu's buttons
+          <div class={s.buttons}>
+            <Face state={state} actions={actions} />
+            <SideButton
+              title="Hint (H)"
+              disabled={state.game.win || state.game.lose || state.game.paused}
+              onClick={actions.hint}
+            >
+              <HintIcon />
+            </SideButton>
+          </div>
+        )}
         <Digit value={state.game.time} />
       </div>
       <div class={state.game.lose ? s.fieldLost : s.field}>
