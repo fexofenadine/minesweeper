@@ -1,7 +1,7 @@
 import { BRIGHT, GLYPH, glyphImage } from '../shell/backgrounds/matrix'
 
 //two glyphs from the matrix rain for 0 and 1, drawn the way the rain draws them
-export const rain = ['ﾊ', 'ﾐ']
+export const rain = ['ｼ', 'ﾓ']
 
 //draws them once and hands them to the css, which only uses them on the matrix theme
 export const showRain = (on) => {
