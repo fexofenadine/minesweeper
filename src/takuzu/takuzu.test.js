@@ -1,7 +1,8 @@
 import { expect, it } from 'vitest'
 import { EMPTY, cellsOf, emptyBoard, linesOf, readLine, sizes, solved, violations } from './rules'
 import { countSolutions, propagate, solve, startCandidates } from './solver'
-import { levels, nextSteps, rate, repeats } from './techniques'
+import { levels, nextSteps, oneLeft, rate, repeats, twins } from './techniques'
+import { allowed } from './Menu'
 import { makeGame, makePuzzle, makeSolution, random } from './generate'
 import { completeWithErrors, findHint } from './hint'
 
@@ -122,7 +123,7 @@ it('fills the same cells with every technique up to hard as line propagation doe
     const ladder = board.slice()
     let broken = false
     for (;;) {
-      const { contradiction, steps } = nextSteps(ladder, n, 2)
+      const { contradiction, steps } = nextSteps(ladder, n, 3)
       if (contradiction) broken = true
       if (contradiction || !steps.length) break
       steps.forEach(({ place }) => place.forEach(([i, v]) => (ladder[i] = v)))
@@ -187,7 +188,7 @@ it('marks a cell that breaks no rule yet but does not fit the solution', () => {
 it('deals every size at every level, needing exactly that level', () => {
   for (const n of sizes) {
     for (let level = 0; level < levels.length; level++) {
-      if (n === 6 && level === 3) continue
+      if (!allowed(n, level)) continue
       const { givens, solution, level: got } = makeGame(n, level, random(n * 10 + level))
       expect(got).toBe(level)
       expect(rate(givens, n).level).toBe(level)
@@ -205,7 +206,8 @@ it('finishes boards by following hints alone, every hint agreeing with the solut
     [8, 1],
     [8, 2],
     [10, 3],
-    [12, 3],
+    [10, 4],
+    [12, 4],
   ]) {
     for (let seed = 0; seed < 3; seed++) {
       const { givens, solution } = makeGame(n, level, random(seed + 100))
@@ -223,6 +225,29 @@ it('finishes boards by following hints alone, every hint agreeing with the solut
       expect(solved(board, n)).toBe(true)
     }
   }
-  for (const kind of ['pair', 'gap', 'count', 'balance', 'what-if']) expect(kinds).toContain(kind)
+  for (const kind of ['pair', 'gap', 'count', 'one-left', 'balance', 'what-if']) {
+    expect(kinds).toContain(kind)
+  }
   expect(kinds).not.toContain('reveal')
+})
+
+it('rules out spots for the last one of a value that would leave three alike', () => {
+  //row 1 needs one more 1, and in the 2nd or 5th cell it would leave three 0s together
+  const [step] = oneLeft(parse(['1.0..1', '......', '......', '......', '......', '......']), 6)
+  expect(step).toMatchObject({ technique: 'one-left', level: 2 })
+  expect(step.place).toEqual([
+    [1, 0],
+    [4, 0],
+  ])
+  expect(step.text).toMatch(/Row 1 needs just one more 1, and in any of these cells/)
+})
+
+it('turns a line two cells short of a full one the other way round', () => {
+  const [step] = twins(parse(['0110', '01..', '....', '....']), 4)
+  expect(step.place).toEqual([
+    [6, 0],
+    [7, 1],
+  ])
+  expect(step.level).toBe(2)
+  expect(step.text).toMatch(/Row 2 matches row 1 except for these two cells/)
 })

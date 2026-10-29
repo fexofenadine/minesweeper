@@ -4,7 +4,7 @@ import { propagate, startCandidates } from './solver'
 //the reasoning a person uses, easiest first, behind hints, difficulty and generation
 //a step is { technique, level, place: [[cell, value]], sources: [cells], text }
 
-export const levels = ['easy', 'medium', 'hard', 'expert']
+export const levels = ['easy', 'medium', 'tricky', 'hard', 'expert']
 
 const capital = (text) => text[0].toUpperCase() + text.slice(1)
 const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven']
@@ -95,6 +95,69 @@ export const counts = (board, n) => {
   return steps
 }
 
+//a line needing just one more of a value: every spot where it would leave three alike is ruled out
+export const oneLeft = (board, n) => {
+  const steps = []
+  cellsOf(n).forEach((cells, line) => {
+    const empty = cells.filter((i) => board[i] === EMPTY)
+    if (empty.length < 2) return
+    for (const v of [0, 1]) {
+      if (n / 2 - cells.filter((i) => board[i] === v).length !== 1) continue
+      //try the last v in each empty cell with the other value everywhere else
+      const blocked = empty.filter((spot) => {
+        const trial = cells.map((i) => (i === spot ? v : board[i] === EMPTY ? 1 - v : board[i]))
+        return trial.some((x, k) => k >= 2 && x === trial[k - 1] && x === trial[k - 2])
+      })
+      if (!blocked.length) continue
+      if (blocked.length === empty.length) {
+        steps.push({ contradiction: true })
+        return
+      }
+      const place = blocked.map((i) => [i, 1 - v])
+      steps.push(
+        step(
+          'one-left',
+          2,
+          place,
+          cells.filter((i) => board[i] !== EMPTY),
+          `${capital(nameOf(line, n))} needs just one more ${v}, and in ${place.length > 1 ? 'any of these cells' : 'this cell'} it would leave three alike in a row, so ${result(place)}.`,
+        ),
+      )
+    }
+  })
+  return steps
+}
+
+//a line two cells short of matching a full one has to finish the other way round
+export const twins = (board, n) => {
+  const steps = []
+  const lines = cellsOf(n)
+  const all = (1 << n) - 1
+  lines.forEach((cells, line) => {
+    const empty = cells.filter((i) => board[i] === EMPTY)
+    if (empty.length !== 2) return
+    const { known, value } = readLine(board, cells)
+    const twin = lines.findIndex((other, l) => {
+      if (l === line || l < n !== line < n) return false
+      const done = readLine(board, other)
+      return done.known === all && (done.value & known) === value
+    })
+    if (twin < 0) return
+    const place = empty.map((i) => [i, 1 - board[lines[twin][cells.indexOf(i)]]])
+    if (place[0][1] === place[1][1]) return
+    steps.push(
+      step(
+        'twins',
+        2,
+        place,
+        [...cells, ...lines[twin]].filter((i) => board[i] !== EMPTY),
+        `${capital(nameOf(line, n))} matches ${nameOf(twin, n)} except for these two cells, and no two ${line < n ? 'rows' : 'columns'} may match, so they go the other way round.`,
+      ),
+    )
+  })
+  return steps
+}
+
 //the valid lines that fit what a line already shows, without repeating a full line if asked
 const fitsOf = (board, cells, n, repeats) => {
   const { known, value } = readLine(board, cells)
@@ -144,7 +207,7 @@ export const balance = (board, n) => {
     steps.push(
       step(
         'balance',
-        2,
+        3,
         place,
         cells.filter((i) => board[i] !== EMPTY),
         `${capital(nameOf(line, n))} still needs ${many(zeros, 0)} and ${many(ones, 1)}. Every way to fit them in without three alike in a row agrees here, so ${result(place)}.`,
@@ -176,7 +239,7 @@ export const repeats = (board, n) => {
     steps.push(
       step(
         'repeat',
-        2,
+        3,
         place,
         [cells, ...twins.map((l) => lines[l])].flat().filter((i) => board[i] !== EMPTY),
         `${capital(nameOf(line, n))} could otherwise end up the same as ${twins.map((l) => nameOf(l, n)).join(' or ')}, and no two ${line < n ? 'rows' : 'columns'} may match, so ${result(place)}.`,
@@ -200,7 +263,7 @@ export const whatIf = (board, n) => {
       return [
         step(
           'what-if',
-          3,
+          4,
           [[i, 1 - v]],
           [i],
           `If this cell were a ${v}, the simpler rules would soon break a rule somewhere, so it must be a ${1 - v}.`,
@@ -211,10 +274,10 @@ export const whatIf = (board, n) => {
   return []
 }
 
-const techniques = [[pairs, gaps], [counts], [balance, repeats], [whatIf]]
+const techniques = [[pairs, gaps], [counts], [oneLeft, twins], [balance, repeats], [whatIf]]
 
 //the easiest steps available, or a contradiction, using techniques up to a level
-export const nextSteps = (board, n, top = 3) => {
+export const nextSteps = (board, n, top = levels.length - 1) => {
   for (let level = 0; level <= top; level++) {
     for (const technique of techniques[level]) {
       const steps = technique(board, n)
@@ -237,7 +300,7 @@ const apply = (board, n, steps) => {
 }
 
 //the hardest level a board needs, or null when techniques up to top can't finish it
-export const rate = (givens, n, top = 3) => {
+export const rate = (givens, n, top = levels.length - 1) => {
   const board = givens.slice()
   let hardest = 0
   while (!full(board)) {

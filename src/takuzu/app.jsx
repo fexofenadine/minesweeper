@@ -8,7 +8,7 @@ import { listen, shellActions, shellState, shortcut } from '../shell/actions'
 import Game, { running } from './Game'
 import BestTimes from './BestTimes'
 import Prompt from './Prompt'
-import { allowed, levelNames } from './Menu'
+import { fallback, levelNames } from './Menu'
 import { EMPTY, emptyBoard, full, sizes, solved } from './rules'
 import { findHint } from './hint'
 import { deal } from './deal'
@@ -21,7 +21,7 @@ const loadChoice = () => {
   const n = sizes.includes(saved) ? saved : 8
   const level = parseInt(load('takuzu.level'), 10)
   if (!(level >= 0 && level < levelNames.length)) return { n, level: 1 }
-  return { n, level: allowed(n, level) ? level : 2 }
+  return { n, level: fallback(n, level) }
 }
 
 //an empty board until the dealer answers
@@ -104,6 +104,23 @@ const changed = (game, board, history, actions, settled = false) => {
   return { hint: null, prompt: stuck && settled, game: next }
 }
 
+//tricky arrived between medium and hard on 2026-10-29, so the old times were cleared once
+//and a saved hard or expert choice moved up a place to keep its name
+export const upgradeLadder = () => {
+  if (load('takuzu.ladder') === '5') return
+  eachSlot((n, level) => {
+    for (const key of [timeKey(n, level, false), timeKey(n, level, true)]) {
+      remove(key)
+      remove(`${key}.name`)
+    }
+  })
+  const level = parseInt(load('takuzu.level'), 10)
+  if (level >= 2) save('takuzu.level', level + 1)
+  save('takuzu.ladder', '5')
+}
+
+upgradeLadder()
+
 export const state = {
   ...shellState(),
   hint: null,
@@ -149,7 +166,7 @@ export const actions = {
       cancelAnimationFrame(game.raf)
       const n = (payload && payload.n) || game.n
       const asked = payload && payload.level !== undefined ? payload.level : game.level
-      const level = allowed(n, asked) ? asked : 2
+      const level = fallback(n, asked)
       save('takuzu.size', n)
       save('takuzu.level', level)
       const id = ++deals

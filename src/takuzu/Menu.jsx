@@ -5,10 +5,13 @@ import ThemeMenu from '../shell/ThemeMenu'
 import { sizes } from './rules'
 import { levels } from './techniques'
 
-export const levelNames = ['Easy', 'Medium', 'Hard', 'Expert']
+export const levelNames = ['Easy', 'Medium', 'Tricky', 'Hard', 'Expert']
 
-//expert needs room for a what-if, 6x6 never does
-export const allowed = (n, level) => !(n === 6 && level === 3)
+//6x6 has no expert, by choice
+export const allowed = (n, level) => !(n === 6 && level === levelNames.length - 1)
+
+//the level asked for, or the hardest one below it that the size allows
+export const fallback = (n, level) => (allowed(n, level) ? level : fallback(n, level - 1))
 
 const Menu = ({ state, actions }) => (
   <ul class={m.root} tabindex={-1} onfocusout={actions.toggleMenu}>

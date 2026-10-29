@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
-import { state, actions, view, createGame } from './app'
+import { state, actions, view, createGame, upgradeLadder } from './app'
 import { EMPTY } from './rules'
 import { makeGame, random } from './generate'
 
@@ -201,10 +201,10 @@ it('ignores the board while paused', () => {
 })
 
 it('has no expert 6x6, falling back to hard', () => {
-  start({ game: { ...dealtGame(), level: 3 } })
+  start({ game: { ...dealtGame(), level: 4 } })
   wired.reset({ n: 6 })
-  expect(now().game).toMatchObject({ n: 6, level: 2, dealing: true })
-  expect(localStorage.getItem('takuzu.level')).toBe('2')
+  expect(now().game).toMatchObject({ n: 6, level: 3, dealing: true })
+  expect(localStorage.getItem('takuzu.level')).toBe('3')
 })
 
 it('drops an answer from an older deal', async () => {
@@ -227,4 +227,22 @@ it('remembers the rain glyph choice and opens the about box', () => {
   expect(now().rain).toBe(false)
   wired.toggleAbout()
   expect(now().about).toBe(true)
+})
+
+it('clears the old best times once when tricky arrives, keeping a hard choice hard', () => {
+  localStorage.setItem('takuzu.8.2', '50')
+  localStorage.setItem('takuzu.8.2.name', 'Old')
+  localStorage.setItem('takuzu.10.3.hints', '90')
+  localStorage.setItem('takuzu.level', '2')
+  localStorage.removeItem('takuzu.ladder')
+  upgradeLadder()
+  expect(localStorage.getItem('takuzu.8.2')).toBe(null)
+  expect(localStorage.getItem('takuzu.8.2.name')).toBe(null)
+  expect(localStorage.getItem('takuzu.10.3.hints')).toBe(null)
+  expect(localStorage.getItem('takuzu.level')).toBe('3')
+  //only once
+  localStorage.setItem('takuzu.8.2', '40')
+  upgradeLadder()
+  expect(localStorage.getItem('takuzu.8.2')).toBe('40')
+  expect(localStorage.getItem('takuzu.level')).toBe('3')
 })
