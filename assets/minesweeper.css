@@ -16,6 +16,11 @@
   border-color: var(--shadow) var(--light) var(--light) var(--shadow);
 }
 
+.Game_buttons {
+  display: flex;
+  gap: 4px;
+}
+
 .Game_field {
   position: relative;
   white-space: nowrap;

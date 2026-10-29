@@ -1309,24 +1309,25 @@ var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)}
 var brightness = ([r, g, b]) => Math.max(r, g, b);
 var sources = /* #__PURE__ */ Object.assign({
 	"/src/About.jsx": () => __vitePreload(() => import("./About-BpTtFm3r.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/BestTime.jsx": () => __vitePreload(() => import("./BestTime-eEp5PG0y.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/BestTime.jsx": () => __vitePreload(() => import("./BestTime-DP2HOKJh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Game.jsx": () => __vitePreload(() => import("./Game-CnLiSrMN.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Game.jsx": () => __vitePreload(() => import("./Game-Dg6wgQO8.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-CsDqIfnR.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/app.jsx": () => __vitePreload(() => import("./app-CYrXyFk6.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/app.jsx": () => __vitePreload(() => import("./app-bCM5tAFQ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/index.js": () => __vitePreload(() => import("./src-2iRfJ9t-.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-C7OYl7t1.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Boss.jsx": () => __vitePreload(() => import("./Boss-CgNRzjtu.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/SideButton.jsx": () => __vitePreload(() => import("./SideButton-CAoiUk4E.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/ThemeMenu.jsx": () => __vitePreload(() => import("./ThemeMenu-CjGFC0cl.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/WindowControls.jsx": () => __vitePreload(() => import("./WindowControls-Cz0TNK3C.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-gO6iL7Az.js").then((m) => m["default"]), [], import.meta.url),
@@ -1338,20 +1339,20 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/shell/storage.js": () => __vitePreload(() => import("./storage-Cj0EFyod.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/themes.js": () => __vitePreload(() => import("./themes-DFrkB3pZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/worker.js": () => __vitePreload(() => import("./worker-D6fmPkLz.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C4tU6EOW.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C_qZLAIo.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-CzUpVlb7.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-D18lEUyG.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-bpI06IUh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-Dl6D4jA5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-BjPsN-o6.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-CH4n24IS.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Prompt.jsx": () => __vitePreload(() => import("./Prompt-zY7l38Ey.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-BAz2-n-8.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-n1Zz3jwX.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-BO0x2QS5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Bpc4lY75.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CdZRjkO5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/index.js": () => __vitePreload(() => import("./takuzu-AO7c84x8.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-DLUFo6i0.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-Dc-4LR4I.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-JSobALHn.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-XOjlfRlB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-Dz_Wq6Gz.js").then((m) => m["default"]), [], import.meta.url)
@@ -2301,6 +2302,22 @@ var Play = ({ pressed, lose, win, onReset }) => /* @__PURE__ */ h("button", {
 	lose,
 	win
 })), /* @__PURE__ */ h("g", { class: Play_module_default.down }, /* @__PURE__ */ h(Smile, null))));
+var SideButton_module_default = { root: "SideButton_root" };
+//#endregion
+//#region src/shell/SideButton.jsx
+var SideButton = ({ title, disabled, onClick }, children) => /* @__PURE__ */ h("button", {
+	type: "button",
+	class: SideButton_module_default.root,
+	tabindex: -1,
+	title,
+	disabled,
+	onclick: () => onClick()
+}, /* @__PURE__ */ h("svg", {
+	width: "19",
+	height: "19"
+}, children));
+var HintIcon = () => /* @__PURE__ */ h("path", { d: "M9.5 2a4.5 4.5 0 0 0-4.5 4.5h2a2.5 2.5 0 1 1 3.4 2.3c-1 .4-1.9 1.3-1.9 2.6V13h2v-1.6c0-.4.3-.7.7-.8A4.5 4.5 0 0 0 9.5 2zm-1 12.5v2h2v-2z" });
+var UndoIcon = () => /* @__PURE__ */ h("path", { d: "M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z" });
 //#endregion
 //#region src/shell/WindowControls.jsx
 var WindowControls = ({ scale, onZoom, paused, canPause, onPause }) => [
@@ -2359,6 +2376,7 @@ var fitZoom = (chosen, fit) => fit >= chosen ? chosen : Math.min(chosen, Math.ma
 var applyZoom = (scale) => root$7.style.setProperty("--scale", scale);
 var saveZoom = (scale) => save("scale", scale);
 var gameWindow = null;
+var hanging = 0;
 var measureFit = (scale) => {
 	const rect = gameWindow && gameWindow.getBoundingClientRect();
 	if (!rect || !rect.width || !rect.height) return {
@@ -2370,7 +2388,7 @@ var measureFit = (scale) => {
 	const height = innerHeight - parseFloat(frame.marginTop) - parseFloat(frame.marginBottom);
 	const size = {
 		width: rect.width / scale,
-		height: rect.height / scale,
+		height: (rect.height - hanging) / scale,
 		room: `${width}x${height}`
 	};
 	return {
@@ -2379,6 +2397,17 @@ var measureFit = (scale) => {
 	};
 };
 var sameSize = (a, b) => Boolean(a && b) && a.room === b.room && Math.abs(a.width / b.width - 1) < .03 && Math.abs(a.height / b.height - 1) < .03;
+var hang = (panel) => {
+	const height = panel ? panel.getBoundingClientRect().bottom - panel.previousElementSibling.getBoundingClientRect().bottom : 0;
+	if (!gameWindow || Math.abs(height - hanging) < .5) return;
+	hanging = height;
+	gameWindow.parentElement.style.marginBottom = height ? `calc(env(safe-area-inset-bottom) - ${height}px)` : "";
+};
+var hangBelow = {
+	oncreate: (panel) => hang(panel),
+	onupdate: (panel) => hang(panel),
+	ondestroy: () => hang(null)
+};
 var watchWindow = (dialog, refit) => {
 	gameWindow = dialog;
 	if (typeof ResizeObserver !== "undefined") new ResizeObserver(() => refit()).observe(dialog);
@@ -2809,4 +2838,4 @@ var registerWorker = () => {
 	if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("../service-worker.js", { scope: "./" }).catch(() => {});
 };
 //#endregion
-export { Menu_module_default as A, startBackgrounds as C, load as D, glyphImage as E, Button as M, app as N, remove as O, h as P, ThemeMenu as S, GLYPH as T, Digit as _, shortcut as a, Separator as b, About_module_default as c, Winner as d, Input as f, Play as g, WindowControls as h, shellState as i, Dialog as j, save as k, BackgroundSettings as l, watchWindow as m, listen as n, Boss as o, Overlay as p, shellActions as r, BossButton as s, registerWorker as t, BestTime_module_default as u, Menu as v, BRIGHT as w, SubMenuItem as x, MenuItem as y };
+export { glyphImage as A, MenuItem as C, startBackgrounds as D, ThemeMenu as E, Dialog as F, Button as I, app as L, remove as M, save as N, BRIGHT as O, Menu_module_default as P, h as R, Menu as S, SubMenuItem as T, HintIcon as _, shortcut as a, Play as b, About_module_default as c, Winner as d, Input as f, WindowControls as g, watchWindow as h, shellState as i, load as j, GLYPH as k, BackgroundSettings as l, hangBelow as m, listen as n, Boss as o, Overlay as p, shellActions as r, BossButton as s, registerWorker as t, BestTime_module_default as u, SideButton as v, Separator as w, Digit as x, UndoIcon as y };

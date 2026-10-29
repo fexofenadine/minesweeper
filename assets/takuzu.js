@@ -1,9 +1,8 @@
-import { A as Menu_module_default, C as startBackgrounds, D as load, E as glyphImage, M as Button, N as app, O as remove, P as h, S as ThemeMenu, T as GLYPH, _ as Digit, a as shortcut, b as Separator, c as About_module_default, d as Winner, g as Play, h as WindowControls, i as shellState, j as Dialog, k as save, l as BackgroundSettings, m as watchWindow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, w as BRIGHT, x as SubMenuItem, y as MenuItem } from "./worker-DD-6gGdw.js";
+import { A as glyphImage, C as MenuItem, D as startBackgrounds, E as ThemeMenu, F as Dialog, I as Button, L as app, M as remove, N as save, O as BRIGHT, P as Menu_module_default, R as h, T as SubMenuItem, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, g as WindowControls, h as watchWindow, i as shellState, j as load, k as GLYPH, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, w as Separator, x as Digit, y as UndoIcon } from "./worker-DWyEL2Vc.js";
 var Game_module_default = {
 	root: "Game_root",
 	scoreboard: "Game_scoreboard",
 	buttons: "Game_buttons",
-	side: "Game_side",
 	field: "Game_field",
 	active: "Game_active Game_field",
 	inactive: "Game_inactive Game_field",
@@ -467,17 +466,6 @@ var Cell = ({ i, value, given, error, mark, onPress }) => /* @__PURE__ */ h("but
 //#endregion
 //#region src/takuzu/Game.jsx
 var running = ({ start, win, dealing }) => start >= 0 && !win && !dealing;
-var Side = ({ title, disabled, onClick }, children) => /* @__PURE__ */ h("button", {
-	type: "button",
-	class: Game_module_default.side,
-	tabindex: -1,
-	title,
-	disabled,
-	onclick: () => onClick()
-}, /* @__PURE__ */ h("svg", {
-	width: "19",
-	height: "19"
-}, children));
 var Game = ({ key, state, actions }) => {
 	const { game, hint } = state;
 	const { n, board, givens, paused } = game;
@@ -503,20 +491,20 @@ var Game = ({ key, state, actions }) => {
 	}, /* @__PURE__ */ h(Menu, {
 		state,
 		actions
-	}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: game.dealing ? 0 : left }), /* @__PURE__ */ h("div", { class: Game_module_default.buttons }, /* @__PURE__ */ h(Side, {
+	}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: game.dealing ? 0 : left }), /* @__PURE__ */ h("div", { class: Game_module_default.buttons }, /* @__PURE__ */ h(SideButton, {
 		title: "Undo (Ctrl+Z)",
 		disabled: !game.history.length || game.win || paused,
 		onClick: actions.undo
-	}, /* @__PURE__ */ h("path", { d: "M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z" })), /* @__PURE__ */ h(Play, {
+	}, /* @__PURE__ */ h(UndoIcon, null)), /* @__PURE__ */ h(Play, {
 		pressed: false,
 		lose: false,
 		win: game.win,
 		onReset: actions.reset
-	}), /* @__PURE__ */ h(Side, {
+	}), /* @__PURE__ */ h(SideButton, {
 		title: "Hint (H)",
 		disabled: game.dealing || game.win || paused,
 		onClick: actions.hint
-	}, /* @__PURE__ */ h("path", { d: "M9.5 2a4.5 4.5 0 0 0-4.5 4.5h2a2.5 2.5 0 1 1 3.4 2.3c-1 .4-1.9 1.3-1.9 2.6V13h2v-1.6c0-.4.3-.7.7-.8A4.5 4.5 0 0 0 9.5 2zm-1 12.5v2h2v-2z" }))), /* @__PURE__ */ h(Digit, { value: game.time })), /* @__PURE__ */ h("div", {
+	}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, { value: game.time })), /* @__PURE__ */ h("div", {
 		class: running(game) && !paused ? Game_module_default.active : Game_module_default.inactive,
 		style: { "--n": n }
 	}, [...board].map((value, i) => /* @__PURE__ */ h(Cell, {
@@ -535,7 +523,8 @@ var Game = ({ key, state, actions }) => {
 		height: "40"
 	}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), hint && !paused && /* @__PURE__ */ h("p", {
 		class: Game_module_default.hint,
-		role: "status"
+		role: "status",
+		...hangBelow
 	}, hint.text)));
 };
 var BestTimes_module_default = {
@@ -572,7 +561,7 @@ var BestTimes = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
 	onclick: () => actions.setBestTimeTab(tab.id)
 }, tab.name))), /* @__PURE__ */ h("table", { class: BestTimes_module_default.table }, /* @__PURE__ */ h("thead", null, /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", null), levelNames.map((name) => /* @__PURE__ */ h("th", { class: BestTimes_module_default.level }, name)))), /* @__PURE__ */ h("tbody", null, sizes.map((n) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", { class: BestTimes_module_default.size }, n, " × ", n), levelNames.map((_, level) => {
-	const best = state[state.tab][`${n}.${level}`];
+	const best = allowed(n, level) && state[state.tab][`${n}.${level}`];
 	return /* @__PURE__ */ h("td", { class: BestTimes_module_default.slot }, !allowed(n, level) && "–", best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.time }, best.time, " s"), best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.name }, best.name));
 }))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
@@ -735,7 +724,7 @@ var deal = (n, level, seed) => {
 };
 //#endregion
 //#region src/takuzu/rain.js
-var rain = ["ﾊ", "ﾐ"];
+var rain = ["ｼ", "ﾓ"];
 var showRain = (on) => {
 	const root = document.documentElement;
 	if (!on) {
@@ -792,6 +781,7 @@ var createGame = ({ n, level }) => ({
 	solution: null,
 	board: emptyBoard(n),
 	history: [],
+	change: 0,
 	dealing: true,
 	deal: 0,
 	start: -1,
@@ -806,9 +796,8 @@ var timeKey = (n, level, hinted) => `takuzu.${n}.${level}${hinted ? ".hints" : "
 var eachSlot = (fn) => sizes.flatMap((n) => levelNames.map((_, level) => fn(n, level, `${n}.${level}`)));
 var bestTimes = (hinted) => Object.fromEntries(eachSlot((n, level, slot) => {
 	const key = timeKey(n, level, hinted);
-	const time = parseInt(load(key), 10) || null;
-	return [slot, time && {
-		time,
+	return [slot, {
+		time: parseInt(load(key), 10) || 999,
 		name: load(`${key}.name`) || "Anonymous"
 	}];
 }));
@@ -825,7 +814,9 @@ var cycle = [
 	0,
 	1
 ];
+var ASK_AFTER = 2500;
 var deals = 0;
+var changes = 0;
 var prevent = (event) => {
 	event.preventDefault();
 	return false;
@@ -839,20 +830,23 @@ var begin = (game, actions) => {
 		time: 1
 	};
 };
-var changed = (game, board, history, actions) => {
+var changed = (game, board, history, actions, settled = false) => {
 	const next = {
 		...begin(game, actions),
 		board,
-		history
+		history,
+		change: ++changes
 	};
 	next.win = solved(board, next.n);
 	if (next.win) {
 		cancelAnimationFrame(next.raf);
 		actions.win(next);
 	}
+	const stuck = !next.win && full(board);
+	if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER);
 	return {
 		hint: null,
-		prompt: !next.win && full(board),
+		prompt: stuck && settled,
 		game: next
 	};
 };
@@ -930,10 +924,16 @@ var actions = {
 	play: ({ event, i }) => ({ game }, actions) => {
 		if (event.button !== 0 && event.button !== 2) return null;
 		if (game.dealing || game.paused || game.win || game.givens[i] !== -1) return null;
+		const back = event.button === 2;
 		const from = game.board[i];
 		const board = game.board.slice();
-		board[i] = cycle[(cycle.indexOf(from) + (event.button === 2 ? 2 : 1)) % 3];
-		return changed(game, board, [...game.history, [i, from]], actions);
+		board[i] = cycle[(cycle.indexOf(from) + (back ? 2 : 1)) % 3];
+		const settled = board[i] === (back ? 0 : 1);
+		return changed(game, board, [...game.history, [i, from]], actions, settled);
+	},
+	ask: (change) => ({ game }) => {
+		if (game.change !== change || game.win || game.paused || !full(game.board)) return null;
+		return { prompt: true };
 	},
 	undo: () => ({ game }, actions) => {
 		if (!game.history.length || game.win || game.paused || game.dealing) return { menu: null };

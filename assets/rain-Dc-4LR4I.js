@@ -1,0 +1,4 @@
+//#region src/takuzu/rain.js?raw
+var rain_default = "import { BRIGHT, GLYPH, glyphImage } from '../shell/backgrounds/matrix'\n\n//two glyphs from the matrix rain for 0 and 1, drawn the way the rain draws them\nexport const rain = ['ｼ', 'ﾓ']\n\n//draws them once and hands them to the css, which only uses them on the matrix theme\nexport const showRain = (on) => {\n  const root = document.documentElement\n  if (!on) {\n    delete root.dataset.rain\n    return\n  }\n  if (!root.style.getPropertyValue('--tz-rain-0')) {\n    const zero = glyphImage(rain[0], 192, GLYPH)\n    const one = glyphImage(rain[1], 192, BRIGHT)\n    if (!zero || !one) return\n    root.style.setProperty('--tz-rain-0', `url(${zero})`)\n    root.style.setProperty('--tz-rain-1', `url(${one})`)\n  }\n  root.dataset.rain = 'on'\n}\n";
+//#endregion
+export { rain_default as default };

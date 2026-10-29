@@ -1,7 +1,8 @@
-import { C as startBackgrounds, D as load, M as Button, N as app, O as remove, P as h, _ as Digit, a as shortcut, c as About_module_default, d as Winner, f as Input, g as Play, h as WindowControls, i as shellState, j as Dialog, k as save, l as BackgroundSettings, m as watchWindow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as Menu } from "./worker-DD-6gGdw.js";
+import { D as startBackgrounds, F as Dialog, I as Button, L as app, M as remove, N as save, R as h, S as Menu, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, f as Input, g as WindowControls, h as watchWindow, i as shellState, j as load, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, x as Digit } from "./worker-DWyEL2Vc.js";
 var Game_module_default = {
 	root: "Game_root",
 	scoreboard: "Game_scoreboard",
+	buttons: "Game_buttons",
 	field: "Game_field",
 	active: "Game_active",
 	inactive: "Game_inactive",
@@ -199,6 +200,12 @@ var rowsOf = (state) => {
 		y
 	})));
 };
+var Face = ({ state, actions }) => /* @__PURE__ */ h(Play, {
+	pressed: state.game.pressed,
+	lose: state.game.lose,
+	win: state.game.win,
+	onReset: actions.reset
+});
 var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	key,
 	title: state.theme === "classic" ? "Minesweeper" : "Minesweeper Plus",
@@ -218,12 +225,17 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 }, /* @__PURE__ */ h(Menu, {
 	state,
 	actions
-}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: state.game.flags }), /* @__PURE__ */ h(Play, {
-	pressed: state.game.pressed,
-	lose: state.game.lose,
-	win: state.game.win,
-	onReset: actions.reset
-}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
+}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: state.game.flags }), state.theme === "classic" ? /* @__PURE__ */ h(Face, {
+	state,
+	actions
+}) : /* @__PURE__ */ h("div", { class: Game_module_default.buttons }, /* @__PURE__ */ h(Face, {
+	state,
+	actions
+}), /* @__PURE__ */ h(SideButton, {
+	title: "Hint (H)",
+	disabled: state.game.win || state.game.lose || state.game.paused,
+	onClick: actions.hint
+}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
 	x,
 	y,
 	pressed: state.game.pressed,
@@ -250,7 +262,8 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	height: "40"
 }, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), state.hint && !state.game.paused && /* @__PURE__ */ h("p", {
 	class: Game_module_default.hint,
-	role: "status"
+	role: "status",
+	...hangBelow
 }, state.hint.text)));
 //#endregion
 //#region src/BestTime.jsx
@@ -277,7 +290,7 @@ var BestTime = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
 	"aria-selected": state.tab === tab.id,
 	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
 	onclick: () => actions.setBestTimeTab(tab.id)
-}, tab.name))), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time && `${row.time} seconds`), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
+}, tab.name))), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
 	onClick: actions.resetBestTime
 }, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "Reset Scores")), /* @__PURE__ */ h(Button, {
@@ -715,11 +728,10 @@ var loadLevel = () => {
 var timeKey = (level, hinted) => hinted ? `${level}Hints` : level;
 var bestTimes = (hinted) => levelNames.map((level) => {
 	const key = timeKey(level, hinted);
-	const time = parseInt(load(key), 10) || null;
 	return {
 		level,
-		name: time ? load(`${key}Name`) || "Anonymous" : "",
-		time
+		name: load(`${key}Name`) || "Anonymous",
+		time: Math.min(999, parseInt(load(key), 10) || 0) || 999
 	};
 });
 var clearBestTimes = (hinted) => {

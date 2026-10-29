@@ -950,6 +950,47 @@ main::before {
 .Play_skin {
   fill: var(--smiley);
 }
+.SideButton_root {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 3px 3px 2px 2px;
+  color: var(--glyph);
+  background: var(--cell);
+  border: 1px solid var(--cell-shadow);
+  outline: 0;
+  cursor: pointer;
+}
+
+.SideButton_root::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.SideButton_root:active:not(:disabled) {
+  padding: 4px 1px 1px 4px;
+}
+
+.SideButton_root:active:not(:disabled)::before {
+  border-width: 1px 0 0 1px;
+  border-color: var(--cell-shadow);
+}
+
+.SideButton_root:disabled {
+  color: var(--cell-shadow);
+  cursor: default;
+}
+
+.SideButton_root svg {
+  display: block;
+  fill: currentColor;
+}
 .Winner_root {
   width: 130px;
   padding: 22px 10px;
