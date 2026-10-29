@@ -176,7 +176,7 @@ it('keeps best times with and without hints apart', () => {
   expect(current.bestTime.hinted[0].time).toBe(50)
   wired.resetBestTime()
   wired.peek()
-  expect(current.bestTime.hinted[0]).toMatchObject({ time: null, name: '' })
+  expect(current.bestTime.hinted[0].time).toBe(999)
   expect(current.bestTime.clean[0].time).toBe(90)
   localStorage.clear()
 })

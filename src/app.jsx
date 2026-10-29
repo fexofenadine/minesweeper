@@ -146,15 +146,13 @@ const loadLevel = () => {
 //best times are kept apart for games played with and without hints
 const timeKey = (level, hinted) => (hinted ? `${level}Hints` : level)
 
-//an empty slot has no time and no name
 const bestTimes = (hinted) =>
   levelNames.map((level) => {
     const key = timeKey(level, hinted)
-    const time = parseInt(load(key), 10) || null
     return {
       level,
-      name: time ? load(`${key}Name`) || 'Anonymous' : '',
-      time,
+      name: load(`${key}Name`) || 'Anonymous',
+      time: Math.min(999, parseInt(load(key), 10) || 0) || 999,
     }
   })
 
