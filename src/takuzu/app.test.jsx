@@ -1,4 +1,4 @@
-import { beforeEach, expect, it } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 import { app, h } from 'hyperapp'
 import { state, actions, view, createGame } from './app'
 import { EMPTY } from './rules'
@@ -34,6 +34,8 @@ const now = () => {
 
 const left = { button: 0 }
 const right = { button: 2 }
+
+afterEach(() => vi.useRealTimers())
 
 beforeEach(() => {
   localStorage.clear()
@@ -83,38 +85,86 @@ it('undoes changes one at a time, also with ctrl+z', () => {
   expect(now().game.history).toHaveLength(0)
 })
 
-const fill = (values) => {
+//sets every open cell to its value with left clicks, leaving out skip
+const fill = (values, skip = -1) => {
   const { board, givens } = now().game
   board.forEach((_, i) => {
-    if (givens[i] !== EMPTY) return
-    const want = values[i]
-    while (now().game.board[i] !== want) wired.play({ event: left, i })
+    if (givens[i] !== EMPTY || i === skip) return
+    while (now().game.board[i] !== values[i]) wired.play({ event: left, i })
   })
 }
 
-it('asks about a full board with errors, and a yes gives a hint', () => {
-  const { solution } = now().game
+//an open cell whose answer is v, and a full board that is wrong somewhere else
+const lastCell = (v) => {
+  const { board, solution } = now().game
+  const last = [...board.keys()].find((i) => board[i] === EMPTY && solution[i] === v)
   const wrong = solution.slice()
-  const i = emptyCell()
-  wrong[i] = 1 - wrong[i]
-  fill(wrong)
-  expect(now().prompt).toBe(true)
-  expect(now().game.win).toBe(false)
-  wired.answerPrompt(true)
+  wrong[[...board.keys()].find((i) => board[i] === EMPTY && i !== last)] ^= 1
+  return { last, wrong }
+}
+
+it('does not ask while the last cell passes through 0 on its way to 1', () => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  const { last } = lastCell(1)
+  fill(now().game.solution, last)
+  wired.play({ event: left, i: last })
   expect(now().prompt).toBe(false)
-  expect(now().game.hinted).toBe(true)
-  expect(['break', 'wrong']).toContain(now().hint.kind)
+  wired.play({ event: left, i: last })
+  expect(now().game.win).toBe(true)
+  vi.advanceTimersByTime(3000)
+  expect(now().prompt).toBe(false)
 })
 
-it('leaves the player to fix a full board on a no', () => {
-  const { solution } = now().game
-  const wrong = solution.slice()
-  wrong[emptyCell()] ^= 1
-  fill(wrong)
+it('asks at once when the last click ends a cell on its final value', () => {
+  const { last, wrong } = lastCell(1)
+  fill(wrong, last)
+  wired.play({ event: left, i: last })
+  wired.play({ event: left, i: last })
+  expect(now().prompt).toBe(true)
+  expect(now().game.win).toBe(false)
+})
+
+it('asks a little later when the last cell may still be on its way, unless it changes', () => {
+  vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+  const { last, wrong } = lastCell(1)
+  fill(wrong, last)
+  wired.play({ event: left, i: last })
+  expect(now().prompt).toBe(false)
+  vi.advanceTimersByTime(2500)
+  expect(now().prompt).toBe(true)
+  wired.answerPrompt(false)
+  //a right click to 1 is part way round too, and changing the board again drops the question
+  wired.play({ event: left, i: last })
+  wired.answerPrompt(false)
+  wired.play({ event: left, i: last })
+  wired.play({ event: right, i: last })
+  expect(now().game.board[last]).toBe(1)
+  expect(now().prompt).toBe(false)
+  vi.advanceTimersByTime(1000)
+  wired.undo()
+  vi.advanceTimersByTime(2000)
+  expect(now().prompt).toBe(false)
+  wired.play({ event: right, i: last })
+  vi.advanceTimersByTime(2500)
+  expect(now().prompt).toBe(true)
+})
+
+it('gives a hint on a yes and leaves the player alone on a no', () => {
+  const { last, wrong } = lastCell(1)
+  fill(wrong, last)
+  wired.play({ event: left, i: last })
+  wired.play({ event: left, i: last })
   wired.answerPrompt(false)
   expect(now().prompt).toBe(false)
   expect(now().hint).toBe(null)
   expect(now().game.hinted).toBe(false)
+  //a right click back to 0 is as far as that way goes
+  wired.play({ event: right, i: last })
+  expect(now().prompt).toBe(true)
+  wired.answerPrompt(true)
+  expect(now().prompt).toBe(false)
+  expect(now().game.hinted).toBe(true)
+  expect(['break', 'wrong']).toContain(now().hint.kind)
 })
 
 it('wins on the solution and offers a best time', () => {
@@ -126,7 +176,7 @@ it('wins on the solution and offers a best time', () => {
   wired.submitBestTime({ preventDefault() {} })
   expect(localStorage.getItem('takuzu.6.1')).toBe(String(game.time))
   expect(now().bestTime.clean['6.1']).toEqual({ time: game.time, name: 'Ada' })
-  expect(now().bestTime.clean['8.1']).toBe(null)
+  expect(now().bestTime.clean['8.1']).toEqual({ time: 999, name: 'Anonymous' })
 })
 
 it('counts a hint before the first move, and starts the clock', () => {

@@ -32,6 +32,7 @@ export const createGame = ({ n, level }) => ({
   solution: null,
   board: emptyBoard(n),
   history: [],
+  change: 0,
   dealing: true,
   deal: 0,
   start: -1,
@@ -53,8 +54,8 @@ const bestTimes = (hinted) =>
   Object.fromEntries(
     eachSlot((n, level, slot) => {
       const key = timeKey(n, level, hinted)
-      const time = parseInt(load(key), 10) || null
-      return [slot, time && { time, name: load(`${key}.name`) || 'Anonymous' }]
+      const time = parseInt(load(key), 10) || 999
+      return [slot, { time, name: load(`${key}.name`) || 'Anonymous' }]
     }),
   )
 
@@ -70,7 +71,11 @@ const clearBestTimes = (hinted) => {
 //a click steps forward through these, a right click back
 const cycle = [EMPTY, 0, 1]
 
+//a full board with errors waits this long before asking, when its last cell may still be on its way
+const ASK_AFTER = 2500
+
 let deals = 0
+let changes = 0
 
 const prevent = (event) => {
   event.preventDefault()
@@ -85,14 +90,18 @@ const begin = (game, actions) => {
 }
 
 //after a cell changes: a win, or a full board that isn't one
-const changed = (game, board, history, actions) => {
-  const next = { ...begin(game, actions), board, history }
+//settled means another click the same way would only empty the cell again, so ask now
+//otherwise the cell may be passing through on its way to the value meant, so ask later
+const changed = (game, board, history, actions, settled = false) => {
+  const next = { ...begin(game, actions), board, history, change: ++changes }
   next.win = solved(board, next.n)
   if (next.win) {
     cancelAnimationFrame(next.raf)
     actions.win(next)
   }
-  return { hint: null, prompt: !next.win && full(board), game: next }
+  const stuck = !next.win && full(board)
+  if (stuck && !settled) setTimeout(() => actions.ask(next.change), ASK_AFTER)
+  return { hint: null, prompt: stuck && settled, game: next }
 }
 
 export const state = {
@@ -166,10 +175,19 @@ export const actions = {
     ({ game }, actions) => {
       if (event.button !== 0 && event.button !== 2) return null
       if (game.dealing || game.paused || game.win || game.givens[i] !== EMPTY) return null
+      const back = event.button === 2
       const from = game.board[i]
       const board = game.board.slice()
-      board[i] = cycle[(cycle.indexOf(from) + (event.button === 2 ? 2 : 1)) % 3]
-      return changed(game, board, [...game.history, [i, from]], actions)
+      board[i] = cycle[(cycle.indexOf(from) + (back ? 2 : 1)) % 3]
+      const settled = board[i] === (back ? 0 : 1)
+      return changed(game, board, [...game.history, [i, from]], actions, settled)
+    },
+  //the delayed question, dropped if the board changed or the game moved on meanwhile
+  ask:
+    (change) =>
+    ({ game }) => {
+      if (game.change !== change || game.win || game.paused || !full(game.board)) return null
+      return { prompt: true }
     },
   undo:
     () =>

@@ -47,7 +47,7 @@ const BestTimes = ({ key, state, actions }) => (
                   {n} × {n}
                 </th>
                 {levelNames.map((_, level) => {
-                  const best = state[state.tab][`${n}.${level}`]
+                  const best = allowed(n, level) && state[state.tab][`${n}.${level}`]
                   return (
                     <td class={s.slot}>
                       {!allowed(n, level) && '–'}
