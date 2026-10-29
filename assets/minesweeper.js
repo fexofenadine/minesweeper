@@ -1,4 +1,4 @@
-import { B as Dialog, C as SideButton, D as Menu, E as Digit, H as Game_module_default, I as load, L as remove, M as startBackgrounds, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, g as Input, h as Winner, i as shellActions, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, t as registerWorker, u as About, v as HintPanel, x as WindowControls, y as PausedCover } from "./worker-BWwFziXg.js";
+import { A as Digit, C as WindowControls, D as SideButton, E as HintIcon, G as Dialog, H as remove, J as app, K as Button, L as startBackgrounds, S as watchWindow, U as save, V as load, Y as h, _ as Overlay, a as shortcut, b as HintPanel, c as BossButton, d as Link, f as BackgroundSettings, g as Input, h as Winner, i as shellState, j as Menu, k as Play, l as HowToPlay, m as BestTime_module_default, n as listen, p as Tabs, q as Game_module_default, r as shellActions, s as Boss, t as registerWorker, u as About, v as clockDigits, x as PausedCover, y as pauseAction } from "./worker-CNrW4LdT.js";
 var Cell_module_default = {
 	root: "Cell_root",
 	pressed: "Cell_pressed Cell_root",
@@ -220,7 +220,10 @@ var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
 	title: "Hint (H)",
 	disabled: state.game.win || state.game.lose || state.game.paused,
 	onClick: actions.hint
-}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
+}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, {
+	value: state.game.time,
+	digits: clockDigits(state.theme, state.game.time)
+})), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
 	x,
 	y,
 	pressed: state.game.pressed,
@@ -312,6 +315,13 @@ var MinesweeperAbout = ({ key, actions }) => /* @__PURE__ */ h(About, {
 	name: "Minesweeper Plus",
 	actions
 }, /* @__PURE__ */ h("p", null, "A Windows style minesweeper with boards that never need a guess, hints that explain their reasoning, zoom, and animated themes ported from xscreensaver."), /* @__PURE__ */ h("p", null, "Based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov, extended by fexofenadine."));
+//#endregion
+//#region src/HowToPlay.jsx
+var MinesweeperHowToPlay = ({ key, actions }) => /* @__PURE__ */ h(HowToPlay, {
+	key,
+	name: "Minesweeper",
+	actions
+}, /* @__PURE__ */ h("p", null, "Open every square that hides no mine. Click a square to open it: a number tells how many of the eight squares around it hide mines. Open a mine and the game is lost."), /* @__PURE__ */ h("p", null, "Right click a square to flag it as a mine, and again for a question mark when Marks is on. Once a number has as many flags around it as it says, double-click it, click it with both buttons or Shift click it to open the rest of its neighbours. On a touch screen, tap to open and hold to flag."), /* @__PURE__ */ h("p", null, "The left counter shows the mines left to flag and the right one the seconds played. No Guessing deals boards that logic alone can clear, and Hint explains the next safe move from the numbers you can see."));
 //#endregion
 //#region src/mines.js
 var neighbourCache = /* @__PURE__ */ new Map();
@@ -1079,6 +1089,9 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	actions
 }), state.about && /* @__PURE__ */ h(MinesweeperAbout, {
 	key: "f",
+	actions
+}), state.howTo && /* @__PURE__ */ h(MinesweeperHowToPlay, {
+	key: "i",
 	actions
 }), state.boss && /* @__PURE__ */ h(Boss, {
 	key: "g",

@@ -189,73 +189,16 @@
 
 :root[data-theme='matrix'][data-rain] .Cell_zero {
   background-color: #020a04;
-  background-image: var(--tz-rain-0);
+  background-image: var(--rain-0);
 }
 
 :root[data-theme='matrix'][data-rain] .Cell_one {
   background-color: #0b3d1a;
-  background-image: var(--tz-rain-1);
+  background-image: var(--rain-1);
 }
 
 :root[data-theme='matrix'][data-rain] .Cell_given {
   box-shadow:
     inset 1px 1px 0 var(--cell-shadow),
     inset 0 0 0 3px rgba(57, 210, 107, 0.45);
-}
-.BestTimes_table {
-  margin: 0 8px;
-  border-collapse: collapse;
-}
-
-.BestTimes_level,
-.BestTimes_size {
-  padding: 2px 8px;
-  font-weight: normal;
-}
-
-.BestTimes_size {
-  text-align: left;
-}
-
-.BestTimes_slot {
-  min-width: 64px;
-  height: 34px;
-  padding: 2px 8px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.BestTimes_time,
-.BestTimes_name {
-  display: block;
-}
-
-/*names can be long, keep the grid even*/
-.BestTimes_name {
-  max-width: 80px;
-  overflow: hidden;
-  font-size: 0.85em;
-  text-overflow: ellipsis;
-  opacity: 0.75;
-}
-.Prompt_root {
-  max-width: 260px;
-  padding: 12px 12px 12px;
-}
-
-.Prompt_text {
-  margin: 0;
-  line-height: 1.3;
-}
-
-.Prompt_footer {
-  display: flex;
-  justify-content: space-around;
-  padding: 16px 0 0;
-}
-
-.Prompt_button {
-  display: block;
-  min-width: 48px;
-  padding: 1px 5px 0;
 }

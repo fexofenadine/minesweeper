@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <title>Nonograms</title>
+    <meta
+      name="description"
+      content="Nonogram picture logic puzzles, every board solvable by logic, free and open source"
+    />
+    <meta
+      name="keywords"
+      content="nonograms, nonogram, paint by numbers, picture logic puzzle, logic puzzle, online, free, open source"
+    />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#cbcbcb" />
+    <meta property="og:title" content="Nonograms: Picture Logic Puzzles" />
+    <meta
+      property="og:description"
+      content="Nonogram picture logic puzzles, every board solvable by logic, free and open source"
+    />
+    <meta property="og:url" content="https://fexofenadine.github.io/puzzles/nonograms/" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="https://fexofenadine.github.io/puzzles/nonograms/nonograms.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="675" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Nonograms" />
+    <link rel="manifest" href="../nonograms/site.webmanifest" />
+    <link rel="apple-touch-icon" href="../nonograms/icon.png" />
+    <link rel="shortcut icon" href="../nonograms/favicon.ico" />
+    <script>//inlined into each game's page head by vite.config.js, so it runs before first paint
+//apply the saved theme and window size before first paint
+try {
+  document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
+  //assume animated off classic, the script corrects it
+  if (document.documentElement.dataset.theme !== 'classic') {
+    document.documentElement.dataset.background = 'animated'
+  }
+  document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
+} catch {
+  //blocked storage keeps the defaults
+}
+//if the game fails to start, show why instead of an empty desktop
+addEventListener('error', (event) => {
+  if (document.querySelector('main *')) return
+  const note = document.createElement('pre')
+  note.style.cssText =
+    'position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;padding:8px;background:#000;color:#fff;font:12px monospace;white-space:pre-wrap'
+  note.textContent = `${document.title} could not start: ${event.message}`
+  document.body.append(note)
+})
+</script>
+    <script type="module" crossorigin src="../assets/nonograms.js?v=20177271"></script>
+    <link rel="modulepreload" crossorigin href="../assets/worker-CNrW4LdT.js?v=5c359040">
+    <link rel="modulepreload" crossorigin href="../assets/rain-L03NNP1o.js?v=3497b69e">
+    <link rel="stylesheet" crossorigin href="../assets/worker.css?v=baebf4fc">
+    <link rel="stylesheet" crossorigin href="../assets/rain.css?v=270cbab0">
+    <link rel="stylesheet" crossorigin href="../assets/nonograms.css?v=0f55655e">
+  </head>
+  <body>
+    <div id="app">
+      <main></main>
+    </div>
+  </body>
+</html>

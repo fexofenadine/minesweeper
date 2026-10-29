@@ -1,4 +1,0 @@
-//#region src/shell/SideButton.jsx?raw
-var SideButton_default = "import { h } from 'hyperapp'\nimport s from './SideButton.module.css'\n\n//a small scoreboard button beside the face, drawn like it\nconst SideButton = ({ title, disabled, onClick }, children) => (\n  <button\n    type=\"button\"\n    class={s.root}\n    tabindex={-1}\n    title={title}\n    disabled={disabled}\n    onclick={() => onClick()}\n  >\n    <svg width=\"19\" height=\"19\">\n      {children}\n    </svg>\n  </button>\n)\n\nexport const HintIcon = () => (\n  <path d=\"M9.5 2a4.5 4.5 0 0 0-4.5 4.5h2a2.5 2.5 0 1 1 3.4 2.3c-1 .4-1.9 1.3-1.9 2.6V13h2v-1.6c0-.4.3-.7.7-.8A4.5 4.5 0 0 0 9.5 2zm-1 12.5v2h2v-2z\" />\n)\n\nexport const UndoIcon = () => (\n  <path d=\"M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z\" />\n)\n\nexport default SideButton\n";
-//#endregion
-export { SideButton_default as default };

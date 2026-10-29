@@ -1,0 +1,244 @@
+/*clues above and to the left of the field, on the same tracks as its cells*/
+.Game_board {
+  --size: 20px;
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas:
+    '. columns'
+    'rows field';
+  justify-content: center;
+  color: var(--text);
+  font: bold 12px/1 var(--text-font);
+}
+
+/*the 2px pads match the field's top and left border*/
+.Game_columns {
+  grid-area: columns;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  align-items: end;
+  padding: 0 3px 2px 2px;
+}
+
+.Game_rows {
+  grid-area: rows;
+  display: grid;
+  grid-template-rows: var(--tracks);
+  justify-items: end;
+  padding: 2px 3px 3px 0;
+}
+
+.Game_columns .Game_clue {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-height: 12px;
+}
+
+.Game_rows .Game_clue {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-right: 2px;
+}
+
+/*two digits squeeze into a column so they don't run into the next one*/
+.Game_columns .Game_wide {
+  font-size: 10px;
+  letter-spacing: -1px;
+}
+
+.Game_done {
+  opacity: 0.4;
+}
+
+.Game_error {
+  color: #ff2020;
+}
+
+/*the clue a hint is about, outlined like its cells*/
+.Game_hinted {
+  opacity: 1;
+  outline: 2px solid #2e8bff;
+  outline-offset: 1px;
+}
+
+.Game_field {
+  grid-area: field;
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--tracks);
+  grid-template-rows: var(--tracks);
+  background: var(--cell-shadow);
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  touch-action: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Game_active {
+  cursor: pointer;
+}
+
+.Game_inactive {
+  cursor: default;
+}
+/*play button over the hidden board*/.Board_paused {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}.Board_paused svg {
+  display: block;
+  margin: 2px;
+  fill: currentColor;
+}/*explanation under the field, never wider than it*/.Board_hint {
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
+  margin: 6px 0 0;
+  padding: 3px 4px 4px;
+  color: var(--text);
+  line-height: 1.3;
+  background: var(--input);
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}/*a hint's outline on a board cell, dark edged to show on every theme*/.Board_outline::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
+}
+/*filled cells in each theme's strongest colour, crosses in a quiet one*/
+:root {
+  --ng-fill: #1a1a1a;
+  --ng-cross: #7b7b7b;
+}
+
+:root[data-theme='synthwave'] {
+  --ng-fill: #ff7edb;
+  --ng-cross: #848bbd;
+}
+
+:root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) {
+  --ng-fill: #268bd2;
+  --ng-cross: #93a1a1;
+}
+
+:root[data-theme='nord'] {
+  --ng-fill: #88c0d0;
+  --ng-cross: #4c566a;
+}
+
+:root[data-theme='matrix'] {
+  --ng-fill: #39d26b;
+  --ng-cross: #1d6b37;
+}
+
+.Cell_root {
+  position: relative;
+  display: block;
+  width: var(--size);
+  height: var(--size);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*an empty cell is a raised tile like an unopened one in minesweeper*/
+.Cell_empty {
+  background: var(--cell);
+}
+
+.Cell_empty::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.Cell_fill {
+  background: var(--ng-fill);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*a crossed out cell lies flat with a faint x, drawn in the background so both pseudo elements stay
+free for the tile edge and a hint's outline*/
+.Cell_cross {
+  --mark: var(--ng-cross);
+  background:
+    linear-gradient(
+        45deg,
+        transparent calc(50% - 1px),
+        var(--mark) calc(50% - 1px) calc(50% + 1px),
+        transparent calc(50% + 1px)
+      )
+      center / 50% 50% no-repeat,
+    linear-gradient(
+        -45deg,
+        transparent calc(50% - 1px),
+        var(--mark) calc(50% - 1px) calc(50% + 1px),
+        transparent calc(50% + 1px)
+      )
+      center / 50% 50% no-repeat,
+    var(--cell);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*once solved only the picture is left*/
+.Cell_blank {
+  background: var(--cell);
+}
+
+/*a hint's fill or cross shows faintly in the raised tile it goes on*/
+.Cell_ghostFill {
+  background: color-mix(in srgb, var(--ng-fill) 40%, var(--cell));
+}
+
+.Cell_ghostCross {
+  --mark: color-mix(in srgb, var(--ng-cross) 70%, transparent);
+  box-shadow: none;
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+
+.Cell_hintSource {
+  --hint-color: #2e8bff;
+}
+
+.Cell_hintPlace {
+  --hint-color: #12d12a;
+}
+
+.Cell_hintWrong {
+  --hint-color: #ff3b3b;
+}
+
+/*rain glyphs on matrix: filled cells show the bright glyph on black, like the rain itself*/
+:root[data-theme='matrix'][data-rain] .Cell_fill {
+  background: #020a04 var(--rain-1) center / 140% no-repeat;
+}

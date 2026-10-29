@@ -1326,51 +1326,73 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Game.jsx": () => __vitePreload(() => import("./Game-CuFEYF5N.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Digit.jsx": () => __vitePreload(() => import("./Digit-BXqezPS5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Game.jsx": () => __vitePreload(() => import("./Game-DyZd-9wM.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-BVg-RxAB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-CsDqIfnR.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-C92zet3c.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/app.jsx": () => __vitePreload(() => import("./app-B_1TrhCZ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/app.jsx": () => __vitePreload(() => import("./app-BsHUco__.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/index.js": () => __vitePreload(() => import("./src-2iRfJ9t-.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/About.jsx": () => __vitePreload(() => import("./About-CCEvo0Uj.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/Cell.jsx": () => __vitePreload(() => import("./Cell-W6mpp_Sk.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/Game.jsx": () => __vitePreload(() => import("./Game-CokKtnOK.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-CjdWyDpa.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/Menu.jsx": () => __vitePreload(() => import("./Menu-CtypsB5Y.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/app.jsx": () => __vitePreload(() => import("./app-Du7F56Xn.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/deal.js": () => __vitePreload(() => import("./deal-CF0k6IhU.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/deal.worker.js": () => __vitePreload(() => import("./deal.worker-DZ-WIkHh.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/generate.js": () => __vitePreload(() => import("./generate-CalIVU_h.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/hint.js": () => __vitePreload(() => import("./hint-BbNdP_Hc.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/index.js": () => __vitePreload(() => import("./nonograms-D7rtoQNU.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/rules.js": () => __vitePreload(() => import("./rules-E3n7F5ni.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/solver.js": () => __vitePreload(() => import("./solver-C8_aghOu.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/techniques.js": () => __vitePreload(() => import("./techniques-JJDDlZLS.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/About.jsx": () => __vitePreload(() => import("./About-C3ovWGOG.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-C7OYl7t1.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-3zHmOYNZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Board.jsx": () => __vitePreload(() => import("./Board-DPSJdVmY.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Boss.jsx": () => __vitePreload(() => import("./Boss-CgNRzjtu.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/SideButton.jsx": () => __vitePreload(() => import("./SideButton-CAoiUk4E.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/GameLinks.jsx": () => __vitePreload(() => import("./GameLinks-CG4aJriN.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-B7tap275.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/Prompt.jsx": () => __vitePreload(() => import("./Prompt-RPg_9R2J.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/SideButton.jsx": () => __vitePreload(() => import("./SideButton-CYbVTgrJ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Tabs.jsx": () => __vitePreload(() => import("./Tabs-ClkdhSrf.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/ThemeMenu.jsx": () => __vitePreload(() => import("./ThemeMenu-CjGFC0cl.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/WindowControls.jsx": () => __vitePreload(() => import("./WindowControls-Cz0TNK3C.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-DphZoY6B.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-DQZXS2h4.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/hill.js": () => __vitePreload(() => import("./hill-C0RBa6DT.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/index.js": () => __vitePreload(() => import("./backgrounds-DqF45KDc.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/matrix.js": () => __vitePreload(() => import("./matrix-BPjC-X-W.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/substrate.js": () => __vitePreload(() => import("./substrate-PZSDDw_U.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/backgrounds/truchet.js": () => __vitePreload(() => import("./truchet-MOZfSJKS.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/clock.js": () => __vitePreload(() => import("./clock-_tnDKn1R.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/clock.js": () => __vitePreload(() => import("./clock-CbDoHKqE.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/deal.js": () => __vitePreload(() => import("./deal-BIPDiiBQ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/grid.js": () => __vitePreload(() => import("./grid-Cn7FYfb1.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/prepaint.js": () => __vitePreload(() => import("./prepaint-BOQns3Rk.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/rain.js": () => __vitePreload(() => import("./rain-C_2PVHRD.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/random.js": () => __vitePreload(() => import("./random-BhJ9jlbQ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/records.js": () => __vitePreload(() => import("./records-Dn-S4FyY.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/storage.js": () => __vitePreload(() => import("./storage-Cj0EFyod.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/themes.js": () => __vitePreload(() => import("./themes-DFrkB3pZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/worker.js": () => __vitePreload(() => import("./worker-D6fmPkLz.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C_qZLAIo.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-Di5OkK2F.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-CO-gWBZY.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-BPUyXzE6.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-C4C3lgHN.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Prompt.jsx": () => __vitePreload(() => import("./Prompt-zY7l38Ey.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-zf0-JfD5.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-CXGq3ded.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-CRnCvm0o.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-I87EOUmF.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-jaiMDJ9A.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-C-bZIqoY.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-Y44P_Wcn.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Dikzn-tm.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-DU89gL2R.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CMuoerwS.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/index.js": () => __vitePreload(() => import("./takuzu-AO7c84x8.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-Dc-4LR4I.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-OtVkdrpA.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-CyCtuQvh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-DSUf_BR0.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-C0hPPQel.js").then((m) => m["default"]), [], import.meta.url)
 });
@@ -2127,6 +2149,18 @@ var ThemeMenu = ({ state, actions }, children) => /* @__PURE__ */ h(MenuItem, {
 	onClick: actions.toggleBackgroundSettings
 }), children);
 //#endregion
+//#region src/shell/GameLinks.jsx
+var games = [
+	["minesweeper", "Minesweeper"],
+	["takuzu", "Takuzu"],
+	["nonograms", "Nonograms"]
+];
+var gameLinks = (current) => games.map(([id, name]) => /* @__PURE__ */ h(SubMenuItem, {
+	name,
+	checked: id === current,
+	onClick: () => id !== current && location.assign(`../${id}/`)
+}));
+//#endregion
 //#region src/Menu.jsx
 var SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => /* @__PURE__ */ h("li", {
 	key,
@@ -2206,10 +2240,7 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 }), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Best Times...",
 	onClick: actions.toggleBestTime
-}), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Takuzu",
-	onClick: () => location.assign("../takuzu/")
-})), /* @__PURE__ */ h(ThemeMenu, {
+}), /* @__PURE__ */ h(Separator, null), gameLinks("minesweeper")), /* @__PURE__ */ h(ThemeMenu, {
 	state,
 	actions
 }), /* @__PURE__ */ h(MenuItem, {
@@ -2218,6 +2249,9 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	active: state.menu,
 	onChange: actions.toggleMenu
 }, /* @__PURE__ */ h(SubMenuItem, {
+	name: "How to Play...",
+	onClick: actions.toggleHowTo
+}), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "About Minesweeper Plus...",
 	onClick: actions.toggleAbout
 })));
@@ -2237,7 +2271,7 @@ var Digit_module_default = {
 };
 //#endregion
 //#region src/Digit.jsx
-var Digit = ({ value }) => /* @__PURE__ */ h("div", { class: Digit_module_default.root }, `00${Math.max(-99, Math.min(999, value))}`.slice(-3).split("").sort((a) => a === "-" ? -1 : 0).map((digit) => /* @__PURE__ */ h("svg", {
+var Digit = ({ value, digits = 3 }) => /* @__PURE__ */ h("div", { class: Digit_module_default.root }, `000${Math.max(-99, Math.min(10 ** digits - 1, value))}`.slice(-digits).split("").sort((a) => a === "-" ? -1 : 0).map((digit) => /* @__PURE__ */ h("svg", {
 	class: Digit_module_default.digit,
 	width: "13",
 	height: "23",
@@ -2335,6 +2369,8 @@ var SideButton = ({ title, disabled, onClick }, children) => /* @__PURE__ */ h("
 }, children));
 var HintIcon = () => /* @__PURE__ */ h("path", { d: "M9.5 2a4.5 4.5 0 0 0-4.5 4.5h2a2.5 2.5 0 1 1 3.4 2.3c-1 .4-1.9 1.3-1.9 2.6V13h2v-1.6c0-.4.3-.7.7-.8A4.5 4.5 0 0 0 9.5 2zm-1 12.5v2h2v-2z" });
 var UndoIcon = () => /* @__PURE__ */ h("path", { d: "M8 4L3 8.5 8 13v-3h4.5a2.5 2.5 0 0 1 0 5H9v2h3.5a4.5 4.5 0 0 0 0-9H8z" });
+var FillIcon = () => /* @__PURE__ */ h("path", { d: "M4 4h11v11H4z" });
+var CrossIcon = () => /* @__PURE__ */ h("path", { d: "M4.5 3L3 4.5 8 9.5l-5 5L4.5 16l5-5 5 5 1.5-1.5-5-5 5-5L14.5 3l-5 5z" });
 //#endregion
 //#region src/shell/WindowControls.jsx
 var WindowControls = ({ scale, onZoom, paused, canPause, onPause }) => [
@@ -2450,6 +2486,31 @@ var HintPanel = ({ text }) => /* @__PURE__ */ h("p", {
 	role: "status",
 	...hangBelow
 }, text);
+//#endregion
+//#region src/shell/clock.js
+var clockDigits = (theme, time) => theme !== "classic" && time > 999 ? 4 : 3;
+var pauseAction = (running, onPause = () => ({})) => (paused) => ({ game }, actions) => {
+	const next = paused === void 0 ? !game.paused : paused;
+	if (!running(game) || next === game.paused) return null;
+	if (!next) {
+		game.raf = requestAnimationFrame(actions.tick);
+		return { game: {
+			...game,
+			paused: false,
+			start: game.start + performance.now() - game.pausedAt
+		} };
+	}
+	cancelAnimationFrame(game.raf);
+	return {
+		menu: null,
+		game: {
+			...game,
+			...onPause(game, actions),
+			paused: true,
+			pausedAt: performance.now()
+		}
+	};
+};
 var Winner_module_default = {
 	root: "Winner_root",
 	text: "Winner_text",
@@ -2604,6 +2665,7 @@ var BackgroundSettings = ({ key, state, actions }) => {
 };
 var About_module_default = {
 	root: "About_root",
+	wide: "About_wide About_root",
 	name: "About_name",
 	link: "About_link",
 	footer: "About_footer",
@@ -2626,6 +2688,19 @@ var About = ({ key, name, actions }, children) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, name), children, /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzles" }, "github.com/fexofenadine/puzzles")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
 	onClick: actions.toggleAbout,
+	onCreate: (el) => el.focus()
+}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
+//#endregion
+//#region src/shell/HowToPlay.jsx
+var HowToPlay = ({ key, name, actions }, children) => /* @__PURE__ */ h(Overlay, {
+	key,
+	onKeyDown: (event) => event.keyCode === 27 && actions.toggleHowTo()
+}, /* @__PURE__ */ h(Dialog, {
+	title: `How to Play ${name}`,
+	onClose: actions.toggleHowTo
+}, /* @__PURE__ */ h("div", { class: About_module_default.wide }, children, /* @__PURE__ */ h("p", null, "Every game: F2 or N starts a new game, H gives a hint, P pauses, and Esc hides the game behind a spreadsheet."), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
+	type: "button",
+	onClick: actions.toggleHowTo,
 	onCreate: (el) => el.focus()
 }, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
 var Boss_module_default = {
@@ -2788,6 +2863,7 @@ var shellState = () => ({
 	boss: null,
 	backgrounds: loadSettings(),
 	backgroundSettings: null,
+	howTo: false,
 	zoom: {
 		chosen: loadZoom(),
 		scale: loadZoom(),
@@ -2817,6 +2893,10 @@ var shortcut = (event, state, actions) => {
 var shellActions = {
 	closeMenu: () => ({ menu: null }),
 	setPortrait: (portrait) => ({ portrait }),
+	toggleHowTo: () => ({ howTo }) => ({
+		menu: null,
+		howTo: !howTo
+	}),
 	boss: () => ({ boss }, actions) => {
 		if (boss) return { boss: null };
 		actions.pause(true);
@@ -2903,33 +2983,9 @@ var shellActions = {
 	}
 };
 //#endregion
-//#region src/shell/clock.js
-var pauseAction = (running, onPause = () => ({})) => (paused) => ({ game }, actions) => {
-	const next = paused === void 0 ? !game.paused : paused;
-	if (!running(game) || next === game.paused) return null;
-	if (!next) {
-		game.raf = requestAnimationFrame(actions.tick);
-		return { game: {
-			...game,
-			paused: false,
-			start: game.start + performance.now() - game.pausedAt
-		} };
-	}
-	cancelAnimationFrame(game.raf);
-	return {
-		menu: null,
-		game: {
-			...game,
-			...onPause(game, actions),
-			paused: true,
-			pausedAt: performance.now()
-		}
-	};
-};
-//#endregion
 //#region src/shell/worker.js
 var registerWorker = () => {
 	if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("../service-worker.js", { scope: "./" }).catch(() => {});
 };
 //#endregion
-export { SubMenuItem as A, Dialog as B, SideButton as C, Menu as D, Digit as E, glyphImage as F, Game_module_default as H, load as I, remove as L, startBackgrounds as M, BRIGHT as N, MenuItem as O, GLYPH as P, save as R, HintIcon as S, Play as T, app as U, Button as V, h as W, Overlay as _, shellState as a, watchWindow as b, Boss as c, Link as d, BackgroundSettings as f, Input as g, Winner as h, shellActions as i, ThemeMenu as j, Separator as k, BossButton as l, BestTime_module_default as m, pauseAction as n, shortcut as o, Tabs as p, listen as r, typing as s, registerWorker as t, About as u, HintPanel as v, UndoIcon as w, WindowControls as x, PausedCover as y, Menu_module_default as z };
+export { Digit as A, glyphImage as B, WindowControls as C, SideButton as D, HintIcon as E, gameLinks as F, Dialog as G, remove as H, ThemeMenu as I, app as J, Button as K, startBackgrounds as L, MenuItem as M, Separator as N, UndoIcon as O, SubMenuItem as P, BRIGHT as R, watchWindow as S, FillIcon as T, save as U, load as V, Menu_module_default as W, h as Y, Overlay as _, shortcut as a, HintPanel as b, BossButton as c, Link as d, BackgroundSettings as f, Input as g, Winner as h, shellState as i, Menu as j, Play as k, HowToPlay as l, BestTime_module_default as m, listen as n, typing as o, Tabs as p, Game_module_default as q, shellActions as r, Boss as s, registerWorker as t, About as u, clockDigits as v, CrossIcon as w, PausedCover as x, pauseAction as y, GLYPH as z };

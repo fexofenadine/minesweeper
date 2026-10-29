@@ -1,0 +1,4 @@
+//#region src/shell/rain.js?raw
+var rain_default = "import { BRIGHT, GLYPH, glyphImage } from './backgrounds/matrix'\n\n//two glyphs from the matrix rain, a dim one and a bright one, drawn the way the rain draws them\nexport const rain = ['ｼ', 'ﾓ']\n\n//draws them once and hands them to the css as --rain-0 and --rain-1, only used on the matrix theme\nexport const showRain = (on) => {\n  const root = document.documentElement\n  if (!on) {\n    delete root.dataset.rain\n    return\n  }\n  if (!root.style.getPropertyValue('--rain-0')) {\n    const dim = glyphImage(rain[0], 192, GLYPH)\n    const bright = glyphImage(rain[1], 192, BRIGHT)\n    if (!dim || !bright) return\n    root.style.setProperty('--rain-0', `url(${dim})`)\n    root.style.setProperty('--rain-1', `url(${bright})`)\n  }\n  root.dataset.rain = 'on'\n}\n";
+//#endregion
+export { rain_default as default };

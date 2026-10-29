@@ -1,6 +1,30 @@
 (function() {
-	const lineCache = {};
+	//#region src/shell/random.js
+	const random = (seed) => {
+		let a = seed >>> 0;
+		return () => {
+			a = a + 1831565813 >>> 0;
+			let t = a;
+			t = Math.imul(t ^ t >>> 15, t | 1);
+			t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+			return ((t ^ t >>> 14) >>> 0) / 4294967296;
+		};
+	};
+	const shuffled = (list, rng) => {
+		const copy = list.slice();
+		for (let i = copy.length - 1; i > 0; i--) {
+			const j = Math.floor(rng() * (i + 1));
+			[copy[i], copy[j]] = [copy[j], copy[i]];
+		}
+		return copy;
+	};
+	//#endregion
+	//#region src/shell/grid.js
 	const cellCache = {};
+	const cellsOf = (n) => cellCache[n] ??= Array.from({ length: 2 * n }, (_, line) => Array.from({ length: n }, (_, k) => line < n ? line * n + k : k * n + line - n));
+	const lineName = (line, n) => line < n ? `row ${line + 1}` : `column ${line - n + 1}`;
+	const capital = (text) => text[0].toUpperCase() + text.slice(1);
+	const lineCache = {};
 	const linesOf = (n) => lineCache[n] ??= Array.from({ length: 1 << n }, (_, mask) => mask).filter((mask) => {
 		let ones = 0;
 		for (let k = 0; k < n; k++) {
@@ -12,7 +36,6 @@
 		}
 		return ones * 2 === n;
 	});
-	const cellsOf = (n) => cellCache[n] ??= Array.from({ length: 2 * n }, (_, line) => Array.from({ length: n }, (_, k) => line < n ? line * n + k : k * n + line - n));
 	const readLine = (board, cells) => {
 		let known = 0;
 		let value = 0;
@@ -30,8 +53,6 @@
 	};
 	const emptyBoard = (n) => new Int8Array(n * n).fill(-1);
 	const full = (board) => !board.includes(-1);
-	const lineName = (line, n) => line < n ? `row ${line + 1}` : `column ${line - n + 1}`;
-	const capital = (text) => text[0].toUpperCase() + text.slice(1);
 	const breaks = (board, n) => {
 		const found = [];
 		const lines = cellsOf(n);
@@ -380,24 +401,6 @@
 	};
 	//#endregion
 	//#region src/takuzu/generate.js
-	const random = (seed) => {
-		let a = seed >>> 0;
-		return () => {
-			a = a + 1831565813 >>> 0;
-			let t = a;
-			t = Math.imul(t ^ t >>> 15, t | 1);
-			t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-			return ((t ^ t >>> 14) >>> 0) / 4294967296;
-		};
-	};
-	const shuffled = (list, rng) => {
-		const copy = list.slice();
-		for (let i = copy.length - 1; i > 0; i--) {
-			const j = Math.floor(rng() * (i + 1));
-			[copy[i], copy[j]] = [copy[j], copy[i]];
-		}
-		return copy;
-	};
 	const makeSolution = (n, rng) => {
 		for (;;) {
 			const board = solve(emptyBoard(n), n, (list) => shuffled(list, rng), 4 * n);

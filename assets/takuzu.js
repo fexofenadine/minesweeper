@@ -1,4 +1,5 @@
-import { A as SubMenuItem, B as Dialog, C as SideButton, E as Digit, F as glyphImage, H as Game_module_default$1, I as load, L as remove, M as startBackgrounds, N as BRIGHT, O as MenuItem, P as GLYPH, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, h as Winner, i as shellActions, j as ThemeMenu, k as Separator, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, s as typing, t as registerWorker, u as About, v as HintPanel, w as UndoIcon, x as WindowControls, y as PausedCover, z as Menu_module_default } from "./worker-BWwFziXg.js";
+import { A as Digit, C as WindowControls, D as SideButton, E as HintIcon, F as gameLinks, G as Dialog, H as remove, I as ThemeMenu, J as app, L as startBackgrounds, M as MenuItem, N as Separator, O as UndoIcon, P as SubMenuItem, S as watchWindow, U as save, V as load, W as Menu_module_default, Y as h, a as shortcut, b as HintPanel, c as BossButton, d as Link, f as BackgroundSettings, h as Winner, i as shellState, k as Play, l as HowToPlay, n as listen, o as typing, q as Game_module_default$1, r as shellActions, s as Boss, t as registerWorker, u as About, v as clockDigits, x as PausedCover, y as pauseAction } from "./worker-CNrW4LdT.js";
+import { a as Prompt, c as cellsOf, i as dealer, l as lineName, n as random, o as BestTimes, r as shuffled, s as capital, t as showRain, u as records } from "./rain-L03NNP1o.js";
 var Game_module_default = {
 	field: "Game_field",
 	active: "Game_active Game_field",
@@ -12,7 +13,6 @@ var sizes = [
 	14
 ];
 var lineCache = {};
-var cellCache = {};
 var linesOf = (n) => lineCache[n] ??= Array.from({ length: 1 << n }, (_, mask) => mask).filter((mask) => {
 	let ones = 0;
 	for (let k = 0; k < n; k++) {
@@ -24,7 +24,6 @@ var linesOf = (n) => lineCache[n] ??= Array.from({ length: 1 << n }, (_, mask) =
 	}
 	return ones * 2 === n;
 });
-var cellsOf = (n) => cellCache[n] ??= Array.from({ length: 2 * n }, (_, line) => Array.from({ length: n }, (_, k) => line < n ? line * n + k : k * n + line - n));
 var readLine = (board, cells) => {
 	let known = 0;
 	let value = 0;
@@ -42,8 +41,6 @@ var readLine = (board, cells) => {
 };
 var emptyBoard = (n) => new Int8Array(n * n).fill(-1);
 var full = (board) => !board.includes(-1);
-var lineName = (line, n) => line < n ? `row ${line + 1}` : `column ${line - n + 1}`;
-var capital = (text) => text[0].toUpperCase() + text.slice(1);
 var breaks = (board, n) => {
 	const found = [];
 	const lines = cellsOf(n);
@@ -435,10 +432,7 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 }), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Best Times...",
 	onClick: actions.toggleBestTime
-}), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
-	name: "Minesweeper",
-	onClick: () => location.assign("../minesweeper/")
-})), /* @__PURE__ */ h(MenuItem, {
+}), /* @__PURE__ */ h(Separator, null), gameLinks("takuzu")), /* @__PURE__ */ h(MenuItem, {
 	name: "Size",
 	type: "size",
 	active: state.menu,
@@ -460,6 +454,9 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	active: state.menu,
 	onChange: actions.toggleMenu
 }, /* @__PURE__ */ h(SubMenuItem, {
+	name: "How to Play...",
+	onClick: actions.toggleHowTo
+}), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "About Takuzu Plus...",
 	onClick: actions.toggleAbout
 })));
@@ -545,7 +542,10 @@ var Game = ({ key, state, actions }) => {
 		title: "Hint (H)",
 		disabled: game.dealing || game.win || paused,
 		onClick: actions.hint
-	}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, { value: game.time })), /* @__PURE__ */ h("div", {
+	}, /* @__PURE__ */ h(HintIcon, null))), /* @__PURE__ */ h(Digit, {
+		value: game.time,
+		digits: clockDigits(state.theme, game.time)
+	})), /* @__PURE__ */ h("div", {
 		class: running(game) && !paused ? Game_module_default.active : Game_module_default.inactive,
 		style: { "--n": n }
 	}, [...board].map((value, i) => /* @__PURE__ */ h(Cell, {
@@ -557,53 +557,6 @@ var Game = ({ key, state, actions }) => {
 		onPress: actions.play
 	})), paused && /* @__PURE__ */ h(PausedCover, { onResume: () => actions.pause(false) })), hint && !paused && /* @__PURE__ */ h(HintPanel, { text: hint.text })));
 };
-var BestTimes_module_default = {
-	table: "BestTimes_table",
-	level: "BestTimes_level",
-	size: "BestTimes_size",
-	slot: "BestTimes_slot",
-	time: "BestTimes_time",
-	name: "BestTimes_name"
-};
-//#endregion
-//#region src/takuzu/BestTimes.jsx
-var tabs = [{
-	id: "clean",
-	name: "No hints"
-}, {
-	id: "hinted",
-	name: "Hints used"
-}];
-var BestTimes = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
-	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleBestTime()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "Fastest Takuzu Solvers",
-	onClose: actions.toggleBestTime
-}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h(Tabs, {
-	tabs,
-	active: state.tab,
-	onSelect: actions.setBestTimeTab
-}), /* @__PURE__ */ h("table", { class: BestTimes_module_default.table }, /* @__PURE__ */ h("thead", null, /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", null), levelNames.map((name) => /* @__PURE__ */ h("th", { class: BestTimes_module_default.level }, name)))), /* @__PURE__ */ h("tbody", null, sizes.map((n) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("th", { class: BestTimes_module_default.size }, n, " × ", n), levelNames.map((_, level) => {
-	const best = allowed(n, level) && state[state.tab][`${n}.${level}`];
-	return /* @__PURE__ */ h("td", { class: BestTimes_module_default.slot }, !allowed(n, level) && "–", best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.time }, best.time, " s"), best && /* @__PURE__ */ h("span", { class: BestTimes_module_default.name }, best.name));
-}))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.resetBestTime
-}, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "Reset Scores")), /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleBestTime,
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "OK"))))));
-var Prompt_module_default = {
-	root: "Prompt_root",
-	text: "Prompt_text",
-	footer: "Prompt_footer",
-	button: "Prompt_button"
-};
-//#endregion
-//#region src/takuzu/hint.js
-var completeWithErrors = "The board is complete but there are errors. Do you want to use a hint?";
 var marked = (entries) => Object.fromEntries(entries);
 var findHint = ({ board, solution, n }) => {
 	if (solved(board, n)) return {
@@ -647,41 +600,7 @@ var findHint = ({ board, solution, n }) => {
 	};
 };
 //#endregion
-//#region src/takuzu/Prompt.jsx
-var Prompt = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
-	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.answerPrompt(false)
-}, /* @__PURE__ */ h(Dialog, {
-	title: "Takuzu",
-	onClose: () => actions.answerPrompt(false)
-}, /* @__PURE__ */ h("div", { class: Prompt_module_default.root }, /* @__PURE__ */ h("p", { class: Prompt_module_default.text }, completeWithErrors), /* @__PURE__ */ h("div", { class: Prompt_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: () => actions.answerPrompt(true)
-}, /* @__PURE__ */ h("span", { class: Prompt_module_default.button }, "Yes")), /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: () => actions.answerPrompt(false),
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: Prompt_module_default.button }, "No"))))));
-//#endregion
 //#region src/takuzu/generate.js
-var random = (seed) => {
-	let a = seed >>> 0;
-	return () => {
-		a = a + 1831565813 >>> 0;
-		let t = a;
-		t = Math.imul(t ^ t >>> 15, t | 1);
-		t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-		return ((t ^ t >>> 14) >>> 0) / 4294967296;
-	};
-};
-var shuffled = (list, rng) => {
-	const copy = list.slice();
-	for (let i = copy.length - 1; i > 0; i--) {
-		const j = Math.floor(rng() * (i + 1));
-		[copy[i], copy[j]] = [copy[j], copy[i]];
-	}
-	return copy;
-};
 var makeSolution = (n, rng) => {
 	for (;;) {
 		const board = solve(emptyBoard(n), n, (list) => shuffled(list, rng), 4 * n);
@@ -720,70 +639,16 @@ var makeGame = (n, level, rng, budget = 1500) => {
 };
 //#endregion
 //#region src/takuzu/deal.js
-var worker = null;
-var waiting = /* @__PURE__ */ new Map();
-var count = 0;
-var here = ({ n, level, seed }) => makeGame(n, level, random(seed));
-var giveUp = () => {
-	worker = false;
-	waiting.forEach(({ ask, resolve }) => resolve(here(ask)));
-	waiting.clear();
-};
-var start = () => {
-	if (worker !== null) return worker;
-	try {
-		worker = new Worker(new URL(
-			/* @vite-ignore */
-			new URL("deal.worker-BMjSpnL2.js", import.meta.url).href,
-			"" + import.meta.url
-		), { type: "module" });
-		worker.onmessage = ({ data }) => {
-			waiting.get(data.id)?.resolve(data);
-			waiting.delete(data.id);
-		};
-		worker.onerror = giveUp;
-	} catch {
-		worker = false;
-	}
-	return worker;
-};
-var deal = (n, level, seed) => {
-	const ask = {
-		n,
-		level,
-		seed
-	};
-	if (typeof Worker === "undefined" || !start()) return Promise.resolve(here(ask));
-	const id = ++count;
-	return new Promise((resolve) => {
-		waiting.set(id, {
-			ask,
-			resolve
-		});
-		worker.postMessage({
-			id,
-			...ask
-		});
-	});
-};
-//#endregion
-//#region src/takuzu/rain.js
-var rain = ["ｼ", "ﾓ"];
-var showRain = (on) => {
-	const root = document.documentElement;
-	if (!on) {
-		delete root.dataset.rain;
-		return;
-	}
-	if (!root.style.getPropertyValue("--tz-rain-0")) {
-		const zero = glyphImage(rain[0], 192, GLYPH);
-		const one = glyphImage(rain[1], 192, BRIGHT);
-		if (!zero || !one) return;
-		root.style.setProperty("--tz-rain-0", `url(${zero})`);
-		root.style.setProperty("--tz-rain-1", `url(${one})`);
-	}
-	root.dataset.rain = "on";
-};
+var dealOne = dealer(() => new Worker(new URL(
+	/* @vite-ignore */
+	new URL("deal.worker-CCQVs0aW.js", import.meta.url).href,
+	"" + import.meta.url
+), { type: "module" }), ({ n, level, seed }) => makeGame(n, level, random(seed)));
+var deal = (n, level, seed) => dealOne({
+	n,
+	level,
+	seed
+});
 //#endregion
 //#region src/takuzu/About.jsx
 var TakuzuAbout = ({ key, actions }) => /* @__PURE__ */ h(About, {
@@ -791,6 +656,13 @@ var TakuzuAbout = ({ key, actions }) => /* @__PURE__ */ h(About, {
 	name: "Takuzu Plus",
 	actions
 }, /* @__PURE__ */ h("p", null, "Binary puzzles: fill the grid with 0s and 1s so that no row or column has three alike in a row, every row and column holds as many 0s as 1s, and no two rows or two columns are the same."), /* @__PURE__ */ h("p", null, "Every board has exactly one solution and can be solved by logic alone, from easy to expert, and hints explain their reasoning. Takuzu, also known as Binairo, was devised by Frank Coussement and Peter De Schepper."), /* @__PURE__ */ h("p", null, "Part of Puzzles by fexofenadine, sharing its window, themes and backgrounds with Minesweeper Plus, which is based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " ", "by Vladimir Kutepov."));
+//#endregion
+//#region src/takuzu/HowToPlay.jsx
+var TakuzuHowToPlay = ({ key, actions }) => /* @__PURE__ */ h(HowToPlay, {
+	key,
+	name: "Takuzu",
+	actions
+}, /* @__PURE__ */ h("p", null, "Fill every cell with 0 or 1 so that no row or column has three of the same digit next to each other, every row and column holds as many 0s as 1s, and no two rows or two columns are the same."), /* @__PURE__ */ h("p", null, "Click a cell to step it through 0, 1 and empty, right click to step back. The framed cells are clues and stay as they are. Ctrl+Z undoes, and the left counter shows the cells still empty."), /* @__PURE__ */ h("p", null, "Show Errors marks broken rules as you play, and Hint explains the next step logic gives. Every board has one solution that needs no guessing."));
 //#endregion
 //#region src/takuzu/app.jsx
 var loadChoice = () => {
@@ -824,23 +696,7 @@ var createGame = ({ n, level }) => ({
 	win: false,
 	hinted: false
 });
-var timeKey = (n, level, hinted) => `takuzu.${n}.${level}${hinted ? ".hints" : ""}`;
-var eachSlot = (fn) => sizes.flatMap((n) => levelNames.map((_, level) => fn(n, level, `${n}.${level}`)));
-var bestTimes = (hinted) => Object.fromEntries(eachSlot((n, level, slot) => {
-	const key = timeKey(n, level, hinted);
-	return [slot, {
-		time: parseInt(load(key), 10) || 999,
-		name: load(`${key}.name`) || "Anonymous"
-	}];
-}));
-var clearBestTimes = (hinted) => {
-	eachSlot((n, level) => {
-		const key = timeKey(n, level, hinted);
-		remove(key);
-		remove(`${key}.name`);
-	});
-	return bestTimes(hinted);
-};
+var { timeKey, eachSlot, actions: recordActions } = records("takuzu", sizes, levelNames);
 var cycle = [
 	-1,
 	0,
@@ -1034,48 +890,7 @@ var actions = {
 			time: next
 		} };
 	},
-	win: ({ n, level, hinted, time }) => () => {
-		const key = timeKey(n, level, hinted);
-		const best = parseInt(load(key), 10);
-		if (best && best <= time) return null;
-		return { winner: {
-			key,
-			time,
-			hinted,
-			level: `${levelNames[level].toLowerCase()} ${n} × ${n}`,
-			name: load("takuzu.name") || ""
-		} };
-	},
-	changeWinner: (payload) => ({ winner }) => ({ winner: {
-		...winner,
-		...payload
-	} }),
-	submitBestTime: (event) => ({ winner }, actions) => {
-		event.preventDefault();
-		const name = winner.name.trim();
-		save(winner.key, winner.time);
-		save(`${winner.key}.name`, name);
-		save("takuzu.name", name);
-		actions.toggleBestTime();
-		actions.setBestTimeTab(winner.hinted ? "hinted" : "clean");
-		return { winner: null };
-	},
-	toggleBestTime: () => ({ bestTime }) => ({
-		menu: null,
-		bestTime: bestTime ? null : {
-			tab: "clean",
-			clean: bestTimes(false),
-			hinted: bestTimes(true)
-		}
-	}),
-	setBestTimeTab: (tab) => (state) => state.bestTime ? { bestTime: {
-		...state.bestTime,
-		tab
-	} } : null,
-	resetBestTime: () => ({ bestTime }) => ({ bestTime: {
-		...bestTime,
-		[bestTime.tab]: clearBestTimes(bestTime.tab === "hinted")
-	} })
+	...recordActions
 };
 var view = (state, actions) => /* @__PURE__ */ h("main", {
 	oncontextmenu: prevent,
@@ -1094,10 +909,16 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	actions
 }), state.bestTime && /* @__PURE__ */ h(BestTimes, {
 	key: "c",
+	title: "Fastest Takuzu Solvers",
+	sizes,
+	levelNames,
+	allowed,
 	state: state.bestTime,
 	actions
 }), state.prompt && /* @__PURE__ */ h(Prompt, {
 	key: "d",
+	title: "Takuzu",
+	text: "The board is complete but there are errors. Do you want to use a hint?",
 	actions
 }), state.backgroundSettings && /* @__PURE__ */ h(BackgroundSettings, {
 	key: "e",
@@ -1105,6 +926,9 @@ var view = (state, actions) => /* @__PURE__ */ h("main", {
 	actions
 }), state.about && /* @__PURE__ */ h(TakuzuAbout, {
 	key: "f",
+	actions
+}), state.howTo && /* @__PURE__ */ h(TakuzuHowToPlay, {
+	key: "i",
 	actions
 }), state.boss && /* @__PURE__ */ h(Boss, {
 	key: "g",

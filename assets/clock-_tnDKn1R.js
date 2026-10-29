@@ -1,4 +1,0 @@
-//#region src/shell/clock.js?raw
-var clock_default = "//pausing stops the clock and hides the board, only while running(game) holds\n//onPause adds the game's own changes, like dropping a half done click\nexport const pauseAction =\n  (running, onPause = () => ({})) =>\n  (paused) =>\n  ({ game }, actions) => {\n    const next = paused === undefined ? !game.paused : paused\n    if (!running(game) || next === game.paused) return null\n    if (!next) {\n      game.raf = requestAnimationFrame(actions.tick)\n      return {\n        game: { ...game, paused: false, start: game.start + performance.now() - game.pausedAt },\n      }\n    }\n    cancelAnimationFrame(game.raf)\n    return {\n      menu: null,\n      game: { ...game, ...onPause(game, actions), paused: true, pausedAt: performance.now() },\n    }\n  }\n";
-//#endregion
-export { clock_default as default };
