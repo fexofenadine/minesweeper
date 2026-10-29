@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en" prefix="og: http://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
+    <title>Minesweeper</title>
+    <meta
+      name="description"
+      content="A free, online minesweeper game written in javascript with open source"
+    />
+    <meta name="keywords" content="minesweeper, game, online, free, javascript, open source" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#cbcbcb" />
+    <meta property="og:title" content="Minesweeper" />
+    <meta
+      property="og:description"
+      content="A free, online minesweeper game written in javascript with open source"
+    />
+    <meta property="og:url" content="https://fexofenadine.github.io/puzzles/minesweeper/" />
+    <meta property="og:locale" content="en_US" />
+    <meta
+      property="og:image"
+      content="https://fexofenadine.github.io/puzzles/minesweeper/minesweeper.jpg"
+    />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="675" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Minesweeper" />
+    <link rel="manifest" href="../minesweeper/site.webmanifest" />
+    <link rel="apple-touch-icon" href="../minesweeper/icon.png" />
+    <link rel="shortcut icon" href="../minesweeper/favicon.ico" />
+    <script>
+      //apply the saved theme and window size before first paint
+      try {
+        document.documentElement.dataset.theme = localStorage.getItem('theme') || 'classic'
+        //assume animated off classic, the script corrects it
+        if (document.documentElement.dataset.theme !== 'classic') {
+          document.documentElement.dataset.background = 'animated'
+        }
+        document.documentElement.style.setProperty('--scale', localStorage.getItem('scale') || 1)
+      } catch {}
+      //if the game fails to start, show why instead of an empty desktop
+      addEventListener('error', (event) => {
+        if (document.querySelector('main *')) return
+        const note = document.createElement('pre')
+        note.style.cssText =
+          'position:fixed;left:0;right:0;bottom:0;z-index:9;margin:0;padding:8px;background:#000;color:#fff;font:12px monospace;white-space:pre-wrap'
+        note.textContent = 'Minesweeper could not start: ' + event.message
+        document.body.append(note)
+      })
+    </script>
+    <script type="module" crossorigin src="../assets/minesweeper.js?v=4a40c4fa"></script>
+    <link rel="modulepreload" crossorigin href="../assets/worker-DD-6gGdw.js?v=2075417c">
+    <link rel="stylesheet" crossorigin href="../assets/worker.css?v=abf25562">
+    <link rel="stylesheet" crossorigin href="../assets/minesweeper.css?v=30b0653d">
+  </head>
+  <body>
+    <div id="app">
+      <main></main>
+    </div>
+  </body>
+</html>

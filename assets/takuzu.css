@@ -1,0 +1,340 @@
+.Game_root {
+  padding: 6px 5px 5px 6px;
+  background: var(--panel);
+  border: solid var(--light);
+  border-width: 3px 0 0 3px;
+}
+
+.Game_scoreboard {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 0 0 6px;
+  padding: 4px 7px 3px 5px;
+  text-align: center;
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+
+.Game_buttons {
+  display: flex;
+  gap: 4px;
+}
+
+/*undo and hint, drawn like the face button between them*/
+.Game_side {
+  position: relative;
+  display: block;
+  margin: 0;
+  padding: 3px 3px 2px 2px;
+  color: var(--glyph);
+  background: var(--cell);
+  border: 1px solid var(--cell-shadow);
+  outline: 0;
+  cursor: pointer;
+}
+
+.Game_side::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+.Game_side:active:not(:disabled) {
+  padding: 4px 1px 1px 4px;
+}
+
+.Game_side:active:not(:disabled)::before {
+  border-width: 1px 0 0 1px;
+  border-color: var(--cell-shadow);
+}
+
+.Game_side:disabled {
+  color: var(--cell-shadow);
+  cursor: default;
+}
+
+.Game_side svg {
+  display: block;
+  fill: currentColor;
+}
+
+.Game_field {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--n), 24px);
+  justify-content: center;
+  border-width: 2px 3px 3px 2px;
+  border-style: solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+  border-radius: 0 2px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.Game_active {
+  cursor: pointer;
+}
+
+.Game_inactive {
+  cursor: default;
+}
+
+/*play button over the hidden board*/
+.Game_paused {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.Game_paused svg {
+  display: block;
+  margin: 2px;
+  fill: currentColor;
+}
+
+/*explanation under the field, never wider than it*/
+.Game_hint {
+  box-sizing: border-box;
+  width: 0;
+  min-width: 100%;
+  margin: 6px 0 0;
+  padding: 3px 4px 4px;
+  color: var(--text);
+  line-height: 1.3;
+  background: var(--input);
+  border: 2px solid;
+  border-color: var(--shadow) var(--light) var(--light) var(--shadow);
+}
+/*the two values in near complementary colours for each theme, the digit in a contrasting one*/
+:root {
+  --tz-zero: #1f5fbf;
+  --tz-zero-text: #fff;
+  --tz-one: #f08a24;
+  --tz-one-text: #1a1a1a;
+}
+
+:root[data-theme='synthwave'] {
+  --tz-zero: #36f9f6;
+  --tz-zero-text: #241b2f;
+  --tz-one: #ff7edb;
+  --tz-one-text: #241b2f;
+}
+
+:root:is([data-theme='solarized'], [data-theme='solarized-phosphor']) {
+  --tz-zero: #268bd2;
+  --tz-zero-text: #fdf6e3;
+  --tz-one: #cb4b16;
+  --tz-one-text: #fdf6e3;
+}
+
+:root[data-theme='nord'] {
+  --tz-zero: #81a1c1;
+  --tz-zero-text: #2e3440;
+  --tz-one: #d08770;
+  --tz-one-text: #2e3440;
+}
+
+/*matrix is all green, so one value is green on black and the other black on green*/
+:root[data-theme='matrix'] {
+  --tz-zero: #020a04;
+  --tz-zero-text: #39d26b;
+  --tz-one: #39d26b;
+  --tz-one-text: #020a04;
+}
+
+.Cell_root {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+  margin: 0;
+  padding: 0;
+  font: bold 15px/24px var(--text-font);
+  text-align: center;
+  border: 0;
+  outline: 0;
+  cursor: inherit;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/*an empty cell is a raised tile like an unopened one in minesweeper*/
+.Cell_empty {
+  background: var(--cell);
+}
+
+.Cell_empty::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid;
+  border-color: var(--cell-light) var(--cell-shadow) var(--cell-shadow) var(--cell-light);
+  content: '';
+}
+
+/*a filled cell lies flat in its colour*/
+.Cell_zero {
+  color: var(--tz-zero-text);
+  font-weight: normal;
+  background: var(--tz-zero);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+.Cell_one {
+  color: var(--tz-one-text);
+  font-weight: normal;
+  background: var(--tz-one);
+  box-shadow: inset 1px 1px 0 var(--cell-shadow);
+}
+
+/*clues are bold with a frame in their own text colour, and can't be changed*/
+.Cell_given {
+  font-weight: bold;
+  box-shadow:
+    inset 1px 1px 0 var(--cell-shadow),
+    inset 0 0 0 3px color-mix(in srgb, currentColor 45%, transparent);
+}
+
+.Cell_error::before {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: repeating-linear-gradient(
+    -45deg,
+    transparent 0 3px,
+    color-mix(in srgb, #ff2020 55%, transparent) 3px 5px
+  );
+  box-shadow: inset 0 0 0 2px #ff2020;
+  content: '';
+}
+
+.Cell_ghost {
+  color: color-mix(in srgb, var(--text) 45%, transparent);
+}
+
+/*hint outlines, the same colours minesweeper uses*/
+.Cell_hintSource::after,
+.Cell_hintPlace::after,
+.Cell_hintWrong::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  border: 2px solid var(--hint-color);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(0, 0, 0, 0.6);
+  pointer-events: none;
+  content: '';
+}
+
+.Cell_hintSource {
+  --hint-color: #2e8bff;
+}
+
+.Cell_hintPlace {
+  --hint-color: #12d12a;
+}
+
+.Cell_hintWrong {
+  --hint-color: #ff3b3b;
+}
+
+/*rain glyphs on matrix: a green glyph on black for 0, a bright one on dark green for 1*/
+:root[data-theme='matrix'][data-rain] .Cell_zero,
+:root[data-theme='matrix'][data-rain] .Cell_one {
+  color: transparent;
+  background-position: center;
+  background-size: 140%;
+  background-repeat: no-repeat;
+}
+
+:root[data-theme='matrix'][data-rain] .Cell_zero {
+  background-color: #020a04;
+  background-image: var(--tz-rain-0);
+}
+
+:root[data-theme='matrix'][data-rain] .Cell_one {
+  background-color: #0b3d1a;
+  background-image: var(--tz-rain-1);
+}
+
+:root[data-theme='matrix'][data-rain] .Cell_given {
+  box-shadow:
+    inset 1px 1px 0 var(--cell-shadow),
+    inset 0 0 0 3px rgba(57, 210, 107, 0.45);
+}
+.BestTimes_table {
+  margin: 0 8px;
+  border-collapse: collapse;
+}
+
+.BestTimes_level,
+.BestTimes_size {
+  padding: 2px 8px;
+  font-weight: normal;
+}
+
+.BestTimes_size {
+  text-align: left;
+}
+
+.BestTimes_slot {
+  min-width: 64px;
+  height: 34px;
+  padding: 2px 8px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.BestTimes_time,
+.BestTimes_name {
+  display: block;
+}
+
+/*names can be long, keep the grid even*/
+.BestTimes_name {
+  max-width: 80px;
+  overflow: hidden;
+  font-size: 0.85em;
+  text-overflow: ellipsis;
+  opacity: 0.75;
+}
+.Prompt_root {
+  max-width: 260px;
+  padding: 12px 12px 12px;
+}
+
+.Prompt_text {
+  margin: 0;
+  line-height: 1.3;
+}
+
+.Prompt_footer {
+  display: flex;
+  justify-content: space-around;
+  padding: 16px 0 0;
+}
+
+.Prompt_button {
+  display: block;
+  min-width: 48px;
+  padding: 1px 5px 0;
+}

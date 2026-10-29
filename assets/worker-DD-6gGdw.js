@@ -208,20 +208,6 @@ function app(state, actions, view, container) {
 		return element;
 	}
 }
-var Game_module_default = {
-	root: "Game_root",
-	scoreboard: "Game_scoreboard",
-	field: "Game_field",
-	active: "Game_active",
-	inactive: "Game_inactive",
-	paused: "Game_paused",
-	fieldLost: "Game_fieldLost Game_field",
-	jitter: "Game_jitter",
-	chroma: "Game_chroma",
-	band: "Game_band",
-	flicker: "Game_flicker",
-	hint: "Game_hint"
-};
 var Dialog_module_default = {
 	a: "Dialog_a",
 	b: "Dialog_b",
@@ -278,7 +264,7 @@ var Menu_module_default = {
 	separator: "Menu_separator"
 };
 //#endregion
-//#region src/storage.js
+//#region src/shell/storage.js
 var load = (key) => {
 	try {
 		return localStorage.getItem(key);
@@ -297,7 +283,7 @@ var remove = (key) => {
 	} catch {}
 };
 //#endregion
-//#region src/backgrounds/matrix.js
+//#region src/shell/backgrounds/matrix.js
 var GRID_SIZE = 70;
 var GRID_DEPTH = 35;
 var WAVE_SIZE = 22;
@@ -367,30 +353,44 @@ var newStrip = (count) => {
 	return s;
 };
 var PAD = 1.6;
+var GLYPH = "#2cff6e";
+var BRIGHT = "#d4ffe0";
+var drawGlyph = (context, glyph, x, y, cell, colour) => {
+	context.save();
+	context.font = `${Math.round(cell / PAD * .8)}px monospace`;
+	context.textAlign = "center";
+	context.textBaseline = "middle";
+	context.fillStyle = colour;
+	context.shadowColor = colour;
+	context.translate(x, y);
+	context.scale(-1, 1);
+	context.shadowBlur = cell * .3;
+	context.fillText(glyph, 0, 0);
+	context.fillText(glyph, 0, 0);
+	context.shadowBlur = cell * .07;
+	context.fillText(glyph, 0, 0);
+	context.restore();
+};
 var buildAtlas = (glyphs, cell) => {
 	const atlas = document.createElement("canvas");
 	atlas.width = cell * glyphs.length;
 	atlas.height = cell * 2;
 	const context = atlas.getContext("2d");
-	context.font = `${Math.round(cell / PAD * .8)}px monospace`;
-	context.textAlign = "center";
-	context.textBaseline = "middle";
-	["#2cff6e", "#d4ffe0"].forEach((colour, row) => {
-		context.fillStyle = colour;
-		context.shadowColor = colour;
+	[GLYPH, BRIGHT].forEach((colour, row) => {
 		glyphs.forEach((glyph, i) => {
-			context.save();
-			context.translate((i + .5) * cell, (row + .5) * cell);
-			context.scale(-1, 1);
-			context.shadowBlur = cell * .3;
-			context.fillText(glyph, 0, 0);
-			context.fillText(glyph, 0, 0);
-			context.shadowBlur = cell * .07;
-			context.fillText(glyph, 0, 0);
-			context.restore();
+			drawGlyph(context, glyph, (i + .5) * cell, (row + .5) * cell, cell, colour);
 		});
 	});
 	return atlas;
+};
+encodings.matrix;
+var glyphImage = (glyph, cell, colour = GLYPH) => {
+	const canvas = document.createElement("canvas");
+	canvas.width = canvas.height = cell;
+	const context = canvas.getContext("2d");
+	if (!context) return null;
+	drawGlyph(context, glyph, cell / 2, cell / 2, cell, colour);
+	return canvas.toDataURL();
 };
 var matrix_default = {
 	name: "GLMatrix",
@@ -522,7 +522,7 @@ var matrix_default = {
 	}
 };
 //#endregion
-//#region src/backgrounds/substrate.js
+//#region src/shell/backgrounds/substrate.js
 var STEP = .42;
 var EMPTY = 10001;
 var palettes$1 = {
@@ -858,7 +858,7 @@ var substrate_default = {
 	}
 };
 //#endregion
-//#region src/backgrounds/truchet.js
+//#region src/shell/backgrounds/truchet.js
 var MAXRATIO = 2;
 var palettes = {
 	accents: [
@@ -1177,7 +1177,7 @@ var truchet_default = {
 	}
 };
 //#endregion
-//#region src/backgrounds/font6x10.js
+//#region src/shell/backgrounds/font6x10.js
 var bytes = Uint8Array.from(atob("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"), (c) => c.charCodeAt(0));
 var pixel = (c, x, y) => {
 	const bit = c * 7 + x;
@@ -1282,7 +1282,7 @@ var __vitePreload = function preload(baseModule, deps, importerUrl) {
 	});
 };
 //#endregion
-//#region src/backgrounds/phosphor.js
+//#region src/shell/backgrounds/phosphor.js
 var BLANK = 0;
 var FLARE = 1;
 var NORMAL = 2;
@@ -1308,37 +1308,57 @@ var rgb = (hex) => [
 var css = ([r, g, b]) => `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
 var brightness = ([r, g, b]) => Math.max(r, g, b);
 var sources = /* #__PURE__ */ Object.assign({
-	"../About.jsx": () => __vitePreload(() => import("./About-D9CbMnRN.js").then((m) => m["default"]), [], import.meta.url),
-	"../BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-Lz6_3lr6.js").then((m) => m["default"]), [], import.meta.url),
-	"../BestTime.jsx": () => __vitePreload(() => import("./BestTime-Ce22rTOt.js").then((m) => m["default"]), [], import.meta.url),
-	"../Boss.jsx": () => __vitePreload(() => import("./Boss-DVj8-Yu3.js").then((m) => m["default"]), [], import.meta.url),
-	"../Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
-	"../Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
-	"../CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
-	"../Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
-	"../Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
-	"../Game.jsx": () => __vitePreload(() => import("./Game-EAJjAAj_.js").then((m) => m["default"]), [], import.meta.url),
-	"../Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
-	"../Menu.jsx": () => __vitePreload(() => import("./Menu-B4hKNzU8.js").then((m) => m["default"]), [], import.meta.url),
-	"../Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
-	"../Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
-	"../Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
-	"../app.jsx": () => __vitePreload(() => import("./app-ByHpwi04.js").then((m) => m["default"]), [], import.meta.url),
-	"./hill.js": () => __vitePreload(() => import("./hill-BeKOzOig.js").then((m) => m["default"]), [], import.meta.url),
-	"./index.js": () => __vitePreload(() => import("./backgrounds-yzT2ejc9.js").then((m) => m["default"]), [], import.meta.url),
-	"./matrix.js": () => __vitePreload(() => import("./matrix-Cs_X-Gm1.js").then((m) => m["default"]), [], import.meta.url),
-	"./substrate.js": () => __vitePreload(() => import("./substrate-DEEODJfR.js").then((m) => m["default"]), [], import.meta.url),
-	"./truchet.js": () => __vitePreload(() => import("./truchet-CPTm170L.js").then((m) => m["default"]), [], import.meta.url),
-	"../hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
-	"../index.js": () => __vitePreload(() => import("./src-C0eXu16q.js").then((m) => m["default"]), [], import.meta.url),
-	"../mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
-	"../storage.js": () => __vitePreload(() => import("./storage-CUVd8b8T.js").then((m) => m["default"]), [], import.meta.url),
-	"../themes.js": () => __vitePreload(() => import("./themes-Bv6WJCtV.js").then((m) => m["default"]), [], import.meta.url),
-	"../zoom.js": () => __vitePreload(() => import("./zoom-rkNmBMtQ.js").then((m) => m["default"]), [], import.meta.url)
+	"/src/About.jsx": () => __vitePreload(() => import("./About-BpTtFm3r.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/BestTime.jsx": () => __vitePreload(() => import("./BestTime-eEp5PG0y.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Button.jsx": () => __vitePreload(() => import("./Button-C8D8-FiQ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Cell.jsx": () => __vitePreload(() => import("./Cell-GIKddMdx.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/CustomField.jsx": () => __vitePreload(() => import("./CustomField-DS_mYmEf.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Dialog.jsx": () => __vitePreload(() => import("./Dialog-BXD_Wy5m.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Digit.jsx": () => __vitePreload(() => import("./Digit-B5rGRU4Q.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Game.jsx": () => __vitePreload(() => import("./Game-CnLiSrMN.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-CsDqIfnR.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/app.jsx": () => __vitePreload(() => import("./app-CYrXyFk6.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/index.js": () => __vitePreload(() => import("./src-2iRfJ9t-.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-C7OYl7t1.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/Boss.jsx": () => __vitePreload(() => import("./Boss-CgNRzjtu.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/ThemeMenu.jsx": () => __vitePreload(() => import("./ThemeMenu-CjGFC0cl.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/WindowControls.jsx": () => __vitePreload(() => import("./WindowControls-Cz0TNK3C.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/actions.js": () => __vitePreload(() => import("./actions-gO6iL7Az.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/hill.js": () => __vitePreload(() => import("./hill-C0RBa6DT.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/index.js": () => __vitePreload(() => import("./backgrounds-DqF45KDc.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/matrix.js": () => __vitePreload(() => import("./matrix-B34wIKLw.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/substrate.js": () => __vitePreload(() => import("./substrate-PZSDDw_U.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/backgrounds/truchet.js": () => __vitePreload(() => import("./truchet-MOZfSJKS.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/storage.js": () => __vitePreload(() => import("./storage-Cj0EFyod.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/themes.js": () => __vitePreload(() => import("./themes-DFrkB3pZ.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/worker.js": () => __vitePreload(() => import("./worker-D6fmPkLz.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C4tU6EOW.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-CzUpVlb7.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-D18lEUyG.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-Dl6D4jA5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-CH4n24IS.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Prompt.jsx": () => __vitePreload(() => import("./Prompt-zY7l38Ey.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-BAz2-n-8.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-BO0x2QS5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Bpc4lY75.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CdZRjkO5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/index.js": () => __vitePreload(() => import("./takuzu-AO7c84x8.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-DLUFo6i0.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-JSobALHn.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-XOjlfRlB.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-Dz_Wq6Gz.js").then((m) => m["default"]), [], import.meta.url)
 });
 var texts = null;
 var loadTexts = () => texts ??= Promise.all(Object.entries(sources).map(async ([path, load]) => ({
-	name: `src/${path.replace(/^\.\.\//, "").replace(/^\.\//, "backgrounds/")}`,
+	name: path.slice(1),
 	text: await load()
 })));
 var runCache = /* @__PURE__ */ new Map();
@@ -1628,10 +1648,10 @@ var phosphor_default = {
 	}
 };
 //#endregion
-//#region src/backgrounds/hill.webp
+//#region src/shell/backgrounds/hill.webp
 var hill_default$1 = new URL("hill.webp", import.meta.url).href;
 //#endregion
-//#region src/backgrounds/ridge.json
+//#region src/shell/backgrounds/ridge.json
 var ridge_default = [
 	[0, .0057],
 	[.0208, .0069],
@@ -1684,7 +1704,7 @@ var ridge_default = [
 	[1, .0806]
 ];
 //#endregion
-//#region src/backgrounds/hill.js
+//#region src/shell/backgrounds/hill.js
 var HILL_WIDTH = 2400;
 var HILL_HEIGHT = 851;
 var RIDGE = .53;
@@ -1775,7 +1795,7 @@ var hillLayout = (width, height) => {
 	};
 };
 //#endregion
-//#region src/backgrounds/index.js
+//#region src/shell/backgrounds/index.js
 var backgrounds = {
 	matrix: matrix_default,
 	substrate: substrate_default,
@@ -2064,7 +2084,7 @@ var startBackgrounds = () => {
 	update();
 };
 //#endregion
-//#region src/themes.js
+//#region src/shell/themes.js
 var themes = [
 	["classic", "Classic"],
 	["synthwave", "Synthwave"],
@@ -2074,14 +2094,30 @@ var themes = [
 	["nord", "Nord"]
 ];
 //#endregion
+//#region src/shell/ThemeMenu.jsx
+var ThemeMenu = ({ state, actions }, children) => /* @__PURE__ */ h(MenuItem, {
+	name: "Theme",
+	type: "theme",
+	active: state.menu,
+	onChange: actions.toggleMenu
+}, themes.map(([theme, name]) => /* @__PURE__ */ h(SubMenuItem, {
+	name,
+	checked: state.theme === theme,
+	onClick: () => actions.setTheme(theme)
+})), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
+	name: "Background Settings...",
+	onClick: actions.toggleBackgroundSettings
+}), children);
+//#endregion
 //#region src/Menu.jsx
-var SubMenuItem = ({ key, name, hotKey, checked, onClick }, children) => /* @__PURE__ */ h("li", {
+var SubMenuItem = ({ key, name, hotKey, checked, disabled, onClick }, children) => /* @__PURE__ */ h("li", {
 	key,
 	class: Menu_module_default.item
 }, /* @__PURE__ */ h("button", {
 	type: "button",
 	class: Menu_module_default.option,
 	tabindex: -1,
+	disabled,
 	onclick: onClick
 }, checked && /* @__PURE__ */ h("svg", {
 	class: Menu_module_default.check,
@@ -2152,19 +2188,13 @@ var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 }), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
 	name: "Best Times...",
 	onClick: actions.toggleBestTime
-})), /* @__PURE__ */ h(MenuItem, {
-	name: "Theme",
-	type: "theme",
-	active: state.menu,
-	onChange: actions.toggleMenu
-}, themes.map(([theme, name]) => /* @__PURE__ */ h(SubMenuItem, {
-	name,
-	checked: state.theme === theme,
-	onClick: () => actions.setTheme(theme)
-})), backgroundFor(state.theme) && /* @__PURE__ */ h(Separator, null), backgroundFor(state.theme) && /* @__PURE__ */ h(SubMenuItem, {
-	name: "Background Settings...",
-	onClick: actions.toggleBackgroundSettings
-})), /* @__PURE__ */ h(MenuItem, {
+}), /* @__PURE__ */ h(Separator, null), /* @__PURE__ */ h(SubMenuItem, {
+	name: "Takuzu",
+	onClick: () => location.assign("../takuzu/")
+})), /* @__PURE__ */ h(ThemeMenu, {
+	state,
+	actions
+}), /* @__PURE__ */ h(MenuItem, {
 	name: "Help",
 	type: "help",
 	active: state.menu,
@@ -2271,178 +2301,40 @@ var Play = ({ pressed, lose, win, onReset }) => /* @__PURE__ */ h("button", {
 	lose,
 	win
 })), /* @__PURE__ */ h("g", { class: Play_module_default.down }, /* @__PURE__ */ h(Smile, null))));
-var Cell_module_default = {
-	root: "Cell_root",
-	pressed: "Cell_pressed Cell_root",
-	image: "Cell_image",
-	hurt: "Cell_hurt Cell_image",
-	n1: "Cell_n1",
-	n2: "Cell_n2",
-	n3: "Cell_n3",
-	n4: "Cell_n4",
-	n5: "Cell_n5",
-	n6: "Cell_n6",
-	n7: "Cell_n7",
-	n8: "Cell_n8",
-	flagCloth: "Cell_flagCloth",
-	wrong: "Cell_wrong",
-	mine: "Cell_mine",
-	shine: "Cell_shine",
-	hintSource: "Cell_hintSource",
-	hintSafe: "Cell_hintSafe",
-	hintMine: "Cell_hintMine",
-	hintWrong: "Cell_hintWrong",
-	hintUnsure: "Cell_hintUnsure"
-};
 //#endregion
-//#region src/Cell.jsx
-var inRange = (x, y, u, v) => u >= 0 && v >= 0 && (x - u - 1) * (x - u + 1) <= 0 && (y - v - 1) * (y - v + 1) <= 0;
-var Num1 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n1,
-	d: "M4 12v-2h2V6H4V5l3-3h2v8h2v2H4z"
-});
-var Num2 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n2,
-	d: "M2 12h10v-2H6v-.5L11 7l1-1V3l-1-1H3L2 3v2h3V4h4v1L8 6 2 9v3z"
-});
-var Num3 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n3,
-	d: "M2 10h7V8H5V6h4V4H2V2h9l1 1v3l-1 1 1 1v3l-1 1H2v-2z"
-});
-var Num4 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n4,
-	d: "M8 12h3V8h1V6h-1V2H8v4H5l2-4H4L2 6v2h6v4z"
-});
-var Num5 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n5,
-	d: "M2 2h10v2H5v2h6l1 1v4l-1 1H2v-2h7V8H2V2z"
-});
-var Num6 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n6,
-	d: "M11 6H5V4h6V2H3L2 3v8l1 1h8l1-1V7zm-2 4H5V8h4z"
-});
-var Num7 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n7,
-	d: "M2 2h10v4l-3 6H6l3-6V4H2V2z"
-});
-var Num8 = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.n8,
-	d: "M12 3l-1-1H3L2 3v3l1 1-1 1v3l1 1h8l1-1V8l-1-1 1-1zm-3 7H5V8h4zm0-4H5V4h4z"
-});
-var Flag = () => /* @__PURE__ */ h("g", { class: Cell_module_default.flag }, /* @__PURE__ */ h("path", { d: "M9 10.5V3H8v7l-4 2v1h8v-1z" }), /* @__PURE__ */ h("path", {
-	class: Cell_module_default.flagCloth,
-	d: "M9 3v5H8L4 5.5 8 3z"
-}));
-var Mark = () => /* @__PURE__ */ h("text", {
-	x: "50%",
-	y: "50%",
-	dx: ".5",
-	dy: ".4em",
-	"text-anchor": "middle"
-}, "?");
-var Fail = () => /* @__PURE__ */ h("path", {
-	class: Cell_module_default.wrong,
-	d: "M13.854 1.854l-.708-.708L7.5 6.793 1.854 1.146l-.708.708L6.793 7.5l-5.647 5.646.708.708L7.5 8.207l5.646 5.647.708-.708L8.207 7.5l5.647-5.646z"
-});
-var Mine = () => /* @__PURE__ */ h("g", { class: Cell_module_default.mine }, /* @__PURE__ */ h("path", { d: "M13.5 7h-1.55A4.445 4.445 0 0 0 11 4.705l.741-.741a.5.5 0 1 0-.707-.707l-.74.743A4.446 4.446 0 0 0 8 3.05V1.5a.5.5 0 0 0-1 0v1.55A4.452 4.452 0 0 0 4.705 4l-.741-.741a.5.5 0 0 0-.707.707L4 4.705A4.452 4.452 0 0 0 3.05 7H1.5a.5.5 0 0 0 0 1h1.55A4.446 4.446 0 0 0 4 10.294l-.741.741a.5.5 0 0 0 .354.854.5.5 0 0 0 .353-.147L4.705 11A4.445 4.445 0 0 0 7 11.95v1.55a.5.5 0 0 0 1 0v-1.55a4.452 4.452 0 0 0 2.3-.95l.74.74a.5.5 0 0 0 .707-.707L11 10.3a4.452 4.452 0 0 0 .95-2.3h1.55a.5.5 0 0 0 0-1z" }), /* @__PURE__ */ h("circle", {
-	class: Cell_module_default.shine,
-	cx: "6",
-	cy: "6",
-	r: "1"
-}));
-var Symbol = ({ opened, mined, flag, mark, num, lose }) => {
-	if (opened) {
-		if (mined) return /* @__PURE__ */ h(Mine, null);
-		switch (num) {
-			case 1: return /* @__PURE__ */ h(Num1, null);
-			case 2: return /* @__PURE__ */ h(Num2, null);
-			case 3: return /* @__PURE__ */ h(Num3, null);
-			case 4: return /* @__PURE__ */ h(Num4, null);
-			case 5: return /* @__PURE__ */ h(Num5, null);
-			case 6: return /* @__PURE__ */ h(Num6, null);
-			case 7: return /* @__PURE__ */ h(Num7, null);
-			case 8: return /* @__PURE__ */ h(Num8, null);
-			default: return null;
-		}
-	}
-	if (flag) {
-		if (lose && !mined) return /* @__PURE__ */ h("g", null, /* @__PURE__ */ h(Mine, null), /* @__PURE__ */ h(Fail, null));
-		return /* @__PURE__ */ h(Flag, null);
-	}
-	if (lose && mined) return /* @__PURE__ */ h(Mine, null);
-	if (mark) return /* @__PURE__ */ h(Mark, null);
-	return null;
-};
-var hintClass = {
-	source: Cell_module_default.hintSource,
-	safe: Cell_module_default.hintSafe,
-	mine: Cell_module_default.hintMine,
-	wrong: Cell_module_default.hintWrong,
-	unsure: Cell_module_default.hintUnsure
-};
-var isPressed = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, lose }) => opened || pressed && !flag && pressedX === x && pressedY === y || group && !flag && inRange(x, y, pressedX, pressedY) || lose && (!flag && mined || flag && !mined);
-var Cell = ({ x, y, pressed, pressedX, pressedY, group, opened, mined, flag, mark, num, lose, hint, onDown, onMove, onTouch, onChord }) => /* @__PURE__ */ h("button", {
-	type: "button",
-	class: [isPressed({
-		x,
-		y,
-		pressed,
-		pressedX,
-		pressedY,
-		group,
-		opened,
-		mined,
-		flag,
-		lose
-	}) ? Cell_module_default.pressed : Cell_module_default.root, hint && hintClass[hint]].filter(Boolean).join(" "),
-	tabindex: -1,
-	onmousedown: (event) => {
-		onDown({
-			event,
-			x,
-			y
-		});
-	},
-	onmouseenter: () => {
-		onMove({
-			x,
-			y
-		});
-	},
-	onmouseleave: () => {
-		onMove({
-			x: -1,
-			y: -1
-		});
-	},
-	ontouchstart: (event) => {
-		onTouch({
-			event,
-			x,
-			y
-		});
-	},
-	ondblclick: () => {
-		onChord({
-			x,
-			y
-		});
-	}
-}, /* @__PURE__ */ h("svg", {
-	class: opened && mined ? Cell_module_default.hurt : Cell_module_default.image,
-	width: "15",
-	height: "15"
-}, /* @__PURE__ */ h(Symbol, {
-	opened,
-	mined,
-	flag,
-	mark,
-	num,
-	lose
-})));
+//#region src/shell/WindowControls.jsx
+var WindowControls = ({ scale, onZoom, paused, canPause, onPause }) => [
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: paused ? "Resume (P)" : "Pause (P)",
+		disabled: !canPause,
+		onClick: () => onPause()
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: paused ? "M4 1.5v8l6-4z" : "M4 2h2v7H4zM8 2h2v7H8z" }))),
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: "Zoom out",
+		disabled: scale <= .5,
+		onClick: () => onZoom(-1)
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: "M3 5h8v2H3z" }))),
+	/* @__PURE__ */ h(Button, {
+		tabIndex: -1,
+		title: "Zoom in",
+		disabled: scale >= 4,
+		onClick: () => onZoom(1)
+	}, /* @__PURE__ */ h("svg", {
+		width: "13",
+		height: "11"
+	}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))
+];
 //#endregion
-//#region src/zoom.js
-var root$8 = document.documentElement;
+//#region src/shell/zoom.js
+var root$7 = document.documentElement;
 var steps = [
 	.5,
 	.625,
@@ -2464,7 +2356,7 @@ var loadZoom = () => {
 };
 var stepZoom = (scale, direction) => direction > 0 ? steps.find((step) => step > scale + .001) ?? steps[steps.length - 1] : steps.findLast((step) => step < scale - .001) ?? steps[0];
 var fitZoom = (chosen, fit) => fit >= chosen ? chosen : Math.min(chosen, Math.max(MIN_FIT, Math.floor(fit * 50) / 50));
-var applyZoom = (scale) => root$8.style.setProperty("--scale", scale);
+var applyZoom = (scale) => root$7.style.setProperty("--scale", scale);
 var saveZoom = (scale) => save("scale", scale);
 var gameWindow = null;
 var measureFit = (scale) => {
@@ -2492,104 +2384,6 @@ var watchWindow = (dialog, refit) => {
 	if (typeof ResizeObserver !== "undefined") new ResizeObserver(() => refit()).observe(dialog);
 	window.addEventListener("resize", () => refit());
 };
-//#endregion
-//#region src/Game.jsx
-var running = ({ start, win, lose }) => start >= 0 && !win && !lose;
-var Zoom = ({ scale, onZoom, game, onPause }) => [
-	/* @__PURE__ */ h(Button, {
-		tabIndex: -1,
-		title: game.paused ? "Resume (P)" : "Pause (P)",
-		disabled: !running(game),
-		onClick: () => onPause()
-	}, /* @__PURE__ */ h("svg", {
-		width: "13",
-		height: "11"
-	}, /* @__PURE__ */ h("path", { d: game.paused ? "M4 1.5v8l6-4z" : "M4 2h2v7H4zM8 2h2v7H8z" }))),
-	/* @__PURE__ */ h(Button, {
-		tabIndex: -1,
-		title: "Zoom out",
-		disabled: scale <= .5,
-		onClick: () => onZoom(-1)
-	}, /* @__PURE__ */ h("svg", {
-		width: "13",
-		height: "11"
-	}, /* @__PURE__ */ h("path", { d: "M3 5h8v2H3z" }))),
-	/* @__PURE__ */ h(Button, {
-		tabIndex: -1,
-		title: "Zoom in",
-		disabled: scale >= 4,
-		onClick: () => onZoom(1)
-	}, /* @__PURE__ */ h("svg", {
-		width: "13",
-		height: "11"
-	}, /* @__PURE__ */ h("path", { d: "M6 2h2v3h3v2H8v3H6V7H3V5h3z" })))
-];
-var transposed = ({ portrait, game }) => portrait && game.width > game.height;
-var rowsOf = (state) => {
-	const { field } = state.game;
-	if (!transposed(state)) return field.map((row, y) => row.map((cell, x) => ({
-		cell,
-		x,
-		y
-	})));
-	return field[0].map((_, x) => field.map((row, y) => ({
-		cell: row[x],
-		x,
-		y
-	})));
-};
-var Game = ({ key, state, actions }) => /* @__PURE__ */ h(Dialog, {
-	key,
-	title: state.theme === "classic" ? "Minesweeper" : "Minesweeper Plus",
-	titleHint: "Double-click for 100% zoom",
-	onTitleDoubleClick: () => actions.zoom(0),
-	controls: /* @__PURE__ */ h(Zoom, {
-		scale: state.zoom.scale,
-		onZoom: actions.zoom,
-		game: state.game,
-		onPause: actions.pause
-	}),
-	onCreate: (dialog) => {
-		watchWindow(dialog, actions.fit);
-		actions.fit();
-	}
-}, /* @__PURE__ */ h(Menu, {
-	state,
-	actions
-}), /* @__PURE__ */ h("div", { class: Game_module_default.root }, /* @__PURE__ */ h("div", { class: Game_module_default.scoreboard }, /* @__PURE__ */ h(Digit, { value: state.game.flags }), /* @__PURE__ */ h(Play, {
-	pressed: state.game.pressed,
-	lose: state.game.lose,
-	win: state.game.win,
-	onReset: actions.reset
-}), /* @__PURE__ */ h(Digit, { value: state.game.time })), /* @__PURE__ */ h("div", { class: state.game.lose ? Game_module_default.fieldLost : Game_module_default.field }, rowsOf(state).map((row) => /* @__PURE__ */ h("div", { class: running(state.game) && !state.game.paused ? Game_module_default.active : Game_module_default.inactive }, row.map(({ cell, x, y }) => /* @__PURE__ */ h(Cell, {
-	x,
-	y,
-	pressed: state.game.pressed,
-	pressedX: state.game.pressedX,
-	pressedY: state.game.pressedY,
-	group: state.game.group,
-	opened: cell.opened && !state.game.paused,
-	mined: cell.mined,
-	flag: cell.flag && !state.game.paused,
-	mark: cell.mark && !state.game.paused,
-	num: cell.num,
-	hint: !state.game.paused && state.hint && state.hint.marks[y * state.game.width + x],
-	lose: state.game.lose,
-	onDown: actions.down,
-	onMove: actions.move,
-	onTouch: actions.touch,
-	onChord: actions.chord
-})))), state.game.paused && /* @__PURE__ */ h("div", { class: Game_module_default.paused }, /* @__PURE__ */ h(Button, {
-	tabIndex: -1,
-	title: "Resume (P)",
-	onClick: () => actions.pause(false)
-}, /* @__PURE__ */ h("svg", {
-	width: "40",
-	height: "40"
-}, /* @__PURE__ */ h("path", { d: "M14 9v22l17-11z" }))))), state.hint && !state.game.paused && /* @__PURE__ */ h("p", {
-	class: Game_module_default.hint,
-	role: "status"
-}, state.hint.text)));
 var Winner_module_default = {
 	root: "Winner_root",
 	text: "Winner_text",
@@ -2665,78 +2459,6 @@ var BestTime_module_default = {
 	tab: "BestTime_tab",
 	tabActive: "BestTime_tabActive BestTime_tab"
 };
-//#endregion
-//#region src/BestTime.jsx
-var tabs$1 = [{
-	id: "clean",
-	name: "No hints"
-}, {
-	id: "hinted",
-	name: "Hints used"
-}];
-var BestTime = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
-	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleBestTime()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "Fastest Mine Sweepers",
-	onClose: actions.toggleBestTime
-}, /* @__PURE__ */ h("div", { class: BestTime_module_default.root }, /* @__PURE__ */ h("div", {
-	class: BestTime_module_default.tabs,
-	role: "tablist"
-}, tabs$1.map((tab) => /* @__PURE__ */ h("button", {
-	type: "button",
-	role: "tab",
-	tabindex: -1,
-	"aria-selected": state.tab === tab.id,
-	class: state.tab === tab.id ? BestTime_module_default.tabActive : BestTime_module_default.tab,
-	onclick: () => actions.setBestTimeTab(tab.id)
-}, tab.name))), /* @__PURE__ */ h("table", { class: BestTime_module_default.table }, /* @__PURE__ */ h("tbody", null, state[state.tab].map((row) => /* @__PURE__ */ h("tr", null, /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.level, ":"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.time, " seconds"), /* @__PURE__ */ h("td", { class: BestTime_module_default.cell }, row.name))))), /* @__PURE__ */ h("div", { class: BestTime_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.resetBestTime
-}, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "Reset Scores")), /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleBestTime,
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: BestTime_module_default.button }, "OK"))))));
-var CustomField_module_default = {
-	root: "CustomField_root",
-	row: "CustomField_row",
-	name: "CustomField_name",
-	value: "CustomField_value",
-	footer: "CustomField_footer",
-	button: "CustomField_button"
-};
-//#endregion
-//#region src/CustomField.jsx
-var CustomField = ({ key, state, actions }) => /* @__PURE__ */ h(Overlay, {
-	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleCustomField()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "Custom Field",
-	onClose: actions.toggleCustomField
-}, /* @__PURE__ */ h("form", {
-	class: CustomField_module_default.root,
-	autocomplete: "off",
-	onsubmit: actions.submitCustomField
-}, /* @__PURE__ */ h("div", null, /* @__PURE__ */ h("label", { class: CustomField_module_default.row }, /* @__PURE__ */ h("span", { class: CustomField_module_default.name }, "Height: "), /* @__PURE__ */ h("span", { class: CustomField_module_default.value }, /* @__PURE__ */ h(Input, {
-	value: state.height,
-	maxLength: 5,
-	inputMode: "numeric",
-	onInput: (event) => actions.changeCustomField({ height: event.target.value })
-}))), /* @__PURE__ */ h("label", { class: CustomField_module_default.row }, /* @__PURE__ */ h("span", { class: CustomField_module_default.name }, "Width: "), /* @__PURE__ */ h("span", { class: CustomField_module_default.value }, /* @__PURE__ */ h(Input, {
-	value: state.width,
-	maxLength: 5,
-	inputMode: "numeric",
-	onInput: (event) => actions.changeCustomField({ width: event.target.value })
-}))), /* @__PURE__ */ h("label", { class: CustomField_module_default.row }, /* @__PURE__ */ h("span", { class: CustomField_module_default.name }, "Mines: "), /* @__PURE__ */ h("span", { class: CustomField_module_default.value }, /* @__PURE__ */ h(Input, {
-	value: state.mines,
-	maxLength: 5,
-	inputMode: "numeric",
-	onInput: (event) => actions.changeCustomField({ mines: event.target.value })
-})))), /* @__PURE__ */ h("div", { class: CustomField_module_default.footer }, /* @__PURE__ */ h(Button, { onCreate: (el) => el.focus() }, /* @__PURE__ */ h("span", { class: CustomField_module_default.button }, "OK")), /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleCustomField
-}, /* @__PURE__ */ h("span", { class: CustomField_module_default.button }, "Cancel"))))));
 var BackgroundSettings_module_default = {
 	root: "BackgroundSettings_root",
 	row: "BackgroundSettings_row",
@@ -2752,7 +2474,7 @@ var BackgroundSettings_module_default = {
 	button: "BackgroundSettings_button"
 };
 //#endregion
-//#region src/BackgroundSettings.jsx
+//#region src/shell/BackgroundSettings.jsx
 var Control = ({ option, value, onChange }) => {
 	if (option.type === "toggle") return /* @__PURE__ */ h("input", {
 		type: "checkbox",
@@ -2808,25 +2530,6 @@ var About_module_default = {
 	footer: "About_footer",
 	button: "About_button"
 };
-//#endregion
-//#region src/About.jsx
-var Link = ({ href }, children) => /* @__PURE__ */ h("a", {
-	class: About_module_default.link,
-	href,
-	target: "_blank",
-	rel: "noopener noreferrer"
-}, children);
-var About = ({ key, actions }) => /* @__PURE__ */ h(Overlay, {
-	key,
-	onKeyDown: (event) => event.keyCode === 27 && actions.toggleAbout()
-}, /* @__PURE__ */ h(Dialog, {
-	title: "About Minesweeper Plus",
-	onClose: actions.toggleAbout
-}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, "Minesweeper Plus"), /* @__PURE__ */ h("p", null, "A Windows style minesweeper with boards that never need a guess, hints that explain their reasoning, zoom, and animated themes ported from xscreensaver."), /* @__PURE__ */ h("p", null, "Based on ", /* @__PURE__ */ h(Link, { href: "https://github.com/frenzzy/minesweeper" }, "Minesweeper"), " by Vladimir Kutepov, extended by fexofenadine."), /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/minesweeperplus" }, "github.com/fexofenadine/minesweeperplus")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
-	type: "button",
-	onClick: actions.toggleAbout,
-	onCreate: (el) => el.focus()
-}, /* @__PURE__ */ h("span", { class: About_module_default.button }, "OK"))))));
 var Boss_module_default = {
 	root: "Boss_root",
 	header: "Boss_header",
@@ -2853,7 +2556,7 @@ var Boss_module_default = {
 	label: "Boss_label"
 };
 //#endregion
-//#region src/Boss.jsx
+//#region src/shell/Boss.jsx
 var departments = [
 	"Engineering",
 	"Sales",
@@ -2976,412 +2679,15 @@ var BossButton = ({ key, actions }) => /* @__PURE__ */ h("div", {
 	onClick: () => actions.boss()
 }, /* @__PURE__ */ h("span", { class: Boss_module_default.label }, "Esc")));
 //#endregion
-//#region src/mines.js
-var neighbourCache = /* @__PURE__ */ new Map();
-var neighboursOf = (width, height) => {
-	const key = `${width}x${height}`;
-	if (!neighbourCache.has(key)) {
-		const list = [];
-		for (let i = 0; i < width * height; i++) {
-			const x = i % width;
-			const y = (i - x) / width;
-			const around = [];
-			for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
-				const nx = x + dx;
-				const ny = y + dy;
-				if ((dx || dy) && nx >= 0 && ny >= 0 && nx < width && ny < height) around.push(ny * width + nx);
-			}
-			list.push(around);
-		}
-		neighbourCache.set(key, list);
-	}
-	return neighbourCache.get(key);
-};
-var scatter = (size, mines, clear) => {
-	const free = [];
-	for (let i = 0; i < size; i++) if (!clear.has(i)) free.push(i);
-	const mined = new Uint8Array(size);
-	for (let n = 0; n < mines; n++) {
-		const j = n + Math.floor(Math.random() * (free.length - n));
-		const pick = free[j];
-		free[j] = free[n];
-		free[n] = pick;
-		mined[pick] = 1;
-	}
-	return mined;
-};
-var UNKNOWN = 0;
-var OPEN = 1;
-var FLAG = 2;
-var solvable = (mined, width, height, start) => {
-	const size = width * height;
-	const around = neighboursOf(width, height);
-	const nums = new Uint8Array(size);
-	let mines = 0;
-	for (let i = 0; i < size; i++) {
-		if (mined[i]) mines++;
-		for (const n of around[i]) nums[i] += mined[n];
-	}
-	if (mined[start]) return false;
-	const state = new Uint8Array(size);
-	let opened = 0;
-	let flagged = 0;
-	const open = (first) => {
-		const stack = [first];
-		while (stack.length) {
-			const i = stack.pop();
-			if (state[i] !== UNKNOWN) continue;
-			state[i] = OPEN;
-			opened++;
-			if (nums[i] === 0) {
-				for (const n of around[i]) if (state[n] === UNKNOWN) stack.push(n);
-			}
-		}
-	};
-	const flag = (i) => {
-		if (state[i] !== UNKNOWN) return;
-		state[i] = FLAG;
-		flagged++;
-	};
-	const frontier = (i) => {
-		const unknown = [];
-		let need = nums[i];
-		for (const n of around[i]) if (state[n] === UNKNOWN) unknown.push(n);
-		else if (state[n] === FLAG) need--;
-		return {
-			unknown,
-			need
-		};
-	};
-	open(start);
-	while (opened < size - mines) {
-		let progress = false;
-		for (let i = 0; i < size; i++) {
-			if (state[i] !== OPEN || !nums[i]) continue;
-			const { unknown, need } = frontier(i);
-			if (!unknown.length) continue;
-			if (need === 0) unknown.forEach(open);
-			else if (need === unknown.length) unknown.forEach(flag);
-			else continue;
-			progress = true;
-		}
-		if (!progress) for (let a = 0; a < size && !progress; a++) {
-			if (state[a] !== OPEN || !nums[a]) continue;
-			const A = frontier(a);
-			if (!A.unknown.length) continue;
-			const inA = new Set(A.unknown);
-			const nearby = new Set(A.unknown.flatMap((u) => around[u]));
-			for (const b of nearby) {
-				if (b === a || state[b] !== OPEN || !nums[b]) continue;
-				const B = frontier(b);
-				if (B.unknown.length <= A.unknown.length) continue;
-				if (!A.unknown.every((u) => B.unknown.includes(u))) continue;
-				const rest = B.unknown.filter((u) => !inA.has(u));
-				const extra = B.need - A.need;
-				if (extra === 0) rest.forEach(open);
-				else if (extra === rest.length) rest.forEach(flag);
-				else continue;
-				progress = true;
-				break;
-			}
-		}
-		if (!progress) {
-			const left = mines - flagged;
-			const unknown = [];
-			for (let i = 0; i < size; i++) if (state[i] === UNKNOWN) unknown.push(i);
-			if (left === 0) unknown.forEach(open);
-			else if (left === unknown.length) unknown.forEach(flag);
-			else return false;
-		}
-	}
-	return true;
-};
-var placeMines = ({ width, height, mines, x, y, safe, noGuess, budget = 1500 }) => {
-	const size = width * height;
-	const start = y * width + x;
-	const around = neighboursOf(width, height);
-	let clear = /* @__PURE__ */ new Set();
-	if (noGuess) clear = /* @__PURE__ */ new Set([start, ...around[start]]);
-	else if (safe) clear = /* @__PURE__ */ new Set([start]);
-	if (size - clear.size < mines) clear = new Set(safe || noGuess ? [start] : []);
-	if (!noGuess) return {
-		mined: scatter(size, mines, clear),
-		solvable: false
-	};
-	const deadline = Date.now() + budget;
-	let mined;
-	do {
-		mined = scatter(size, mines, clear);
-		if (solvable(mined, width, height, start)) return {
-			mined,
-			solvable: true
-		};
-	} while (Date.now() < deadline);
-	return {
-		mined,
-		solvable: false
-	};
-};
-//#endregion
-//#region src/hint.js
-var count = (n, word) => `${n} ${word}${n === 1 ? "" : "s"}`;
-var allMines = (n) => n === 1 ? "it is a mine" : "they are all mines";
-var where = (a, b, width, transposed) => {
-	const across = b % width - a % width;
-	const down = Math.floor(b / width) - Math.floor(a / width);
-	const [dx, dy] = transposed ? [down, across] : [across, down];
-	const v = dy < 0 ? "above" : dy > 0 ? "below" : "";
-	const h = dx < 0 ? "left" : dx > 0 ? "right" : "";
-	if (v && h) return `${v} and to the ${h} of it`;
-	return v ? `${v} it` : `to the ${h} of it`;
-};
-var hint = (kind, cells, sources, text, role = {
-	clear: "safe",
-	mine: "mine",
-	conflict: "wrong"
-}[kind]) => {
-	const marks = {};
-	sources.forEach((i) => marks[i] = "source");
-	cells.forEach((i) => marks[i] = role);
-	return {
-		kind,
-		cells,
-		sources,
-		marks,
-		text
-	};
-};
-var noHint = (text) => hint("none", [], [], text);
-var explainChord = ({ field, width, height }, x, y) => {
-	const i = y * width + x;
-	const { opened, num } = field[y][x];
-	if (!opened || !num) return null;
-	const hidden = [];
-	const flagged = [];
-	for (const n of neighboursOf(width, height)[i]) {
-		const c = field[Math.floor(n / width)][n % width];
-		if (c.flag) flagged.push(n);
-		else if (!c.opened) hidden.push(n);
-	}
-	const rule = "Chording needs exactly as many flags around a number as it shows.";
-	if (flagged.length > num) return hint("chord", flagged, [i], `${rule} This ${num} touches ${count(flagged.length, "flag")}, so at least one of the highlighted flags is wrong.`, "wrong");
-	if (flagged.length < num && hidden.length) {
-		const has = flagged.length ? `only ${count(flagged.length, "flag")}` : "none";
-		return hint("chord", hidden, [i], `${rule} This ${num} has ${has}, so flag ${count(num - flagged.length, "more mine")} among the highlighted cells first.`, "unsure");
-	}
-	return null;
-};
-var findHint = ({ field, width, height, minesLeft, transposed = false }) => {
-	const around = neighboursOf(width, height);
-	const cells = field.flat();
-	const numbered = [];
-	for (let i = 0; i < width * height; i++) if (cells[i].opened && cells[i].num) numbered.push(i);
-	const look = (i) => {
-		const hidden = [];
-		const flagged = [];
-		for (const n of around[i]) if (cells[n].flag) flagged.push(n);
-		else if (!cells[n].opened) hidden.push(n);
-		return {
-			hidden,
-			flagged,
-			need: cells[i].num - flagged.length
-		};
-	};
-	const seen = new Map(numbered.map((i) => [i, look(i)]));
-	for (const i of numbered) {
-		const { flagged, need } = seen.get(i);
-		if (need < 0) return hint("conflict", flagged, [i], `The highlighted ${cells[i].num} touches ${count(flagged.length, "flag")}, more than its number, so at least one of those flags is wrong.`);
-	}
-	for (const i of numbered) {
-		const { hidden, flagged, need } = seen.get(i);
-		if (!hidden.length) continue;
-		const num = cells[i].num;
-		if (need === 0) return hint("clear", hidden, [i], `The highlighted ${num} already has ${count(flagged.length, "flag")} around it, so its other hidden neighbours are safe.`);
-		if (need === hidden.length) {
-			const needs = flagged.length ? `touches ${count(flagged.length, "flag")} and needs ${count(need, "more mine")}` : `needs ${count(need, "mine")}`;
-			return hint("mine", hidden, [i], `The highlighted ${num} ${needs}, and has exactly ${count(need, "hidden neighbour")} left, so ${allMines(need)}.`);
-		}
-	}
-	for (const a of numbered) {
-		const A = seen.get(a);
-		if (!A.hidden.length) continue;
-		const nearby = new Set(A.hidden.flatMap((u) => around[u]));
-		for (const b of nearby) {
-			const B = seen.get(b);
-			if (b === a || !B || B.hidden.length <= A.hidden.length) continue;
-			if (!A.hidden.every((u) => B.hidden.includes(u))) continue;
-			const rest = B.hidden.filter((u) => !A.hidden.includes(u));
-			const extra = B.need - A.need;
-			if (extra !== 0 && extra !== rest.length) continue;
-			const shared = `Every hidden cell next to the highlighted ${cells[a].num} is also next to the ${cells[b].num} ${where(a, b, width, transposed)}. Those shared cells hold exactly ${count(A.need, "mine")}`;
-			if (extra === 0) return hint("clear", rest, [a, b], `${shared}, which is all the ${cells[b].num} needs, so its other hidden neighbours are safe.`);
-			return hint("mine", rest, [a, b], `${shared}, so the ${cells[b].num} needs ${extra} more among its ${count(rest.length, "other hidden neighbour")}, and ${allMines(rest.length)}.`);
-		}
-	}
-	const left = [];
-	cells.forEach((c, i) => !c.opened && !c.flag && left.push(i));
-	if (left.length && minesLeft === 0) return hint("clear", left, [], "The mine counter is at 0, so every hidden cell without a flag is safe.");
-	if (left.length && minesLeft === left.length) return hint("mine", left, [], `The mine counter shows ${minesLeft} and exactly ${count(left.length, "hidden cell")} without a flag ${left.length === 1 ? "is" : "are"} left, so ${allMines(left.length)}.`);
-	return noHint("Nothing on the board can be worked out for certain right now, so this needs a guess.");
-};
-//#endregion
-//#region src/app.jsx
-var levels = {
-	beginner: {
-		level: "beginner",
-		width: 9,
-		height: 9,
-		mines: 10
-	},
-	intermediate: {
-		level: "intermediate",
-		width: 16,
-		height: 16,
-		mines: 40
-	},
-	expert: {
-		level: "expert",
-		width: 30,
-		height: 16,
-		mines: 99
-	},
-	extreme: {
-		level: "extreme",
-		width: 39,
-		height: 21,
-		mines: 169
-	}
-};
-var levelNames = Object.keys(levels);
-var createGame = ({ level, width, height, mines }) => {
-	const field = new Array(height);
-	for (let y = 0; y < height; y++) {
-		field[y] = new Array(width);
-		for (let x = 0; x < width; x++) field[y][x] = {
-			opened: false,
-			mined: false,
-			flag: false,
-			mark: false,
-			num: 0
-		};
-	}
-	return {
-		level,
-		width,
-		height,
-		mines,
-		field,
-		left: width * height - mines,
-		pressed: false,
-		pressedX: -1,
-		pressedY: -1,
-		group: false,
-		flags: mines,
-		start: -1,
-		time: 0,
-		raf: null,
-		lose: false,
-		win: false,
-		touch: false,
-		hinted: false,
-		paused: false,
-		pausedAt: 0,
-		openedAt: {
-			x: -1,
-			y: -1,
-			time: 0
-		}
-	};
-};
-var openable = (game, x, y) => {
-	const cell = game.field[y][x];
-	if (cell.opened) {
-		let num = 0;
-		for (let offsetX = -1; offsetX <= 1; offsetX++) for (let offsetY = -1; offsetY <= 1; offsetY++) {
-			const dx = offsetX + x;
-			const dy = offsetY + y;
-			if (dx >= 0 && dy >= 0 && dx < game.width && dy < game.height) num += game.field[dy][dx].flag ? 1 : 0;
-		}
-		return num === cell.num;
-	}
-	return false;
-};
-var toggleFlag = (game, x, y, marks) => {
-	const cell = game.field[y][x];
-	const field = game.field.slice();
-	field[y] = field[y].slice();
-	field[y][x] = {
-		...cell,
-		flag: marks ? !cell.mark && !cell.flag : !cell.flag,
-		mark: marks && cell.flag
-	};
-	const change = cell.flag === field[y][x].flag ? 0 : field[y][x].flag ? -1 : 1;
-	return {
-		field,
-		flags: game.flags + change
-	};
-};
-var revealRange = (x, y, fn) => fn(x - 1, y - 1) + fn(x - 1, y + 1) + fn(x + 1, y - 1) + fn(x + 1, y + 1) + fn(x - 1, y) + fn(x + 1, y) + fn(x, y - 1) + fn(x, y + 1);
-var customLevel = (data, defaults) => {
-	const width = Math.max(9, Math.min(40, parseInt(data.width, 10) || defaults.width));
-	const height = Math.max(9, Math.min(30, parseInt(data.height, 10) || defaults.height));
-	const mines = parseInt(data.mines, 10) || defaults.mines;
-	return {
-		level: "custom",
-		width,
-		height,
-		mines: Math.max(10, Math.min(Math.floor(width * height * .8), mines))
-	};
-};
-var loadLevel = () => {
-	const level = load("level");
-	if (typeof level !== "string") return levels.beginner;
-	if (levels[level]) return levels[level];
-	const data = level.split(",");
-	return customLevel({
-		width: data[0],
-		height: data[1],
-		mines: data[2]
-	}, levels.beginner);
-};
+//#region src/shell/actions.js
 var loadTheme = () => {
 	const theme = load("theme");
 	return themes.some(([id]) => id === theme) ? theme : "classic";
 };
-var timeKey = (level, hinted) => hinted ? `${level}Hints` : level;
-var bestTimes = (hinted) => levelNames.map((level) => {
-	const key = timeKey(level, hinted);
-	return {
-		level,
-		name: load(`${key}Name`) || "Anonymous",
-		time: Math.min(999, parseInt(load(key), 10) || 0) || 999
-	};
-});
-var clearBestTimes = (hinted) => {
-	levelNames.forEach((level) => {
-		const key = timeKey(level, hinted);
-		remove(key);
-		remove(`${key}Name`);
-	});
-	return bestTimes(hinted);
-};
-var prevent = (event) => {
-	event.preventDefault();
-	return false;
-};
-var state = {
+var shellState = () => ({
 	menu: null,
-	hint: null,
-	game: createGame(loadLevel()),
-	marks: Boolean(load("marks")),
-	safeStart: load("safeStart") !== "off",
-	noGuess: Boolean(load("noGuess")),
 	theme: loadTheme(),
-	winner: null,
-	bestTime: null,
-	about: false,
 	boss: null,
-	customField: null,
 	backgrounds: loadSettings(),
 	backgroundSettings: null,
 	zoom: {
@@ -3390,372 +2696,34 @@ var state = {
 		seen: null
 	},
 	portrait: Boolean(window.matchMedia && matchMedia("(orientation: portrait)").matches)
+});
+var listen = (actions) => {
+	document.addEventListener("visibilitychange", () => document.hidden && actions.pause(true));
+	window.addEventListener("blur", () => actions.pause(true));
+	if (window.matchMedia) matchMedia("(orientation: portrait)").addEventListener("change", (event) => actions.setPortrait(event.matches));
 };
-var actions = {
-	init: () => (state, actions) => {
-		window.addEventListener("keydown", actions.press);
-		document.addEventListener("visibilitychange", () => document.hidden && actions.pause(true));
-		window.addEventListener("blur", () => actions.pause(true));
-		if (window.matchMedia) matchMedia("(orientation: portrait)").addEventListener("change", (event) => actions.setPortrait(event.matches));
-	},
+var shortcut = (event, state, actions) => {
+	if ([
+		"INPUT",
+		"SELECT",
+		"TEXTAREA"
+	].includes(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return null;
+	if (event.keyCode === 27) {
+		if (state.menu) actions.closeMenu();
+		else actions.boss();
+		return null;
+	}
+	return state.boss ? null : event.keyCode;
+};
+var shellActions = {
+	closeMenu: () => ({ menu: null }),
 	setPortrait: (portrait) => ({ portrait }),
-	press: (event) => (state, actions) => {
-		if ([
-			"INPUT",
-			"SELECT",
-			"TEXTAREA"
-		].includes(event.target.tagName) || event.ctrlKey || event.metaKey || event.altKey) return;
-		if (event.keyCode === 27) actions.boss();
-		else if (state.boss) {} else if (event.keyCode === 113 || event.keyCode === 78) actions.reset();
-		else if (event.keyCode === 72) actions.hint();
-		else if (event.keyCode === 80) actions.pause();
-	},
-	pause: (paused) => ({ game }, actions) => {
-		const next = paused === void 0 ? !game.paused : paused;
-		if (game.start < 0 || game.win || game.lose || next === game.paused) return null;
-		if (!next) {
-			game.raf = requestAnimationFrame(actions.tick);
-			return { game: {
-				...game,
-				paused: false,
-				start: game.start + performance.now() - game.pausedAt
-			} };
-		}
-		cancelAnimationFrame(game.raf);
-		window.removeEventListener("mouseup", actions.up);
-		return {
-			menu: null,
-			game: {
-				...game,
-				paused: true,
-				pausedAt: performance.now(),
-				pressed: false,
-				group: false,
-				pressedX: -1,
-				pressedY: -1
-			}
-		};
-	},
 	boss: () => ({ boss }, actions) => {
 		if (boss) return { boss: null };
 		actions.pause(true);
 		return {
 			menu: null,
 			boss: makeSheet()
-		};
-	},
-	reset: (payload) => ({ game }) => {
-		cancelAnimationFrame(game.raf);
-		const params = payload && levels[payload.level] || payload || game;
-		save("level", params.level === "custom" ? [
-			params.width,
-			params.height,
-			params.mines
-		].join() : params.level);
-		return {
-			menu: null,
-			hint: null,
-			game: createGame(params)
-		};
-	},
-	hint: () => (state) => {
-		const { game } = state;
-		if (game.win || game.lose || game.paused) return { menu: null };
-		if (game.start < 0) return {
-			menu: null,
-			hint: noHint("Open a cell first, then ask for a hint.")
-		};
-		const { field, width, height, flags } = game;
-		return {
-			menu: null,
-			hint: findHint({
-				field,
-				width,
-				height,
-				minesLeft: flags,
-				transposed: transposed(state)
-			}),
-			game: {
-				...game,
-				hinted: true
-			}
-		};
-	},
-	touch: ({ event, x, y }) => ({ game }, actions) => {
-		if (game.win || game.lose || game.paused) return null;
-		const rect = event.currentTarget.getBoundingClientRect();
-		const timer = setTimeout(actions.flag, 600);
-		const move = ({ touches }) => {
-			if (!touches || touches.length !== 1 || touches[0].clientX < rect.left || touches[0].clientX > rect.right || touches[0].clientY < rect.top || touches[0].clientY > rect.bottom) {
-				clearTimeout(timer);
-				actions.move({
-					x: -1,
-					y: -1
-				});
-			}
-		};
-		const stop = ({ changedTouches }) => {
-			clearTimeout(timer);
-			window.removeEventListener("scroll", move);
-			window.removeEventListener("touchmove", move);
-			window.removeEventListener("touchend", stop);
-			window.removeEventListener("touchcancel", stop);
-			move({ touches: changedTouches });
-			actions.up();
-		};
-		window.addEventListener("scroll", move);
-		window.addEventListener("touchmove", move);
-		window.addEventListener("touchend", stop);
-		window.addEventListener("touchcancel", stop);
-		return { game: {
-			...game,
-			pressed: true,
-			pressedX: x,
-			pressedY: y,
-			group: event.shiftKey || openable(game, x, y),
-			touch: true
-		} };
-	},
-	flag: () => ({ game, marks }) => {
-		const { pressedX, pressedY } = game;
-		if (game.paused || pressedX < 0 || pressedY < 0 || game.field[pressedY][pressedX].opened) return null;
-		return {
-			hint: null,
-			game: {
-				...game,
-				...toggleFlag(game, pressedX, pressedY, marks),
-				pressedX: -1,
-				pressedY: -1
-			}
-		};
-	},
-	down: ({ event, x, y }) => ({ game, marks }, actions) => {
-		if (game.touch || event.button > 2 || game.win || game.lose || game.paused) return null;
-		window.addEventListener("mouseup", actions.up);
-		const { field, flags } = !game.pressed && event.button === 2 && !game.field[y][x].opened ? toggleFlag(game, x, y, marks) : game;
-		return {
-			...field !== game.field && { hint: null },
-			game: {
-				...game,
-				field,
-				pressed: event.button !== 2,
-				pressedX: x,
-				pressedY: y,
-				group: event.shiftKey || event.buttons > 2,
-				flags
-			}
-		};
-	},
-	chord: ({ x, y }) => ({ game }, actions) => {
-		if (game.win || game.lose || game.paused) return null;
-		if (!openable(game, x, y)) {
-			const { openedAt } = game;
-			return openedAt.x === x && openedAt.y === y && performance.now() - openedAt.time < 500 ? null : { hint: explainChord(game, x, y) };
-		}
-		actions.aim({
-			x,
-			y
-		});
-		actions.up();
-		return null;
-	},
-	aim: ({ x, y }) => ({ game }) => ({ game: {
-		...game,
-		pressed: false,
-		pressedX: x,
-		pressedY: y,
-		group: true
-	} }),
-	move: ({ x, y }) => ({ game }) => {
-		if (x === game.pressedX && y === game.pressedY) return null;
-		return { game: {
-			...game,
-			pressedX: x,
-			pressedY: y
-		} };
-	},
-	up: () => ({ game, safeStart, noGuess }, actions) => {
-		window.removeEventListener("mouseup", actions.up);
-		const { width, height, pressedX, pressedY } = game;
-		if (game.win || game.lose || game.paused || pressedX < 0 || pressedY < 0) {
-			if (!game.pressed && !game.group) return null;
-			return { game: {
-				...game,
-				pressed: false,
-				group: false
-			} };
-		}
-		const field = game.field.map((row) => row.map((c) => ({ ...c })));
-		const outBounds = (x, y) => x < 0 || y < 0 || x >= width || y >= height;
-		const calcNear = (x, y, fn) => {
-			let num = 0;
-			for (let offsetX = -1; offsetX <= 1; offsetX++) for (let offsetY = -1; offsetY <= 1; offsetY++) if (!outBounds(offsetX + x, offsetY + y)) num += fn(field[offsetY + y][offsetX + x]) ? 1 : 0;
-			return num;
-		};
-		let { left, lose } = game;
-		const reveal = (x, y) => {
-			if (outBounds(x, y)) return 0;
-			const c = field[y][x];
-			if (c.opened || c.flag) return 0;
-			c.opened = true;
-			c.num = calcNear(x, y, (i) => i.mined);
-			if (c.mined) lose = true;
-			if (c.num) return 1;
-			return revealRange(x, y, reveal) + 1;
-		};
-		const begin = game.start < 0 && game.pressed && !game.group && !field[pressedY][pressedX].flag;
-		if (begin) {
-			const { mined } = placeMines({
-				width,
-				height,
-				mines: game.mines,
-				x: pressedX,
-				y: pressedY,
-				safe: safeStart,
-				noGuess
-			});
-			field.forEach((row, y) => row.forEach((c, x) => c.mined = mined[y * width + x] === 1));
-			game.raf = requestAnimationFrame(actions.tick);
-		}
-		const cell = field[pressedY][pressedX];
-		const wasOpened = cell.opened;
-		let chordHint = null;
-		if (game.group) {
-			if (cell.opened) {
-				if (calcNear(pressedX, pressedY, (c) => c.flag) === cell.num) left -= revealRange(pressedX, pressedY, reveal);
-				else chordHint = explainChord({
-					field,
-					width,
-					height
-				}, pressedX, pressedY);
-			}
-		} else if (game.pressed) {
-			if (game.touch && wasOpened) chordHint = explainChord({
-				field,
-				width,
-				height
-			}, pressedX, pressedY);
-			left -= reveal(pressedX, pressedY);
-		}
-		const win = left <= 0;
-		if (win || lose) {
-			cancelAnimationFrame(game.raf);
-			if (!lose) actions.win();
-		}
-		const changed = left !== game.left || lose || begin;
-		return {
-			...(chordHint || changed) && { hint: chordHint },
-			game: {
-				...game,
-				left,
-				field,
-				openedAt: !wasOpened && cell.opened ? {
-					x: pressedX,
-					y: pressedY,
-					time: performance.now()
-				} : game.openedAt,
-				pressed: false,
-				group: false,
-				start: begin ? performance.now() : game.start,
-				time: begin ? 1 : game.time,
-				lose,
-				win,
-				touch: false
-			}
-		};
-	},
-	tick: (now) => ({ game }, actions) => {
-		game.raf = requestAnimationFrame(actions.tick);
-		const next = Math.floor((now - game.start) / 1e3) + 1;
-		if (game.time === next) return null;
-		return { game: {
-			...game,
-			time: next
-		} };
-	},
-	win: () => ({ game }) => {
-		if (game.level === "custom") return null;
-		const time = parseInt(load(timeKey(game.level, game.hinted)), 10);
-		if (time && time <= game.time) return null;
-		return { winner: {
-			name: "Anonymous",
-			time: game.time,
-			level: game.level,
-			hinted: game.hinted
-		} };
-	},
-	changeWinner: (payload) => ({ winner }) => ({ winner: {
-		...winner,
-		...payload
-	} }),
-	submitBestTime: (event) => ({ winner }, actions) => {
-		event.preventDefault();
-		const key = timeKey(winner.level, winner.hinted);
-		save(key, winner.time);
-		save(`${key}Name`, winner.name.trim());
-		actions.toggleBestTime();
-		actions.setBestTimeTab(winner.hinted ? "hinted" : "clean");
-		return { winner: null };
-	},
-	toggleAbout: () => ({ about }) => ({
-		menu: null,
-		about: !about
-	}),
-	toggleBestTime: () => ({ bestTime }) => ({
-		menu: null,
-		bestTime: bestTime ? null : {
-			tab: "clean",
-			clean: bestTimes(false),
-			hinted: bestTimes(true)
-		}
-	}),
-	setBestTimeTab: (tab) => (state) => state.bestTime ? { bestTime: {
-		...state.bestTime,
-		tab
-	} } : null,
-	resetBestTime: () => ({ bestTime }) => ({ bestTime: {
-		...bestTime,
-		[bestTime.tab]: clearBestTimes(bestTime.tab === "hinted")
-	} }),
-	toggleCustomField: () => ({ game, customField }) => ({
-		menu: null,
-		customField: customField ? null : {
-			width: String(game.width),
-			height: String(game.height),
-			mines: String(game.mines)
-		}
-	}),
-	changeCustomField: (payload) => ({ customField }) => ({ customField: {
-		...customField,
-		...payload
-	} }),
-	submitCustomField: (event) => ({ game, customField }, actions) => {
-		event.preventDefault();
-		actions.reset(customLevel(customField, game));
-		return { customField: null };
-	},
-	toggleSafeStart: () => (state) => {
-		const safeStart = !state.safeStart;
-		save("safeStart", safeStart ? "" : "off");
-		return {
-			menu: null,
-			safeStart
-		};
-	},
-	toggleNoGuess: () => (state) => {
-		const noGuess = !state.noGuess;
-		save("noGuess", noGuess ? "yes" : "");
-		return {
-			menu: null,
-			noGuess
-		};
-	},
-	toggleMarks: () => (state) => {
-		const marks = !state.marks;
-		save("marks", marks ? "yes" : "");
-		return {
-			menu: null,
-			marks
 		};
 	},
 	toggleBackgroundSettings: () => ({ theme, backgrounds, backgroundSettings }) => {
@@ -3835,44 +2803,10 @@ var actions = {
 		return null;
 	}
 };
-var view = (state, actions) => /* @__PURE__ */ h("main", {
-	oncontextmenu: prevent,
-	ondragstart: prevent,
-	oncreate: actions.init
-}, state.game && /* @__PURE__ */ h(Game, {
-	key: "a",
-	state,
-	actions
-}), /* @__PURE__ */ h(BossButton, {
-	key: "h",
-	actions
-}), state.winner && /* @__PURE__ */ h(Winner, {
-	key: "b",
-	state: state.winner,
-	actions
-}), state.bestTime && /* @__PURE__ */ h(BestTime, {
-	key: "c",
-	state: state.bestTime,
-	actions
-}), state.customField && /* @__PURE__ */ h(CustomField, {
-	key: "d",
-	state: state.customField,
-	actions
-}), state.backgroundSettings && /* @__PURE__ */ h(BackgroundSettings, {
-	key: "e",
-	state: state.backgroundSettings,
-	actions
-}), state.about && /* @__PURE__ */ h(About, {
-	key: "f",
-	actions
-}), state.boss && /* @__PURE__ */ h(Boss, {
-	key: "g",
-	state: state.boss,
-	actions
-}));
 //#endregion
-//#region src/index.js
-app(state, actions, view, document.getElementById("app"));
-startBackgrounds();
-if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("service-worker.js").catch(() => {});
+//#region src/shell/worker.js
+var registerWorker = () => {
+	if ("serviceWorker" in navigator && true) navigator.serviceWorker.register("../service-worker.js", { scope: "./" }).catch(() => {});
+};
 //#endregion
+export { Menu_module_default as A, startBackgrounds as C, load as D, glyphImage as E, Button as M, app as N, remove as O, h as P, ThemeMenu as S, GLYPH as T, Digit as _, shortcut as a, Separator as b, About_module_default as c, Winner as d, Input as f, Play as g, WindowControls as h, shellState as i, Dialog as j, save as k, BackgroundSettings as l, watchWindow as m, listen as n, Boss as o, Overlay as p, shellActions as r, BossButton as s, registerWorker as t, BestTime_module_default as u, Menu as v, BRIGHT as w, SubMenuItem as x, MenuItem as y };
