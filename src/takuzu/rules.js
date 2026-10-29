@@ -48,7 +48,7 @@ export const full = (board) => !board.includes(EMPTY)
 
 export const lineName = (line, n) => (line < n ? `row ${line + 1}` : `column ${line - n + 1}`)
 
-const capital = (text) => text[0].toUpperCase() + text.slice(1)
+export const capital = (text) => text[0].toUpperCase() + text.slice(1)
 
 //each broken rule with its cells and a sentence: three alike in a row, too many of one value,
 //or a full line repeated

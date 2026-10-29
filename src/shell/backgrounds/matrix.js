@@ -131,8 +131,6 @@ const buildAtlas = (glyphs, cell) => {
   return atlas
 }
 
-export const rainGlyphs = encodings.matrix
-
 //a single rain glyph as an image url, for other pages to draw with, null without canvas
 export const glyphImage = (glyph, cell, colour = GLYPH) => {
   const canvas = document.createElement('canvas')

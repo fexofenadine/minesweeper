@@ -4,6 +4,7 @@ import s from './BestTimes.module.css'
 import Overlay from '../Overlay'
 import Dialog from '../Dialog'
 import Button from '../Button'
+import Tabs from '../shell/Tabs'
 import { sizes } from './rules'
 import { allowed, levelNames } from './Menu'
 
@@ -17,20 +18,7 @@ const BestTimes = ({ key, state, actions }) => (
   <Overlay key={key} onKeyDown={(event) => event.keyCode === 27 && actions.toggleBestTime()}>
     <Dialog title="Fastest Takuzu Solvers" onClose={actions.toggleBestTime}>
       <div class={b.root}>
-        <div class={b.tabs} role="tablist">
-          {tabs.map((tab) => (
-            <button
-              type="button"
-              role="tab"
-              tabindex={-1}
-              aria-selected={state.tab === tab.id}
-              class={state.tab === tab.id ? b.tabActive : b.tab}
-              onclick={() => actions.setBestTimeTab(tab.id)}
-            >
-              {tab.name}
-            </button>
-          ))}
-        </div>
+        <Tabs tabs={tabs} active={state.tab} onSelect={actions.setBestTimeTab} />
         <table class={s.table}>
           <thead>
             <tr>

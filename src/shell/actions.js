@@ -33,11 +33,13 @@ export const listen = (actions) => {
   }
 }
 
+//keys typed into a dialog's fields are not shortcuts
+export const typing = (event) => ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
+
 //the key code a game should act on, or null once the shell has handled it
 export const shortcut = (event, state, actions) => {
   //leave typing in a dialog and browser shortcuts alone
-  const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
-  if (typing || event.ctrlKey || event.metaKey || event.altKey) return null
+  if (typing(event) || event.ctrlKey || event.metaKey || event.altKey) return null
   if (event.keyCode === 27) {
     //an open menu closes first, as in windows
     if (state.menu) actions.closeMenu()

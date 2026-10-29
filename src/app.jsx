@@ -1,6 +1,6 @@
 import { h } from 'hyperapp'
 import './app.css'
-import Game, { transposed } from './Game'
+import Game, { running, transposed } from './Game'
 import Winner from './Winner'
 import BestTime from './BestTime'
 import CustomField from './CustomField'
@@ -11,6 +11,7 @@ import { placeMines } from './mines'
 import { explainChord, findHint, noHint } from './hint'
 import { load, save, remove } from './shell/storage'
 import { listen, shellActions, shellState, shortcut } from './shell/actions'
+import { pauseAction } from './shell/clock'
 
 const levels = {
   beginner: {
@@ -199,33 +200,11 @@ export const actions = {
       actions.pause()
     }
   },
-  //stop the clock and hide the board, only while a game is running
-  pause:
-    (paused) =>
-    ({ game }, actions) => {
-      const next = paused === undefined ? !game.paused : paused
-      if (game.start < 0 || game.win || game.lose || next === game.paused) return null
-      if (!next) {
-        game.raf = requestAnimationFrame(actions.tick)
-        return {
-          game: { ...game, paused: false, start: game.start + performance.now() - game.pausedAt },
-        }
-      }
-      cancelAnimationFrame(game.raf)
-      window.removeEventListener('mouseup', actions.up)
-      return {
-        menu: null,
-        game: {
-          ...game,
-          paused: true,
-          pausedAt: performance.now(),
-          pressed: false,
-          group: false,
-          pressedX: -1,
-          pressedY: -1,
-        },
-      }
-    },
+  //a half done click is dropped when the game pauses
+  pause: pauseAction(running, (game, actions) => {
+    window.removeEventListener('mouseup', actions.up)
+    return { pressed: false, group: false, pressedX: -1, pressedY: -1 }
+  }),
   reset:
     (payload) =>
     ({ game }) => {

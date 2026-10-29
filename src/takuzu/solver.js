@@ -52,7 +52,9 @@ export const propagate = (board, n, candidates) => {
 }
 
 //tries each candidate of the line with the fewest, so a branch fills a whole line
-const search = (board, n, candidates, limit, order, found) => {
+//budget.left counts down the searches allowed, running out gives up
+const search = (board, n, candidates, limit, order, found, budget) => {
+  if (--budget.left < 0) return 0
   const narrowed = propagate(board, n, candidates)
   if (!narrowed) return 0
   let pick = -1
@@ -71,7 +73,7 @@ const search = (board, n, candidates, limit, order, found) => {
     cells.forEach((i, k) => (copy[i] = (mask >> k) & 1))
     const branch = narrowed.slice()
     branch[pick] = [mask]
-    total += search(copy, n, branch, limit - total, order, found)
+    total += search(copy, n, branch, limit - total, order, found, budget)
     if (total >= limit) break
   }
   return total
@@ -81,11 +83,12 @@ const asIs = (list) => list
 
 //how many solutions, counting no further than limit
 export const countSolutions = (board, n, limit = 2) =>
-  search(board.slice(), n, startCandidates(n), limit, asIs, [])
+  search(board.slice(), n, startCandidates(n), limit, asIs, [], { left: Infinity })
 
 //the first solution found, or null; shuffle orders the branches for random boards
-export const solve = (board, n, shuffle = asIs) => {
+//and tries caps the searches, giving up with null so a random search can start over
+export const solve = (board, n, shuffle = asIs, tries = Infinity) => {
   const found = []
-  search(board.slice(), n, startCandidates(n), 1, shuffle, found)
+  search(board.slice(), n, startCandidates(n), 1, shuffle, found, { left: tries })
   return found[0] ?? null
 }

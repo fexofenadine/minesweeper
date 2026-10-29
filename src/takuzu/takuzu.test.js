@@ -251,3 +251,15 @@ it('turns a line two cells short of a full one the other way round', () => {
   expect(step.level).toBe(2)
   expect(step.text).toMatch(/Row 2 matches row 1 except for these two cells/)
 })
+
+it('never gets stuck building a random board', () => {
+  //these seeds once sent the random search into dead ends lasting over a second and over a minute
+  for (const [n, seed] of [
+    [12, 707],
+    [14, 387],
+  ]) {
+    const started = performance.now()
+    expect(solved(makeSolution(n, random(seed)), n)).toBe(true)
+    expect(performance.now() - started).toBeLessThan(500)
+  }
+})

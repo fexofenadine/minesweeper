@@ -5,12 +5,12 @@ import Menu from './Menu'
 import Digit from './Digit'
 import Play from './Play'
 import Cell from './Cell'
-import Button from './Button'
 import SideButton, { HintIcon } from './shell/SideButton'
 import WindowControls from './shell/WindowControls'
-import { hangBelow, watchWindow } from './shell/zoom'
+import { PausedCover, HintPanel } from './shell/Board'
+import { watchWindow } from './shell/zoom'
 
-const running = ({ start, win, lose }) => start >= 0 && !win && !lose
+export const running = ({ start, win, lose }) => start >= 0 && !win && !lose
 
 //wide boards on portrait screens are shown transposed, cells keep their own x and y
 export const transposed = ({ portrait, game }) => portrait && game.width > game.height
@@ -99,21 +99,9 @@ const Game = ({ key, state, actions }) => (
             ))}
           </div>
         ))}
-        {state.game.paused && (
-          <div class={s.paused}>
-            <Button tabIndex={-1} title="Resume (P)" onClick={() => actions.pause(false)}>
-              <svg width="40" height="40">
-                <path d="M14 9v22l17-11z" />
-              </svg>
-            </Button>
-          </div>
-        )}
+        {state.game.paused && <PausedCover onResume={() => actions.pause(false)} />}
       </div>
-      {state.hint && !state.game.paused && (
-        <p class={s.hint} role="status" {...hangBelow}>
-          {state.hint.text}
-        </p>
-      )}
+      {state.hint && !state.game.paused && <HintPanel text={state.hint.text} />}
     </div>
   </Dialog>
 )

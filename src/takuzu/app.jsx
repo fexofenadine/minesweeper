@@ -4,7 +4,8 @@ import Winner from '../Winner'
 import BackgroundSettings from '../shell/BackgroundSettings'
 import Boss, { BossButton } from '../shell/Boss'
 import { load, remove, save } from '../shell/storage'
-import { listen, shellActions, shellState, shortcut } from '../shell/actions'
+import { listen, shellActions, shellState, shortcut, typing } from '../shell/actions'
+import { pauseAction } from '../shell/clock'
 import Game, { running } from './Game'
 import BestTimes from './BestTimes'
 import Prompt from './Prompt'
@@ -143,9 +144,8 @@ export const actions = {
   },
   press: (event) => (state, actions) => {
     //undo is the one shortcut with a modifier
-    const typing = ['INPUT', 'SELECT', 'TEXTAREA'].includes(event.target.tagName)
     if ((event.ctrlKey || event.metaKey) && !event.altKey && event.keyCode === 90) {
-      if (typing || state.boss) return
+      if (typing(event) || state.boss) return
       event.preventDefault()
       actions.undo()
       return
@@ -244,21 +244,7 @@ export const actions = {
   toggleAbout:
     () =>
     ({ about }) => ({ menu: null, about: !about }),
-  //stop the clock and hide the board, only while a game is running
-  pause:
-    (paused) =>
-    ({ game }, actions) => {
-      const next = paused === undefined ? !game.paused : paused
-      if (!running(game) || next === game.paused) return null
-      if (!next) {
-        game.raf = requestAnimationFrame(actions.tick)
-        return {
-          game: { ...game, paused: false, start: game.start + performance.now() - game.pausedAt },
-        }
-      }
-      cancelAnimationFrame(game.raf)
-      return { menu: null, game: { ...game, paused: true, pausedAt: performance.now() } }
-    },
+  pause: pauseAction(running),
   tick:
     (now) =>
     ({ game }, actions) => {

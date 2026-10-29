@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import { basename } from 'node:path'
 import { defineConfig } from 'vite'
 
@@ -17,6 +18,19 @@ const versionAssets = () => ({
           .slice(0, 8)
         return `${path}${file}?v=${hash}"`
       }),
+  },
+})
+
+//both games share one pre-paint script, inlined so it runs before the page draws
+const prepaint = () => ({
+  name: 'prepaint',
+  transformIndexHtml: {
+    order: 'pre',
+    handler: (html) =>
+      html.replace(
+        '<!--prepaint-->',
+        `<script>${readFileSync('src/shell/prepaint.js', 'utf8')}</script>`,
+      ),
   },
 })
 
@@ -49,7 +63,7 @@ export default defineConfig({
       },
     },
   },
-  plugins: [versionAssets()],
+  plugins: [prepaint(), versionAssets()],
   test: {
     environment: 'jsdom',
   },

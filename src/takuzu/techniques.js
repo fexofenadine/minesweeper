@@ -1,4 +1,13 @@
-import { EMPTY, cellsOf, full, lineName as nameOf, linesOf, readLine, violations } from './rules'
+import {
+  EMPTY,
+  capital,
+  cellsOf,
+  full,
+  lineName as nameOf,
+  linesOf,
+  readLine,
+  violations,
+} from './rules'
 import { propagate, startCandidates } from './solver'
 
 //the reasoning a person uses, easiest first, behind hints, difficulty and generation
@@ -6,7 +15,6 @@ import { propagate, startCandidates } from './solver'
 
 export const levels = ['easy', 'medium', 'tricky', 'hard', 'expert']
 
-const capital = (text) => text[0].toUpperCase() + text.slice(1)
 const words = ['no', 'one', 'two', 'three', 'four', 'five', 'six', 'seven']
 const many = (count, v) => `${words[count]} ${v}${count === 1 ? '' : 's'}`
 

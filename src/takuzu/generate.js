@@ -24,7 +24,13 @@ export const shuffled = (list, rng) => {
 }
 
 //a random full board that keeps every rule
-export const makeSolution = (n, rng) => solve(emptyBoard(n), n, (list) => shuffled(list, rng))
+//now and then a random search walks into a dead end that takes minutes, so it starts over instead
+export const makeSolution = (n, rng) => {
+  for (;;) {
+    const board = solve(emptyBoard(n), n, (list) => shuffled(list, rng), 4 * n)
+    if (board) return board
+  }
+}
 
 //takes clues away in random order while the board keeps exactly one solution
 //keep says whether a board is still acceptable, difficulty rating plugs in here later

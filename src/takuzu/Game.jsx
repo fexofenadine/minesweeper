@@ -1,12 +1,13 @@
 import { h } from 'hyperapp'
+import g from '../Game.module.css'
 import s from './Game.module.css'
 import Dialog from '../Dialog'
 import Digit from '../Digit'
 import Play from '../Play'
-import Button from '../Button'
 import SideButton, { HintIcon, UndoIcon } from '../shell/SideButton'
 import WindowControls from '../shell/WindowControls'
-import { hangBelow, watchWindow } from '../shell/zoom'
+import { PausedCover, HintPanel } from '../shell/Board'
+import { watchWindow } from '../shell/zoom'
 import Menu from './Menu'
 import Cell from './Cell'
 import { EMPTY, violations } from './rules'
@@ -40,10 +41,10 @@ const Game = ({ key, state, actions }) => {
       }}
     >
       <Menu state={state} actions={actions} />
-      <div class={s.root}>
-        <div class={s.scoreboard}>
+      <div class={g.root}>
+        <div class={g.scoreboard}>
           <Digit value={game.dealing ? 0 : left} />
-          <div class={s.buttons}>
+          <div class={g.buttons}>
             <SideButton
               title="Undo (Ctrl+Z)"
               disabled={!game.history.length || game.win || paused}
@@ -73,21 +74,9 @@ const Game = ({ key, state, actions }) => {
               onPress={actions.play}
             />
           ))}
-          {paused && (
-            <div class={s.paused}>
-              <Button tabIndex={-1} title="Resume (P)" onClick={() => actions.pause(false)}>
-                <svg width="40" height="40">
-                  <path d="M14 9v22l17-11z" />
-                </svg>
-              </Button>
-            </div>
-          )}
+          {paused && <PausedCover onResume={() => actions.pause(false)} />}
         </div>
-        {hint && !paused && (
-          <p class={s.hint} role="status" {...hangBelow}>
-            {hint.text}
-          </p>
-        )}
+        {hint && !paused && <HintPanel text={hint.text} />}
       </div>
     </Dialog>
   )
