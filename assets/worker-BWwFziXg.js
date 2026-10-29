@@ -1367,7 +1367,7 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-CXGq3ded.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Dikzn-tm.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CdZRjkO5.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/hint.js": () => __vitePreload(() => import("./hint-CMuoerwS.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/index.js": () => __vitePreload(() => import("./takuzu-AO7c84x8.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-Dc-4LR4I.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-OtVkdrpA.js").then((m) => m["default"]), [], import.meta.url),

@@ -1,4 +1,4 @@
-import { A as SubMenuItem, B as Dialog, C as SideButton, E as Digit, F as glyphImage, H as Game_module_default$1, I as load, L as remove, M as startBackgrounds, N as BRIGHT, O as MenuItem, P as GLYPH, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, h as Winner, i as shellActions, j as ThemeMenu, k as Separator, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, s as typing, t as registerWorker, u as About, v as HintPanel, w as UndoIcon, x as WindowControls, y as PausedCover, z as Menu_module_default } from "./worker-D-X_Ba-8.js";
+import { A as SubMenuItem, B as Dialog, C as SideButton, E as Digit, F as glyphImage, H as Game_module_default$1, I as load, L as remove, M as startBackgrounds, N as BRIGHT, O as MenuItem, P as GLYPH, R as save, S as HintIcon, T as Play, U as app, V as Button, W as h, _ as Overlay, a as shellState, b as watchWindow, c as Boss, d as Link, f as BackgroundSettings, h as Winner, i as shellActions, j as ThemeMenu, k as Separator, l as BossButton, m as BestTime_module_default, n as pauseAction, o as shortcut, p as Tabs, r as listen, s as typing, t as registerWorker, u as About, v as HintPanel, w as UndoIcon, x as WindowControls, y as PausedCover, z as Menu_module_default } from "./worker-BWwFziXg.js";
 var Game_module_default = {
 	field: "Game_field",
 	active: "Game_active Game_field",
@@ -614,10 +614,12 @@ var findHint = ({ board, solution, n }) => {
 	const broken = breaks(board, n);
 	if (broken.length) {
 		const { cells, text } = broken[0];
+		const bad = cells.filter((i) => board[i] !== solution[i]);
+		const fix = bad.length ? bad : cells;
 		return {
 			kind: "break",
-			text: `${text} Change one of the highlighted cells.`,
-			marks: marked(cells.map((i) => [i, "wrong"]))
+			text: `${text} ${fix.length > 1 ? "The cells outlined in red are the ones" : "The cell outlined in red is the one"} to change.`,
+			marks: marked(cells.map((i) => [i, fix.includes(i) ? "wrong" : "source"]))
 		};
 	}
 	const wrong = [...board.keys()].find((i) => board[i] !== -1 && board[i] !== solution[i]);
