@@ -1,4 +1,4 @@
-import { D as startBackgrounds, F as Dialog, I as Button, L as app, M as remove, N as save, R as h, S as Menu, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, f as Input, g as WindowControls, h as watchWindow, i as shellState, j as load, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, x as Digit } from "./worker-DWyEL2Vc.js";
+import { D as startBackgrounds, F as Dialog, I as Button, L as app, M as remove, N as save, R as h, S as Menu, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, f as Input, g as WindowControls, h as watchWindow, i as shellState, j as load, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, x as Digit } from "./worker-COk6R1rk.js";
 var Game_module_default = {
 	root: "Game_root",
 	scoreboard: "Game_scoreboard",

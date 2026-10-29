@@ -1,4 +1,4 @@
-import { A as glyphImage, C as MenuItem, D as startBackgrounds, E as ThemeMenu, F as Dialog, I as Button, L as app, M as remove, N as save, O as BRIGHT, P as Menu_module_default, R as h, T as SubMenuItem, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, g as WindowControls, h as watchWindow, i as shellState, j as load, k as GLYPH, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, w as Separator, x as Digit, y as UndoIcon } from "./worker-DWyEL2Vc.js";
+import { A as glyphImage, C as MenuItem, D as startBackgrounds, E as ThemeMenu, F as Dialog, I as Button, L as app, M as remove, N as save, O as BRIGHT, P as Menu_module_default, R as h, T as SubMenuItem, _ as HintIcon, a as shortcut, b as Play, c as About_module_default, d as Winner, g as WindowControls, h as watchWindow, i as shellState, j as load, k as GLYPH, l as BackgroundSettings, m as hangBelow, n as listen, o as Boss, p as Overlay, r as shellActions, s as BossButton, t as registerWorker, u as BestTime_module_default, v as SideButton, w as Separator, x as Digit, y as UndoIcon } from "./worker-COk6R1rk.js";
 var Game_module_default = {
 	root: "Game_root",
 	scoreboard: "Game_scoreboard",
@@ -168,6 +168,7 @@ var solve = (board, n, shuffle = asIs) => {
 var levels = [
 	"easy",
 	"medium",
+	"tricky",
 	"hard",
 	"expert"
 ];
@@ -235,6 +236,48 @@ var counts = (board, n) => {
 	});
 	return steps;
 };
+var oneLeft = (board, n) => {
+	const steps = [];
+	cellsOf(n).forEach((cells, line) => {
+		const empty = cells.filter((i) => board[i] === -1);
+		if (empty.length < 2) return;
+		for (const v of [0, 1]) {
+			if (n / 2 - cells.filter((i) => board[i] === v).length !== 1) continue;
+			const blocked = empty.filter((spot) => {
+				const trial = cells.map((i) => i === spot ? v : board[i] === -1 ? 1 - v : board[i]);
+				return trial.some((x, k) => k >= 2 && x === trial[k - 1] && x === trial[k - 2]);
+			});
+			if (!blocked.length) continue;
+			if (blocked.length === empty.length) {
+				steps.push({ contradiction: true });
+				return;
+			}
+			const place = blocked.map((i) => [i, 1 - v]);
+			steps.push(step("one-left", 2, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} needs just one more ${v}, and in ${place.length > 1 ? "any of these cells" : "this cell"} it would leave three alike in a row, so ${result(place)}.`));
+		}
+	});
+	return steps;
+};
+var twins = (board, n) => {
+	const steps = [];
+	const lines = cellsOf(n);
+	const all = (1 << n) - 1;
+	lines.forEach((cells, line) => {
+		const empty = cells.filter((i) => board[i] === -1);
+		if (empty.length !== 2) return;
+		const { known, value } = readLine(board, cells);
+		const twin = lines.findIndex((other, l) => {
+			if (l === line || l < n !== line < n) return false;
+			const done = readLine(board, other);
+			return done.known === all && (done.value & known) === value;
+		});
+		if (twin < 0) return;
+		const place = empty.map((i) => [i, 1 - board[lines[twin][cells.indexOf(i)]]]);
+		if (place[0][1] === place[1][1]) return;
+		steps.push(step("twins", 2, place, [...cells, ...lines[twin]].filter((i) => board[i] !== -1), `${capital(lineName(line, n))} matches ${lineName(twin, n)} except for these two cells, and no two ${line < n ? "rows" : "columns"} may match, so they go the other way round.`));
+	});
+	return steps;
+};
 var fitsOf = (board, cells, n, repeats) => {
 	const { known, value } = readLine(board, cells);
 	return linesOf(n).filter((mask) => (mask & known) === value && !repeats?.has(mask));
@@ -273,7 +316,7 @@ var balance = (board, n) => {
 		if (!place.length) return;
 		const zeros = n / 2 - cells.filter((i) => board[i] === 0).length;
 		const ones = n / 2 - cells.filter((i) => board[i] === 1).length;
-		steps.push(step("balance", 2, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} still needs ${many(zeros, 0)} and ${many(ones, 1)}. Every way to fit them in without three alike in a row agrees here, so ${result(place)}.`));
+		steps.push(step("balance", 3, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} still needs ${many(zeros, 0)} and ${many(ones, 1)}. Every way to fit them in without three alike in a row agrees here, so ${result(place)}.`));
 	});
 	return steps;
 };
@@ -295,7 +338,7 @@ var repeats = (board, n) => {
 		if (!place.length) return;
 		const twins = blocked.map((mask) => others.get(mask));
 		const lines = cellsOf(n);
-		steps.push(step("repeat", 2, place, [cells, ...twins.map((l) => lines[l])].flat().filter((i) => board[i] !== -1), `${capital(lineName(line, n))} could otherwise end up the same as ${twins.map((l) => lineName(l, n)).join(" or ")}, and no two ${line < n ? "rows" : "columns"} may match, so ${result(place)}.`));
+		steps.push(step("repeat", 3, place, [cells, ...twins.map((l) => lines[l])].flat().filter((i) => board[i] !== -1), `${capital(lineName(line, n))} could otherwise end up the same as ${twins.map((l) => lineName(l, n)).join(" or ")}, and no two ${line < n ? "rows" : "columns"} may match, so ${result(place)}.`));
 	});
 	return steps;
 };
@@ -307,17 +350,18 @@ var whatIf = (board, n) => {
 		const trial = board.slice();
 		trial[i] = v;
 		if (propagate(trial, n, base)) continue;
-		return [step("what-if", 3, [[i, 1 - v]], [i], `If this cell were a ${v}, the simpler rules would soon break a rule somewhere, so it must be a ${1 - v}.`)];
+		return [step("what-if", 4, [[i, 1 - v]], [i], `If this cell were a ${v}, the simpler rules would soon break a rule somewhere, so it must be a ${1 - v}.`)];
 	}
 	return [];
 };
 var techniques = [
 	[pairs, gaps],
 	[counts],
+	[oneLeft, twins],
 	[balance, repeats],
 	[whatIf]
 ];
-var nextSteps = (board, n, top = 3) => {
+var nextSteps = (board, n, top = levels.length - 1) => {
 	for (let level = 0; level <= top; level++) for (const technique of techniques[level]) {
 		const steps = technique(board, n);
 		if (steps.some((s) => s.contradiction)) return {
@@ -338,7 +382,7 @@ var apply = (board, n, steps) => {
 	}
 	return violations(board, n).size === 0;
 };
-var rate = (givens, n, top = 3) => {
+var rate = (givens, n, top = levels.length - 1) => {
 	const board = givens.slice();
 	let hardest = 0;
 	while (!full(board)) {
@@ -357,10 +401,12 @@ var rate = (givens, n, top = 3) => {
 var levelNames = [
 	"Easy",
 	"Medium",
+	"Tricky",
 	"Hard",
 	"Expert"
 ];
-var allowed = (n, level) => !(n === 6 && level === 3);
+var allowed = (n, level) => !(n === 6 && level === levelNames.length - 1);
+var fallback = (n, level) => allowed(n, level) ? level : fallback(n, level - 1);
 var Menu = ({ state, actions }) => /* @__PURE__ */ h("ul", {
 	class: Menu_module_default.root,
 	tabindex: -1,
@@ -697,7 +743,7 @@ var start = () => {
 	try {
 		worker = new Worker(new URL(
 			/* @vite-ignore */
-			new URL("deal.worker-DAO_qmi-.js", import.meta.url).href,
+			new URL("deal.worker-CuayEGjx.js", import.meta.url).href,
 			"" + import.meta.url
 		), { type: "module" });
 		worker.onmessage = ({ data }) => {
@@ -771,7 +817,7 @@ var loadChoice = () => {
 	};
 	return {
 		n,
-		level: allowed(n, level) ? level : 2
+		level: fallback(n, level)
 	};
 };
 var createGame = ({ n, level }) => ({
@@ -850,6 +896,19 @@ var changed = (game, board, history, actions, settled = false) => {
 		game: next
 	};
 };
+var upgradeLadder = () => {
+	if (load("takuzu.ladder") === "5") return;
+	eachSlot((n, level) => {
+		for (const key of [timeKey(n, level, false), timeKey(n, level, true)]) {
+			remove(key);
+			remove(`${key}.name`);
+		}
+	});
+	const level = parseInt(load("takuzu.level"), 10);
+	if (level >= 2) save("takuzu.level", level + 1);
+	save("takuzu.ladder", "5");
+};
+upgradeLadder();
 var state = {
 	...shellState(),
 	hint: null,
@@ -889,8 +948,7 @@ var actions = {
 	reset: (payload) => ({ game }, actions) => {
 		cancelAnimationFrame(game.raf);
 		const n = payload && payload.n || game.n;
-		const asked = payload && payload.level !== void 0 ? payload.level : game.level;
-		const level = allowed(n, asked) ? asked : 2;
+		const level = fallback(n, payload && payload.level !== void 0 ? payload.level : game.level);
 		save("takuzu.size", n);
 		save("takuzu.level", level);
 		const id = ++deals;

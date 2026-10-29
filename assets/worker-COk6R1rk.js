@@ -1344,9 +1344,9 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/takuzu/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-bpI06IUh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-BjPsN-o6.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-CH4n24IS.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/Menu.jsx": () => __vitePreload(() => import("./Menu-C4C3lgHN.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Prompt.jsx": () => __vitePreload(() => import("./Prompt-zY7l38Ey.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-n1Zz3jwX.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/app.jsx": () => __vitePreload(() => import("./app-BQTvLBbz.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.js": () => __vitePreload(() => import("./deal-BO0x2QS5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/deal.worker.js": () => __vitePreload(() => import("./deal.worker-CZDca1Jh.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/generate.js": () => __vitePreload(() => import("./generate-Bpc4lY75.js").then((m) => m["default"]), [], import.meta.url),
@@ -1355,7 +1355,7 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/takuzu/rain.js": () => __vitePreload(() => import("./rain-Dc-4LR4I.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/rules.js": () => __vitePreload(() => import("./rules-JSobALHn.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/solver.js": () => __vitePreload(() => import("./solver-XOjlfRlB.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-Dz_Wq6Gz.js").then((m) => m["default"]), [], import.meta.url)
+	"/src/takuzu/techniques.js": () => __vitePreload(() => import("./techniques-BWmIttHM.js").then((m) => m["default"]), [], import.meta.url)
 });
 var texts = null;
 var loadTexts = () => texts ??= Promise.all(Object.entries(sources).map(async ([path, load]) => ({

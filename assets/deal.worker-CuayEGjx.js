@@ -147,6 +147,13 @@
 	};
 	//#endregion
 	//#region src/takuzu/techniques.js
+	const levels = [
+		"easy",
+		"medium",
+		"tricky",
+		"hard",
+		"expert"
+	];
 	const capital = (text) => text[0].toUpperCase() + text.slice(1);
 	const words = [
 		"no",
@@ -211,6 +218,48 @@
 		});
 		return steps;
 	};
+	const oneLeft = (board, n) => {
+		const steps = [];
+		cellsOf(n).forEach((cells, line) => {
+			const empty = cells.filter((i) => board[i] === -1);
+			if (empty.length < 2) return;
+			for (const v of [0, 1]) {
+				if (n / 2 - cells.filter((i) => board[i] === v).length !== 1) continue;
+				const blocked = empty.filter((spot) => {
+					const trial = cells.map((i) => i === spot ? v : board[i] === -1 ? 1 - v : board[i]);
+					return trial.some((x, k) => k >= 2 && x === trial[k - 1] && x === trial[k - 2]);
+				});
+				if (!blocked.length) continue;
+				if (blocked.length === empty.length) {
+					steps.push({ contradiction: true });
+					return;
+				}
+				const place = blocked.map((i) => [i, 1 - v]);
+				steps.push(step("one-left", 2, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} needs just one more ${v}, and in ${place.length > 1 ? "any of these cells" : "this cell"} it would leave three alike in a row, so ${result(place)}.`));
+			}
+		});
+		return steps;
+	};
+	const twins = (board, n) => {
+		const steps = [];
+		const lines = cellsOf(n);
+		const all = (1 << n) - 1;
+		lines.forEach((cells, line) => {
+			const empty = cells.filter((i) => board[i] === -1);
+			if (empty.length !== 2) return;
+			const { known, value } = readLine(board, cells);
+			const twin = lines.findIndex((other, l) => {
+				if (l === line || l < n !== line < n) return false;
+				const done = readLine(board, other);
+				return done.known === all && (done.value & known) === value;
+			});
+			if (twin < 0) return;
+			const place = empty.map((i) => [i, 1 - board[lines[twin][cells.indexOf(i)]]]);
+			if (place[0][1] === place[1][1]) return;
+			steps.push(step("twins", 2, place, [...cells, ...lines[twin]].filter((i) => board[i] !== -1), `${capital(lineName(line, n))} matches ${lineName(twin, n)} except for these two cells, and no two ${line < n ? "rows" : "columns"} may match, so they go the other way round.`));
+		});
+		return steps;
+	};
 	const fitsOf = (board, cells, n, repeats) => {
 		const { known, value } = readLine(board, cells);
 		return linesOf(n).filter((mask) => (mask & known) === value && !repeats?.has(mask));
@@ -249,7 +298,7 @@
 			if (!place.length) return;
 			const zeros = n / 2 - cells.filter((i) => board[i] === 0).length;
 			const ones = n / 2 - cells.filter((i) => board[i] === 1).length;
-			steps.push(step("balance", 2, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} still needs ${many(zeros, 0)} and ${many(ones, 1)}. Every way to fit them in without three alike in a row agrees here, so ${result(place)}.`));
+			steps.push(step("balance", 3, place, cells.filter((i) => board[i] !== -1), `${capital(lineName(line, n))} still needs ${many(zeros, 0)} and ${many(ones, 1)}. Every way to fit them in without three alike in a row agrees here, so ${result(place)}.`));
 		});
 		return steps;
 	};
@@ -271,7 +320,7 @@
 			if (!place.length) return;
 			const twins = blocked.map((mask) => others.get(mask));
 			const lines = cellsOf(n);
-			steps.push(step("repeat", 2, place, [cells, ...twins.map((l) => lines[l])].flat().filter((i) => board[i] !== -1), `${capital(lineName(line, n))} could otherwise end up the same as ${twins.map((l) => lineName(l, n)).join(" or ")}, and no two ${line < n ? "rows" : "columns"} may match, so ${result(place)}.`));
+			steps.push(step("repeat", 3, place, [cells, ...twins.map((l) => lines[l])].flat().filter((i) => board[i] !== -1), `${capital(lineName(line, n))} could otherwise end up the same as ${twins.map((l) => lineName(l, n)).join(" or ")}, and no two ${line < n ? "rows" : "columns"} may match, so ${result(place)}.`));
 		});
 		return steps;
 	};
@@ -283,17 +332,18 @@
 			const trial = board.slice();
 			trial[i] = v;
 			if (propagate(trial, n, base)) continue;
-			return [step("what-if", 3, [[i, 1 - v]], [i], `If this cell were a ${v}, the simpler rules would soon break a rule somewhere, so it must be a ${1 - v}.`)];
+			return [step("what-if", 4, [[i, 1 - v]], [i], `If this cell were a ${v}, the simpler rules would soon break a rule somewhere, so it must be a ${1 - v}.`)];
 		}
 		return [];
 	};
 	const techniques = [
 		[pairs, gaps],
 		[counts],
+		[oneLeft, twins],
 		[balance, repeats],
 		[whatIf]
 	];
-	const nextSteps = (board, n, top = 3) => {
+	const nextSteps = (board, n, top = levels.length - 1) => {
 		for (let level = 0; level <= top; level++) for (const technique of techniques[level]) {
 			const steps = technique(board, n);
 			if (steps.some((s) => s.contradiction)) return {
@@ -314,7 +364,7 @@
 		}
 		return violations(board, n).size === 0;
 	};
-	const rate = (givens, n, top = 3) => {
+	const rate = (givens, n, top = levels.length - 1) => {
 		const board = givens.slice();
 		let hardest = 0;
 		while (!full(board)) {
