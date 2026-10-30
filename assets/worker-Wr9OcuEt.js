@@ -1331,14 +1331,14 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-BVg-RxAB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Input.jsx": () => __vitePreload(() => import("./Input-BH3afC1u.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Menu.jsx": () => __vitePreload(() => import("./Menu-C92zet3c.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-CBzd_TPF.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/Overlay.jsx": () => __vitePreload(() => import("./Overlay-7Yez4d9U.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Play.jsx": () => __vitePreload(() => import("./Play-DPV83WcB.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/Winner.jsx": () => __vitePreload(() => import("./Winner-BcLjHZfV.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/app.jsx": () => __vitePreload(() => import("./app-BsHUco__.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/hint.js": () => __vitePreload(() => import("./hint-BnxKYGV5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/index.js": () => __vitePreload(() => import("./src-2iRfJ9t-.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/mines.js": () => __vitePreload(() => import("./mines-Da7olYdB.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/nonograms/About.jsx": () => __vitePreload(() => import("./About-CCEvo0Uj.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/nonograms/About.jsx": () => __vitePreload(() => import("./About-Cb9v38u5.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/nonograms/Cell.jsx": () => __vitePreload(() => import("./Cell-W6mpp_Sk.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/nonograms/Game.jsx": () => __vitePreload(() => import("./Game-CokKtnOK.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/nonograms/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-CjdWyDpa.js").then((m) => m["default"]), [], import.meta.url),
@@ -1352,7 +1352,7 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/nonograms/rules.js": () => __vitePreload(() => import("./rules-E3n7F5ni.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/nonograms/solver.js": () => __vitePreload(() => import("./solver-C8_aghOu.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/nonograms/techniques.js": () => __vitePreload(() => import("./techniques-JJDDlZLS.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/shell/About.jsx": () => __vitePreload(() => import("./About-C3ovWGOG.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/shell/About.jsx": () => __vitePreload(() => import("./About-M2-GZ2xy.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/BackgroundSettings.jsx": () => __vitePreload(() => import("./BackgroundSettings-C7OYl7t1.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/BestTimes.jsx": () => __vitePreload(() => import("./BestTimes-3zHmOYNZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/Board.jsx": () => __vitePreload(() => import("./Board-DPSJdVmY.js").then((m) => m["default"]), [], import.meta.url),
@@ -1381,7 +1381,7 @@ var sources = /* #__PURE__ */ Object.assign({
 	"/src/shell/themes.js": () => __vitePreload(() => import("./themes-DFrkB3pZ.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/worker.js": () => __vitePreload(() => import("./worker-D6fmPkLz.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/shell/zoom.js": () => __vitePreload(() => import("./zoom-C_qZLAIo.js").then((m) => m["default"]), [], import.meta.url),
-	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-Di5OkK2F.js").then((m) => m["default"]), [], import.meta.url),
+	"/src/takuzu/About.jsx": () => __vitePreload(() => import("./About-ym12u20l.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Cell.jsx": () => __vitePreload(() => import("./Cell-B28BFMy2.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/Game.jsx": () => __vitePreload(() => import("./Game-CRnCvm0o.js").then((m) => m["default"]), [], import.meta.url),
 	"/src/takuzu/HowToPlay.jsx": () => __vitePreload(() => import("./HowToPlay-I87EOUmF.js").then((m) => m["default"]), [], import.meta.url),
@@ -2528,11 +2528,21 @@ var keyDown = (onKeyDown) => (event) => {
 	if (event.keyCode === 27 && onKeyDown) event.stopPropagation();
 	if (onKeyDown) onKeyDown(event);
 };
+var guardClicks = (el) => {
+	let pressed = false;
+	el.addEventListener("pointerdown", () => pressed = true, true);
+	el.addEventListener("click", (event) => {
+		if (pressed || !event.detail) return;
+		event.preventDefault();
+		event.stopPropagation();
+	}, true);
+};
 var Overlay = ({ key, onKeyDown }, children) => /* @__PURE__ */ h("section", {
 	key,
 	class: Overlay_module_default.root,
 	tabindex: -1,
-	onkeydown: keyDown(onKeyDown)
+	onkeydown: keyDown(onKeyDown),
+	oncreate: guardClicks
 }, /* @__PURE__ */ h("div", { class: Overlay_module_default.table }, /* @__PURE__ */ h("div", { class: Overlay_module_default.cell }, children)));
 var Input_module_default = {
 	root: "Input_root",
@@ -2685,7 +2695,7 @@ var About = ({ key, name, actions }, children) => /* @__PURE__ */ h(Overlay, {
 }, /* @__PURE__ */ h(Dialog, {
 	title: `About ${name}`,
 	onClose: actions.toggleAbout
-}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, name), children, /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzles" }, "github.com/fexofenadine/puzzles")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
+}, /* @__PURE__ */ h("div", { class: About_module_default.root }, /* @__PURE__ */ h("p", { class: About_module_default.name }, name), children, /* @__PURE__ */ h("p", null, "Uses canvas ports of xscreensaver's GLMatrix, Substrate, Truchet and Phosphor under the xscreensaver licence, fonts under the SIL Open Font License and LGPL 2.1, photos from Unsplash and CC0 photos from Wikimedia Commons, and the SynthWave '84, Solarized and Nord colour schemes. Released under the MIT licence; full credits are in the README."), /* @__PURE__ */ h("p", null, /* @__PURE__ */ h(Link, { href: "https://github.com/fexofenadine/puzzlesplus" }, "github.com/fexofenadine/puzzlesplus")), /* @__PURE__ */ h("div", { class: About_module_default.footer }, /* @__PURE__ */ h(Button, {
 	type: "button",
 	onClick: actions.toggleAbout,
 	onCreate: (el) => el.focus()

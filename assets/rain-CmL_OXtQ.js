@@ -1,4 +1,4 @@
-import { B as glyphImage, G as Dialog, H as remove, K as Button, R as BRIGHT, U as save, V as load, Y as h, _ as Overlay, m as BestTime_module_default, p as Tabs, z as GLYPH } from "./worker-CNrW4LdT.js";
+import { B as glyphImage, G as Dialog, H as remove, K as Button, R as BRIGHT, U as save, V as load, Y as h, _ as Overlay, m as BestTime_module_default, p as Tabs, z as GLYPH } from "./worker-Wr9OcuEt.js";
 //#region src/shell/records.js
 var records = (prefix, sizes, levelNames) => {
 	const timeKey = (n, level, hinted) => `${prefix}.${n}.${level}${hinted ? ".hints" : ""}`;
