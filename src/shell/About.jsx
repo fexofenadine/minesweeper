@@ -24,8 +24,8 @@ const About = ({ key, name, actions }, children) => (
           colour schemes. Released under the MIT licence; full credits are in the README.
         </p>
         <p>
-          <Link href="https://github.com/fexofenadine/puzzles">
-            github.com/fexofenadine/puzzles
+          <Link href="https://github.com/fexofenadine/puzzlesplus">
+            github.com/fexofenadine/puzzlesplus
           </Link>
         </p>
         <div class={s.footer}>

@@ -1,10 +1,10 @@
-# Puzzles
+# Puzzles Plus
 
 Windows style puzzle games with hints that explain their reasoning, boards you can solve by logic alone, zoom and animated themes ported from xscreensaver. All three games share the window, the six themes and their backgrounds, pause and the boss key, and your theme and zoom carry over between them. The Game menu switches between them, and Help → How to Play sums up each game's rules.
 
-| [Play Minesweeper Plus](https://fexofenadine.github.io/puzzles/minesweeper/)                                        | [Play Takuzu Plus](https://fexofenadine.github.io/puzzles/takuzu/)                              | [Play Nonograms Plus](https://fexofenadine.github.io/puzzles/nonograms/)                                    |
-| ------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
-| [![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzles/minesweeper/) | [![Play Takuzu Plus](public/takuzu/takuzu.jpg)](https://fexofenadine.github.io/puzzles/takuzu/) | [![Play Nonograms Plus](public/nonograms/nonograms.jpg)](https://fexofenadine.github.io/puzzles/nonograms/) |
+| [Play Minesweeper Plus](https://fexofenadine.github.io/puzzlesplus/minesweeper/)                                        | [Play Takuzu Plus](https://fexofenadine.github.io/puzzlesplus/takuzu/)                              | [Play Nonograms Plus](https://fexofenadine.github.io/puzzlesplus/nonograms/)                                    |
+| ----------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| [![Play Minesweeper Plus](public/minesweeper/minesweeper.jpg)](https://fexofenadine.github.io/puzzlesplus/minesweeper/) | [![Play Takuzu Plus](public/takuzu/takuzu.jpg)](https://fexofenadine.github.io/puzzlesplus/takuzu/) | [![Play Nonograms Plus](public/nonograms/nonograms.jpg)](https://fexofenadine.github.io/puzzlesplus/nonograms/) |
 
 ## Themes
 

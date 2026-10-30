@@ -13,9 +13,9 @@ const TakuzuAbout = ({ key, actions }) => (
       Coussement and Peter De Schepper.
     </p>
     <p>
-      Part of Puzzles by fexofenadine, sharing its window, themes and backgrounds with Minesweeper
-      Plus, which is based on <Link href="https://github.com/frenzzy/minesweeper">Minesweeper</Link>{' '}
-      by Vladimir Kutepov.
+      Part of Puzzles Plus by fexofenadine, sharing its window, themes and backgrounds with
+      Minesweeper Plus, which is based on{' '}
+      <Link href="https://github.com/frenzzy/minesweeper">Minesweeper</Link> by Vladimir Kutepov.
     </p>
   </About>
 )
